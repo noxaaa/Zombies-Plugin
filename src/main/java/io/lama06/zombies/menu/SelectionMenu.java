@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -244,11 +245,19 @@ public final class SelectionMenu implements Listener {
                 player.closeInventory();
                 if (event.getClick().isLeftClick()) {
                     entries[entryIndex].callback().run();
-                } else if (event.getClick().isRightClick()) {
+                } else if (event.getClick().isRightClick() && entries[entryIndex].secondAction() != null) {
                     entries[entryIndex].secondAction().run();
                 }
             });
         }
+    }
+
+    @EventHandler
+    private void onInventoryDrag(final InventoryDragEvent event) {
+        if (!event.getWhoClicked().equals(player)) {
+            return;
+        }
+        event.setCancelled(true);
     }
 
     @EventHandler
