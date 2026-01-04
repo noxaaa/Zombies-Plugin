@@ -25,6 +25,7 @@ public final class WorldConfig implements CheckableConfig {
     public BlockPosition teamMachine;
     public boolean autoStartStop;
     public boolean preventBuilding;
+    public double spawnRange = 0; // 0 = unlimited
 
     @Override
     public void check() throws InvalidConfigException {

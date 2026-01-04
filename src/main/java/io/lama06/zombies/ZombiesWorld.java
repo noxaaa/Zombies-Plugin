@@ -123,22 +123,45 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
             return null;
         }
         final ZombiesPlayer player = players.get(rnd.nextInt(players.size()));
-        final Window window = getNearestWindowToPlayer(player);
+        final Window window = getWindowForSpawn(player);
         if (window == null) {
             return null;
         }
         return window.spawnLocation.toBukkit(getBukkit());
     }
 
-    private Window getNearestWindowToPlayer(final ZombiesPlayer player) {
-        return getAvailableWindows().stream().min(Comparator.comparingDouble(window -> {
-            final Vector windowVector = window.spawnLocation.toBukkit(player.getBukkit().getWorld()).toVector();
-            final Vector playerVector = player.getBukkit().getLocation().toVector();
-            final double xDiff = windowVector.getX() - playerVector.getX();
-            final double zDiff = windowVector.getZ() - playerVector.getZ();
-            final double yDiff = (windowVector.getY() - playerVector.getY()) * 6; // avoid spawning zombies on different floor
-            return Math.sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
-        })).orElse(null);
+    private Window getWindowForSpawn(final ZombiesPlayer player) {
+        final List<Window> available = getAvailableWindows();
+        if (available.isEmpty()) {
+            return null;
+        }
+        final WorldConfig config = getConfig();
+        final double spawnRange = config != null ? config.spawnRange : 0;
+        final RandomGenerator rnd = ThreadLocalRandom.current();
+
+        if (spawnRange <= 0) {
+            // Unlimited - random from all available windows
+            return available.get(rnd.nextInt(available.size()));
+        }
+
+        // Filter windows within range
+        final Vector playerVector = player.getBukkit().getLocation().toVector();
+        final List<Window> candidates = available.stream()
+            .filter(window -> {
+                final Vector windowVector = window.spawnLocation.toBukkit(player.getBukkit().getWorld()).toVector();
+                final double xDiff = windowVector.getX() - playerVector.getX();
+                final double zDiff = windowVector.getZ() - playerVector.getZ();
+                final double yDiff = (windowVector.getY() - playerVector.getY()) * 6;
+                final double distance = Math.sqrt(xDiff*xDiff + yDiff*yDiff + zDiff*zDiff);
+                return distance <= spawnRange;
+            })
+            .toList();
+
+        if (candidates.isEmpty()) {
+            // No windows in range, use all available
+            return available.get(rnd.nextInt(available.size()));
+        }
+        return candidates.get(rnd.nextInt(candidates.size()));
     }
 
     @Override
