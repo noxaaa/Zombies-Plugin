@@ -51,6 +51,10 @@ public final class TeamMachineSystem implements Listener {
         if (!clickedBlock.getLocation().toBlock().equals(config.teamMachine)) {
             return;
         }
+        if (!world.get(ZombiesWorld.POWER_SWITCH)) {
+            player.sendMessage(Component.text("The power switch isn't enabled"));
+            return;
+        }
         SelectionMenu.open(
                 player.getBukkit(),
                 Component.text("Team Machine").color(NamedTextColor.LIGHT_PURPLE).decorate(TextDecoration.BOLD),
