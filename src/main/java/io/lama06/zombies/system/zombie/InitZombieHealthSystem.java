@@ -19,7 +19,7 @@ public final class InitZombieHealthSystem implements Listener {
         if (!(entity instanceof final LivingEntity living)) {
             return;
         }
-        final AttributeInstance maxHealth = living.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        final AttributeInstance maxHealth = living.getAttribute(Attribute.MAX_HEALTH);
         if (maxHealth == null) {
             return;
         }

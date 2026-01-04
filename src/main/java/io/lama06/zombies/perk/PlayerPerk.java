@@ -31,14 +31,14 @@ public enum PlayerPerk implements MenuDisplayableEnum {
     EXTRA_HEALTH(Material.GOLDEN_APPLE, Component.text("Extra Health").color(NamedTextColor.RED)) {
         @Override
         public void enable(final ZombiesPlayer player) {
-            final AttributeInstance maxHealth = player.getBukkit().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+            final AttributeInstance maxHealth = player.getBukkit().getAttribute(Attribute.MAX_HEALTH);
             maxHealth.setBaseValue(30);
             player.getBukkit().setHealth(30);
         }
 
         @Override
         public void disable(final ZombiesPlayer player) {
-            final AttributeInstance maxHealth = player.getBukkit().getAttribute(Attribute.GENERIC_MAX_HEALTH);
+            final AttributeInstance maxHealth = player.getBukkit().getAttribute(Attribute.MAX_HEALTH);
             maxHealth.setBaseValue(20);
         }
     },
