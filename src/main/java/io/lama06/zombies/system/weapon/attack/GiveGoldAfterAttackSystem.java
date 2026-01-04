@@ -11,12 +11,20 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public final class GiveGoldAfterAttackSystem implements Listener {
     @EventHandler
     private void onPlayerAttacksZombie(final PlayerAttackZombieEvent event) {
+        // 检查僵尸是否存活
+        final Entity entity = event.getZombie().getEntity();
+        if (entity instanceof LivingEntity living && living.isDead()) {
+            return;  // 僵尸已死亡，不给予金币
+        }
+
         final Weapon weapon = event.getWeapon();
         final AttackData attackData = weapon.getData().attack;
         if (attackData == null) {
