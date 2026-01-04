@@ -1,5 +1,6 @@
 {
   "startArea": "Alley",
+  "spawnRange": 0,
   "doors": [
     {
       "area1": "Alley",
