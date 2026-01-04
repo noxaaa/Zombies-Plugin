@@ -14,7 +14,11 @@ public final class ApplyAttackDamageSystem implements Listener {
         if (attackData == null) {
             return;
         }
-        event.setBaseDamage(attackData.damage());
+        double damage = attackData.damage();
+        if (event.isHeadshot()) {
+            damage += attackData.headshotBonusDamage();
+        }
+        event.setBaseDamage(damage);
         if (attackData.fire()) {
             event.setFire(true);
         }

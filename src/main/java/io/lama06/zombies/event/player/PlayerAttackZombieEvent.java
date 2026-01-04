@@ -19,6 +19,7 @@ public final class PlayerAttackZombieEvent extends PlayerEvent {
     private boolean fire;
     private boolean kill;
     private boolean freeze;
+    private boolean headshot;
     private double baseDamage;
     private double damageModifier = 1;
 
@@ -70,6 +71,14 @@ public final class PlayerAttackZombieEvent extends PlayerEvent {
 
     public void setFreeze(final boolean freeze) {
         this.freeze = freeze;
+    }
+
+    public boolean isHeadshot() {
+        return headshot;
+    }
+
+    public void setHeadshot(final boolean headshot) {
+        this.headshot = headshot;
     }
 
     @Override

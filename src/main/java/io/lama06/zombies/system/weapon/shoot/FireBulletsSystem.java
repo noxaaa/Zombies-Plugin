@@ -22,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -186,7 +187,15 @@ public final class FireBulletsSystem implements Listener {
             hitEntities.add(entity);
             final Zombie zombie = new Zombie(entity);
             if (zombie.isZombie()) {
-                Bukkit.getPluginManager().callEvent(new PlayerAttackZombieEvent(weapon, zombie));
+                // 判断是否爆头
+                final Vector hitPos = ray.getHitPosition();
+                final BoundingBox box = entity.getBoundingBox();
+                final double headThreshold = box.getMinY() + (box.getHeight() * 0.75);
+                final boolean isHeadshot = hitPos.getY() >= headThreshold;
+
+                final PlayerAttackZombieEvent event = new PlayerAttackZombieEvent(weapon, zombie);
+                event.setHeadshot(isHeadshot);
+                Bukkit.getPluginManager().callEvent(event);
             }
             final double hitDistance = ray.getHitPosition().distance(rayStart.toVector());
             remainingDistance -= hitDistance;
