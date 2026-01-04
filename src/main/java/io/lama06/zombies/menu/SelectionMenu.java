@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -25,7 +26,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
-public final class SelectionMenu implements Listener {
+public final class SelectionMenu implements Listener, InventoryHolder {
     public static void open(
             final Player player,
             final Component title,
@@ -71,6 +72,11 @@ public final class SelectionMenu implements Listener {
     private final SelectionEntry[] entries;
     private final Inventory[] pages;
     private int currentPage;
+
+    @Override
+    public Inventory getInventory() {
+        return pages[currentPage];
+    }
 
     private SelectionMenu(
             final Player player,
@@ -177,7 +183,7 @@ public final class SelectionMenu implements Listener {
         final boolean singlePage = numberOfPages == 1;
         final Component pageTitle = singlePage
                 ? title : title.append(Component.text(" (Page %d of %d)".formatted(pageIndex + 1, numberOfPages)));
-        final Inventory inventory = Bukkit.createInventory(null, TOTAL_ITEMS, pageTitle);
+        final Inventory inventory = Bukkit.createInventory(this, TOTAL_ITEMS, pageTitle);
         setupMargin(inventory);
         setupNavigation(inventory, pageIndex);
         fillContent(inventory, pageIndex);
@@ -213,14 +219,14 @@ public final class SelectionMenu implements Listener {
 
     @EventHandler
     private void onInventoryClick(final InventoryClickEvent event) {
-        if (!event.getWhoClicked().equals(player)) {
+        if (event.getInventory().getHolder() != this) {
             return;
         }
         event.setCancelled(true);
         if (!event.getClick().isMouseClick()) {
             return;
         }
-        if (event.getClickedInventory() == null || !event.getClickedInventory().equals(pages[currentPage])) {
+        if (event.getClickedInventory() == null || event.getClickedInventory().getHolder() != this) {
             return;
         }
         final ItemStack clickedItem = event.getCurrentItem();
@@ -254,7 +260,7 @@ public final class SelectionMenu implements Listener {
 
     @EventHandler
     private void onInventoryDrag(final InventoryDragEvent event) {
-        if (!event.getWhoClicked().equals(player)) {
+        if (event.getInventory().getHolder() != this) {
             return;
         }
         event.setCancelled(true);
@@ -262,7 +268,7 @@ public final class SelectionMenu implements Listener {
 
     @EventHandler
     private void onInventoryClose(final InventoryCloseEvent event) {
-        if (!event.getPlayer().equals(player)) {
+        if (event.getInventory().getHolder() != this) {
             return;
         }
         final PersistentDataContainer pdc = player.getPersistentDataContainer();
