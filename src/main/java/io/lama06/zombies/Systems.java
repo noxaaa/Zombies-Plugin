@@ -50,6 +50,7 @@ public final class Systems {
             new StartGameTimerSystem(),
             new StartNextRoundSystem(),
             new TeamMachineSystem(),
+            new UltimateMachineSystem(),
 
             // Lucky Chest
             new InteractWithLuckyChestSystem(),

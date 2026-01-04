@@ -14,6 +14,7 @@ public final class WeaponData {
     public MeleeData melee;
     public AttackData attack;
     public boolean inLuckyChest;
+    public WeaponType upgradesTo;  // 升级后的武器类型，null 表示不可升级/已满级
 
     public WeaponData setDisplayName(final Component displayName) {
         this.displayName = displayName;
@@ -62,6 +63,11 @@ public final class WeaponData {
 
     public WeaponData includeInLuckyChest() {
         inLuckyChest = true;
+        return this;
+    }
+
+    public WeaponData setUpgradesTo(final WeaponType upgradesTo) {
+        this.upgradesTo = upgradesTo;
         return this;
     }
 }

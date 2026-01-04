@@ -23,6 +23,8 @@ public final class WorldConfig implements CheckableConfig {
     public final List<PerkMachine> perkMachines = new ArrayList<>();
     public PowerSwitch powerSwitch;
     public BlockPosition teamMachine;
+    public BlockPosition ultimateMachine;
+    public int ultimateMachinePrice = 5000;
     public boolean autoStartStop;
     public boolean preventBuilding;
     public double spawnRange = 0; // 0 = unlimited
@@ -176,6 +178,39 @@ public final class WorldConfig implements CheckableConfig {
                             teamMachine = null;
                             reopen.run();
                         }
+                ),
+                new SelectionEntry(
+                        Component.text("Ultimate Machine: " + PositionUtil.format(ultimateMachine)),
+                        Material.DIAMOND_BLOCK,
+                        () -> BlockPositionSelection.open(
+                                player,
+                                Component.text("Ultimate Machine Position"),
+                                reopen,
+                                ultimateMachine -> {
+                                    this.ultimateMachine = ultimateMachine;
+                                    reopen.run();
+                                }
+                        ),
+                        Component.text("Remove").color(NamedTextColor.RED),
+                        () -> {
+                            ultimateMachine = null;
+                            reopen.run();
+                        }
+                ),
+                new SelectionEntry(
+                        Component.text("Ultimate Machine Price: " + ultimateMachinePrice).color(NamedTextColor.GOLD),
+                        Material.GOLD_NUGGET,
+                        () -> InputMenu.open(
+                                player,
+                                Component.text("Ultimate Machine Price").color(NamedTextColor.GOLD),
+                                ultimateMachinePrice,
+                                new IntegerInputType(),
+                                price -> {
+                                    this.ultimateMachinePrice = price;
+                                    reopen.run();
+                                },
+                                reopen
+                        )
                 ),
                 new SelectionEntry(
                         Component.text("Auto Start / Stop: " + autoStartStop),
