@@ -52,7 +52,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Sniper"))
                     .setMaterial(Material.WOODEN_SHOVEL)
-                    .setShoot(new ShootData(2, 1))
+                    .setShoot(new ShootData(2, 1, 2))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
                     .setAttack(new AttackData(20, false, 30))
                     .setAmmo(new AmmoData(40, 4))

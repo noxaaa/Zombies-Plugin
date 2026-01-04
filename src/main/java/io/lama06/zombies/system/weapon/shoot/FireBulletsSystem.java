@@ -8,6 +8,7 @@ import io.lama06.zombies.weapon.ShootData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,7 +18,9 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
@@ -62,20 +65,38 @@ public final class FireBulletsSystem implements Listener {
     }
 
     private void detectShotAtZombie(final ZombiesPlayer player, final Weapon weapon, final WeaponShootEvent.Bullet bullet) {
-        final RayTraceResult ray = player.getWorld().getBukkit().rayTraceEntities(
-                player.getBukkit().getEyeLocation(),
-                bullet.direction(),
-                50,
-                entity -> !entity.equals(player.getBukkit())
-        );
-        if (ray == null) {
-            return;
+        final ShootData shootData = weapon.getData().shoot;
+        final int maxTargets = shootData.piercing();
+        final Set<Entity> hitEntities = new HashSet<>();
+        hitEntities.add(player.getBukkit());
+
+        Location rayStart = player.getBukkit().getEyeLocation();
+        final double maxDistance = 50;
+        double remainingDistance = maxDistance;
+
+        for (int i = 0; i < maxTargets && remainingDistance > 0; i++) {
+            final double searchDistance = remainingDistance;
+            final RayTraceResult ray = player.getWorld().getBukkit().rayTraceEntities(
+                    rayStart,
+                    bullet.direction(),
+                    searchDistance,
+                    entity -> !hitEntities.contains(entity)
+            );
+            if (ray == null) {
+                break;
+            }
+            final Entity entity = ray.getHitEntity();
+            if (entity == null) {
+                break;
+            }
+            hitEntities.add(entity);
+            final Zombie zombie = new Zombie(entity);
+            if (zombie.isZombie()) {
+                Bukkit.getPluginManager().callEvent(new PlayerAttackZombieEvent(weapon, zombie));
+            }
+            final double hitDistance = ray.getHitPosition().distance(rayStart.toVector());
+            remainingDistance -= hitDistance;
+            rayStart = ray.getHitPosition().toLocation(player.getWorld().getBukkit());
         }
-        final Entity entity = ray.getHitEntity();
-        final Zombie zombie = new Zombie(entity);
-        if (!zombie.isZombie()) {
-            return;
-        }
-        Bukkit.getPluginManager().callEvent(new PlayerAttackZombieEvent(weapon, zombie));
     }
 }
