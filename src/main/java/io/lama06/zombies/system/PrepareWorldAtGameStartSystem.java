@@ -3,16 +3,22 @@ package io.lama06.zombies.system;
 import io.lama06.zombies.*;
 import io.lama06.zombies.data.Component;
 import io.lama06.zombies.event.GameStartEvent;
+import io.lama06.zombies.event.StartRoundEvent;
 import io.lama06.zombies.perk.GlobalPerk;
 import io.lama06.zombies.weapon.WeaponType;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.GameRule;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.List;
 
 public final class PrepareWorldAtGameStartSystem implements Listener {
@@ -67,5 +73,18 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             player.giveWeapon(0, WeaponType.KNIFE);
             player.giveWeapon(1, WeaponType.PISTOL);
         }
+
+        // 显示回合1的 Title 和音效
+        final Title title = Title.title(
+                net.kyori.adventure.text.Component.text("Round").color(NamedTextColor.RED),
+                net.kyori.adventure.text.Component.text("1").color(NamedTextColor.RED),
+                Title.Times.times(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
+        );
+        for (final ZombiesPlayer player : world.getPlayers()) {
+            player.getBukkit().showTitle(title);
+            player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
+        }
+
+        Bukkit.getPluginManager().callEvent(new StartRoundEvent(world, 1));
     }
 }
