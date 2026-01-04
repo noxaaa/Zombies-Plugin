@@ -1,8 +1,6 @@
 package io.lama06.zombies.system.player;
 
-import io.lama06.zombies.ZombiesPlayer;
-import io.lama06.zombies.ZombiesPlugin;
-import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.*;
 import io.lama06.zombies.event.GameEndEvent;
 import io.lama06.zombies.event.GameStartEvent;
 import io.lama06.zombies.event.StartRoundEvent;
@@ -29,16 +27,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class RenderScoreboardSystem implements Listener {
+    private static int getPendingZombies(final ZombiesWorld world) {
+        final WorldConfig config = world.getConfig();
+        if (config == null || config.rounds.isEmpty()) {
+            return 0;
+        }
+        final Integer round = world.get(ZombiesWorld.ROUND);
+        final Integer triggeredWaves = world.get(ZombiesWorld.TRIGGERED_WAVES);
+        if (round == null || triggeredWaves == null || round < 1 || round > config.rounds.size()) {
+            return 0;
+        }
+        final RoundConfig roundConfig = config.rounds.get(round - 1);
+        int pending = 0;
+        for (int i = triggeredWaves; i < roundConfig.waves.size(); i++) {
+            pending += roundConfig.waves.get(i).getTotalZombies();
+        }
+        return pending;
+    }
+
     private static List<Component> getSidebarContent(final ZombiesPlayer player) {
         final List<Component> content = new ArrayList<>();
         final ZombiesWorld world = player.getWorld();
 
-        final int round = world.get(ZombiesWorld.ROUND);
-        content.add(Component.text("Round " + round).color(NamedTextColor.RED));
+        final Integer round = world.get(ZombiesWorld.ROUND);
+        content.add(Component.text("Round " + (round != null ? round : 0)).color(NamedTextColor.RED));
 
         final int aliveZombies = world.getZombies().size();
-        final int remainingZombies = world.get(ZombiesWorld.REMAINING_ZOMBIES);
-        final int zombiesLeft = aliveZombies + remainingZombies;
+        final int pendingZombies = getPendingZombies(world);
+        final int zombiesLeft = aliveZombies + pendingZombies;
         content.add(Component.text("Zombies Left: ").append(Component.text(zombiesLeft).color(NamedTextColor.GREEN)));
 
         content.add(Component.empty());

@@ -20,7 +20,6 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
     private void onGameStart(final GameStartEvent event) {
         final ZombiesWorld world = event.getWorld();
         final WorldConfig config = world.getConfig();
-        final SpawnRate firstRoundSpawnRate = SpawnRate.SPAWN_RATES.get(0);
         final Integer lastGameId = world.get(ZombiesWorld.GAME_ID);
         final int gameId = lastGameId == null ? 1 : lastGameId + 1;
 
@@ -33,9 +32,8 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
         world.set(ZombiesWorld.OPEN_DOORS, List.of());
         world.set(ZombiesWorld.REACHABLE_AREAS, List.of(config.startArea));
         world.set(ZombiesWorld.POWER_SWITCH, false);
-        world.set(ZombiesWorld.NEXT_ZOMBIE_TIME, firstRoundSpawnRate.spawnDelay());
-        world.set(ZombiesWorld.REMAINING_ZOMBIES, firstRoundSpawnRate.getNumberOfZombies());
-        world.set(ZombiesWorld.BOSS_SPAWNED, false);
+        world.set(ZombiesWorld.ROUND_START_TIME, world.getBukkit().getGameTime());
+        world.set(ZombiesWorld.TRIGGERED_WAVES, 0);
         world.set(ZombiesWorld.DRAGONS_WRATH_USED, 0);
 
         final Component perksComponent = world.addComponent(ZombiesWorld.PERKS_COMPONENT);

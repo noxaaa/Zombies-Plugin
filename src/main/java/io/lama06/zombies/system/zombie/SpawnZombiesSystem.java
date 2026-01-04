@@ -7,50 +7,67 @@ import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.random.RandomGenerator;
+import java.util.Map;
 
 public final class SpawnZombiesSystem implements Listener {
     @EventHandler
     private void onServerTick(final ServerTickEndEvent event) {
         for (final ZombiesWorld world : ZombiesPlugin.INSTANCE.getGameWorlds()) {
-            final int round = world.get(ZombiesWorld.ROUND);
-            final int nextZombieTime = world.get(ZombiesWorld.NEXT_ZOMBIE_TIME);
-            if (nextZombieTime > 0) {
-                world.set(ZombiesWorld.NEXT_ZOMBIE_TIME, nextZombieTime - 1);
-                continue;
-            }
-            final SpawnRate spawnRate = SpawnRate.SPAWN_RATES.get(round - 1);
-            final Location spawnPoint = world.getNextZombieSpawnPoint();
-            if (spawnPoint == null) {
-                continue;
-            }
-            final ZombieType type = getNextZombie(world);
-            if (type == null) {
-                continue;
-            }
-            world.spawnZombie(spawnPoint, type);
-            world.set(ZombiesWorld.NEXT_ZOMBIE_TIME, spawnRate.spawnDelay());
+            spawnWaves(world);
         }
     }
 
-    private ZombieType getNextZombie(final ZombiesWorld world) {
-        final int remainingZombies = world.get(ZombiesWorld.REMAINING_ZOMBIES);
-        final int round = world.get(ZombiesWorld.ROUND);
-        if (remainingZombies == 0) {
-            return null;
+    private void spawnWaves(final ZombiesWorld world) {
+        final WorldConfig config = world.getConfig();
+        if (config == null || config.rounds.isEmpty()) {
+            return;
         }
-        final List<ZombieType> types = new ArrayList<>();
-        SpawnRate.SPAWN_RATES.get(round - 1).zombies().forEach((type, count) -> {
-            for (int i = 0; i < count; i++) {
-                types.add(type);
+
+        final Integer round = world.get(ZombiesWorld.ROUND);
+        final Long roundStartTime = world.get(ZombiesWorld.ROUND_START_TIME);
+        final Integer triggeredWaves = world.get(ZombiesWorld.TRIGGERED_WAVES);
+
+        if (round == null || roundStartTime == null || triggeredWaves == null) {
+            return;
+        }
+
+        if (round < 1 || round > config.rounds.size()) {
+            return;
+        }
+
+        final RoundConfig roundConfig = config.rounds.get(round - 1);
+        final List<Wave> waves = roundConfig.waves;
+
+        if (triggeredWaves >= waves.size()) {
+            return;
+        }
+
+        final long currentTime = world.getBukkit().getGameTime();
+        final long elapsedTicks = currentTime - roundStartTime;
+
+        for (int i = triggeredWaves; i < waves.size(); i++) {
+            final Wave wave = waves.get(i);
+            if (elapsedTicks >= wave.delayTicks) {
+                spawnWave(world, wave);
+                world.set(ZombiesWorld.TRIGGERED_WAVES, i + 1);
+            } else {
+                break;
             }
-        });
-        final RandomGenerator rnd = ThreadLocalRandom.current();
-        final ZombieType nextZombieType = types.get(rnd.nextInt(types.size()));
-        world.set(ZombiesWorld.REMAINING_ZOMBIES, remainingZombies - 1);
-        return nextZombieType;
+        }
+    }
+
+    private void spawnWave(final ZombiesWorld world, final Wave wave) {
+        for (final Map.Entry<ZombieType, Integer> entry : wave.zombies.entrySet()) {
+            final ZombieType type = entry.getKey();
+            final int count = entry.getValue();
+            for (int i = 0; i < count; i++) {
+                final Location spawnPoint = world.getNextZombieSpawnPoint();
+                if (spawnPoint == null) {
+                    continue;
+                }
+                world.spawnZombie(spawnPoint, type);
+            }
+        }
     }
 }

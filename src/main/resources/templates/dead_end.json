@@ -1462,5 +1462,70 @@
     "z": 51
   },
   "autoStartStop": false,
-  "preventBuilding": false
+  "preventBuilding": false,
+  "rounds": [
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_EASY": 5 } },
+        { "delayTicks": 400, "zombies": { "NORMAL_EASY": 5 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_EASY": 4, "NORMAL_MEDIUM": 3 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_EASY": 3, "NORMAL_MEDIUM": 2 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_EASY": 3, "NORMAL_MEDIUM": 4 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_MEDIUM": 3, "NORMAL_HARD": 2 } },
+        { "delayTicks": 600, "zombies": { "NORMAL_HARD": 2 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_MEDIUM": 5, "NORMAL_HARD": 3 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_MEDIUM": 4, "NORMAL_HARD": 4 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_MEDIUM": 5, "LITTLE_BOMBIE": 4 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_MEDIUM": 5, "LITTLE_BOMBIE": 4 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "ZOMBIE_WOLF": 4, "NORMAL_HARD": 4 } },
+        { "delayTicks": 300, "zombies": { "ZOMBIE_WOLF": 4, "NORMAL_HARD": 4, "PIG_ZOMBIE": 2 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_HARD": 4, "PIG_ZOMBIE": 4 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_HARD": 3, "PIG_ZOMBIE": 4, "GUARDIAN_ZOMBIE": 2 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_HARD": 4, "ZOMBIE_WOLF": 4 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_HARD": 3, "ZOMBIE_WOLF": 4, "NORMAL_MEDIUM": 3 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_HARD": 4, "ZOMBIE_WOLF": 6 } },
+        { "delayTicks": 300, "zombies": { "NORMAL_HARD": 3, "ZOMBIE_WOLF": 7 } }
+      ]
+    },
+    {
+      "waves": [
+        { "delayTicks": 0, "zombies": { "NORMAL_HARD": 5, "ZOMBIE_WOLF": 3 } },
+        { "delayTicks": 300, "zombies": { "PIG_ZOMBIE": 3, "LITTLE_BOMBIE": 2 } },
+        { "delayTicks": 600, "zombies": { "NORMAL_HARD": 5, "ZOMBIE_WOLF": 2, "PIG_ZOMBIE": 3, "LITTLE_BOMBIE": 2 } },
+        { "delayTicks": 900, "zombies": { "BOMBIE": 1 } }
+      ]
+    }
+  ]
 }

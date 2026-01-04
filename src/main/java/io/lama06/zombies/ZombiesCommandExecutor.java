@@ -462,15 +462,23 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             sender.sendMessage(Component.text("游戏未运行").color(NamedTextColor.RED));
             return;
         }
+        final WorldConfig config = world.getConfig();
+        if (config == null || config.rounds.isEmpty()) {
+            sender.sendMessage(Component.text("配置无效").color(NamedTextColor.RED));
+            return;
+        }
+        final Integer currentRound = world.get(ZombiesWorld.ROUND);
+        if (currentRound == null) {
+            return;
+        }
         // 杀死所有僵尸
         final List<Zombie> zombies = world.getZombies();
         for (final Zombie zombie : zombies) {
             zombie.getEntity().remove();
         }
-        // 清空剩余僵尸
-        world.set(ZombiesWorld.REMAINING_ZOMBIES, 0);
-        // 设置 Boss 已生成（跳过 Boss 检查）
-        world.set(ZombiesWorld.BOSS_SPAWNED, true);
+        // 标记当前回合所有波次已触发
+        final RoundConfig roundConfig = config.rounds.get(currentRound - 1);
+        world.set(ZombiesWorld.TRIGGERED_WAVES, roundConfig.waves.size());
         sender.sendMessage(Component.text("已跳过当前回合").color(NamedTextColor.GREEN));
     }
 }

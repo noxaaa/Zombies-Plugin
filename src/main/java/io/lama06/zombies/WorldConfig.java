@@ -26,6 +26,7 @@ public final class WorldConfig implements CheckableConfig {
     public boolean autoStartStop;
     public boolean preventBuilding;
     public double spawnRange = 0; // 0 = unlimited
+    public final List<RoundConfig> rounds = new ArrayList<>();
 
     @Override
     public void check() throws InvalidConfigException {
