@@ -7,6 +7,7 @@ import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.perk.PerkMachine;
 import io.lama06.zombies.util.PositionUtil;
 import io.lama06.zombies.weapon.WeaponType;
+import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieType;
 import io.papermc.paper.math.BlockPosition;
 import net.kyori.adventure.text.Component;
@@ -66,6 +67,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             case "cancel" -> cancel(sender);
             case "placeSigns" -> placeSigns(sender, remainingArgs);
             case "dumpWorldConfig" -> dumpWorldConfig(sender);
+            case "nextround" -> nextRound(sender);
             default -> sender.sendMessage(Component.text("unknown command").color(NamedTextColor.RED));
         }
 
@@ -91,7 +93,8 @@ public final class ZombiesCommandExecutor implements TabExecutor {
                 "stop",
                 "giveGold",
                 "giveWeapon",
-                "spawnZombie"
+                "spawnZombie",
+                "nextround"
         );
     }
 
@@ -448,5 +451,26 @@ public final class ZombiesCommandExecutor implements TabExecutor {
         final Gson gson = ConfigManager.createGson();
         final String json = gson.toJson(config);
         sender.sendMessage(Component.text("> Copy <").clickEvent(ClickEvent.copyToClipboard(json)).color(NamedTextColor.GREEN));
+    }
+
+    private void nextRound(final CommandSender sender) {
+        if (!(sender instanceof final Player player)) {
+            return;
+        }
+        final ZombiesWorld world = new ZombiesWorld(player.getWorld());
+        if (!world.isGameRunning()) {
+            sender.sendMessage(Component.text("游戏未运行").color(NamedTextColor.RED));
+            return;
+        }
+        // 杀死所有僵尸
+        final List<Zombie> zombies = world.getZombies();
+        for (final Zombie zombie : zombies) {
+            zombie.getEntity().remove();
+        }
+        // 清空剩余僵尸
+        world.set(ZombiesWorld.REMAINING_ZOMBIES, 0);
+        // 设置 Boss 已生成（跳过 Boss 检查）
+        world.set(ZombiesWorld.BOSS_SPAWNED, true);
+        sender.sendMessage(Component.text("已跳过当前回合").color(NamedTextColor.GREEN));
     }
 }
