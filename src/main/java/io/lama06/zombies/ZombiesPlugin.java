@@ -60,7 +60,11 @@ public final class ZombiesPlugin extends JavaPlugin implements Listener {
     }
 
     public ZombiesConfig getGlobalConfig() {
-        return configManager.getConfig();
+        final ZombiesConfig config = configManager.getConfig();
+        if (config == null) {
+            return new ZombiesConfig();
+        }
+        return config;
     }
 
     public ConfigManager getConfigManager() {
