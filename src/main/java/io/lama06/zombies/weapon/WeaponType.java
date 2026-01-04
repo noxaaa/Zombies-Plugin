@@ -42,7 +42,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Shotgun"))
                     .setMaterial(Material.IRON_HOE)
                     .setShoot(new ShootData(10, 0.85))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
                     .setAttack(new AttackData(1.5, false, 8))
                     .setAmmo(new AmmoData(65, 5))
                     .setDelay(new DelayData((int) (1.4 * 20)))
