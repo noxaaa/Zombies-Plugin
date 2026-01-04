@@ -26,10 +26,16 @@ public final class StartNextRoundSystem implements Listener {
             if (!zombies.isEmpty()) {
                 continue;
             }
-            final int currentRound = world.get(ZombiesWorld.ROUND);
+            final Integer currentRoundObj = world.get(ZombiesWorld.ROUND);
+            if (currentRoundObj == null || currentRoundObj < 1 || currentRoundObj > SpawnRate.SPAWN_RATES.size()) {
+                continue;
+            }
+            final int currentRound = currentRoundObj;
             final SpawnRate currentSpawnRate = SpawnRate.SPAWN_RATES.get(currentRound - 1);
-            final int remainingZombies = world.get(ZombiesWorld.REMAINING_ZOMBIES);
-            final boolean bossSpawned = world.get(ZombiesWorld.BOSS_SPAWNED);
+            final Integer remainingZombiesObj = world.get(ZombiesWorld.REMAINING_ZOMBIES);
+            final int remainingZombies = remainingZombiesObj != null ? remainingZombiesObj : 0;
+            final Boolean bossSpawnedObj = world.get(ZombiesWorld.BOSS_SPAWNED);
+            final boolean bossSpawned = bossSpawnedObj != null && bossSpawnedObj;
             if (remainingZombies > 0 || (currentSpawnRate.boss() != null && !bossSpawned)) {
                 continue;
             }
