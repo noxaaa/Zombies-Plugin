@@ -35,6 +35,7 @@ public final class FireBulletsSystem implements Listener {
 
     private record HoldingState(int weaponSlot, int lastActivityTick) { }
     private final Map<UUID, HoldingState> holdingFire = new HashMap<>();
+    private final Set<UUID> burstInProgress = new HashSet<>();  // 正在连发中的玩家
     private int currentTick = 0;
 
     @EventHandler
@@ -98,7 +99,9 @@ public final class FireBulletsSystem implements Listener {
 
     @EventHandler
     private void onPlayerQuit(final PlayerQuitEvent event) {
-        holdingFire.remove(event.getPlayer().getUniqueId());
+        final UUID playerId = event.getPlayer().getUniqueId();
+        holdingFire.remove(playerId);
+        burstInProgress.remove(playerId);
     }
 
     @EventHandler
@@ -109,13 +112,22 @@ public final class FireBulletsSystem implements Listener {
     @EventHandler
     private void onGameEnd(final GameEndEvent event) {
         for (final ZombiesPlayer player : event.getWorld().getPlayers()) {
-            holdingFire.remove(player.getBukkit().getUniqueId());
+            final UUID playerId = player.getBukkit().getUniqueId();
+            holdingFire.remove(playerId);
+            burstInProgress.remove(playerId);
         }
     }
 
     private void tryFire(final ZombiesPlayer player, final Weapon weapon) {
+        final UUID playerId = player.getBukkit().getUniqueId();
         final BurstData burstData = weapon.getData().burst;
         if (burstData != null) {
+            // 检查是否正在连发中
+            if (burstInProgress.contains(playerId)) {
+                return;
+            }
+            // 标记连发开始
+            burstInProgress.add(playerId);
             // 连发模式：发射第一发，然后调度后续发射
             fireSingleShot(player, weapon, true);  // 第一发跳过延迟
             for (int i = 1; i < burstData.count(); i++) {
@@ -124,13 +136,19 @@ public final class FireBulletsSystem implements Listener {
                 Bukkit.getScheduler().runTaskLater(ZombiesPlugin.INSTANCE, () -> {
                     // 确保玩家仍然存活且武器仍然有效
                     if (!player.getWorld().isGameRunning() || !player.isAlive()) {
+                        burstInProgress.remove(playerId);
                         return;
                     }
                     final Weapon currentWeapon = player.getWeapon(weapon.getSlot());
                     if (currentWeapon == null || currentWeapon.getData().shoot == null) {
+                        burstInProgress.remove(playerId);
                         return;
                     }
                     fireSingleShot(player, currentWeapon, !isLastShot);
+                    // 最后一发完成后解除连发标记
+                    if (isLastShot) {
+                        burstInProgress.remove(playerId);
+                    }
                 }, delay);
             }
         } else {
