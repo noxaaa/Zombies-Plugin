@@ -7,7 +7,6 @@ import io.lama06.zombies.util.VectorUtil;
 import io.lama06.zombies.weapon.ShootData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
-import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -24,19 +23,14 @@ import java.util.random.RandomGenerator;
 
 public final class FireBulletsSystem implements Listener {
     @EventHandler
-    private void onPlayerAttackEntity(final PrePlayerAttackEntityEvent event) {
-        onLeftClick(event.getPlayer());
-    }
-
-    @EventHandler
     private void onPlayerInteract(final PlayerInteractEvent event) {
-        if (!event.getAction().isLeftClick()) {
+        if (!event.getAction().isRightClick()) {
             return;
         }
-        onLeftClick(event.getPlayer());
+        onRightClick(event.getPlayer());
     }
 
-    private void onLeftClick(final Player bukkit) {
+    private void onRightClick(final Player bukkit) {
         final ZombiesPlayer player = new ZombiesPlayer(bukkit);
         if (!player.getWorld().isGameRunning() || !player.isAlive()) {
             return;

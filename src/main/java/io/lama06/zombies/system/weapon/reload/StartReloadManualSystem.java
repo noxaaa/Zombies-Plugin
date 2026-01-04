@@ -14,7 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public final class StartReloadManualSystem implements Listener {
     @EventHandler
     private void onPlayerInteract(final PlayerInteractEvent event) {
-        if (!event.getAction().isRightClick()) {
+        if (!event.getAction().isLeftClick()) {
             return;
         }
         final ZombiesPlayer player = new ZombiesPlayer(event.getPlayer());
