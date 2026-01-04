@@ -141,6 +141,7 @@ public final class Systems {
             new SpawnDescendantsSystem(),
             new SpawnFireTrailSystem(),
             new SpawnZombiesSystem(),
+            new PreventMagmaSplitSystem(),
 
             // Break Window
             new CancelMovementDuringWindowBreakingSystem(),
