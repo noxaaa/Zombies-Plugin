@@ -4,7 +4,7 @@ import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.DyeColor;
-import org.bukkit.entity.MagmaCube;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
@@ -20,33 +20,22 @@ public final class AngerZombiesSystem implements Listener {
         if (nearestPlayer == null) {
             return;
         }
-        if (zombie.getEntity() instanceof final PigZombie pigZombie) {
-            angerPigZombie(pigZombie, nearestPlayer);
-        } else if (zombie.getEntity() instanceof final Wolf wolf) {
-            angerWolf(wolf, nearestPlayer);
-        } else if (zombie.getEntity() instanceof final MagmaCube magmaCube) {
-            angerMagmaCube(magmaCube, nearestPlayer);
+        // 为所有 Mob 类型设置目标
+        if (zombie.getEntity() instanceof final Mob mob) {
+            mob.setTarget(nearestPlayer.getBukkit());
         }
-    }
-
-    private void angerPigZombie(final PigZombie zombie, final ZombiesPlayer nearestPlayer) {
-        zombie.setAngry(true);
-        zombie.setTarget(nearestPlayer.getBukkit());
-    }
-
-    private void angerWolf(final Wolf wolf, final ZombiesPlayer nearestPlayer) {
-        wolf.setAngry(true);
-        wolf.setTarget(nearestPlayer.getBukkit());
-        wolf.setCollarColor(DyeColor.RED);
-    }
-
-    private void angerMagmaCube(final MagmaCube magmaCube, final ZombiesPlayer nearestPlayer) {
-        magmaCube.setTarget(nearestPlayer.getBukkit());
+        // 特殊处理：设置愤怒状态
+        if (zombie.getEntity() instanceof final PigZombie pigZombie) {
+            pigZombie.setAngry(true);
+        } else if (zombie.getEntity() instanceof final Wolf wolf) {
+            wolf.setAngry(true);
+            wolf.setCollarColor(DyeColor.RED);
+        }
     }
 
     private ZombiesPlayer getNearestPlayer(final Zombie zombie) {
         return zombie.getWorld().getAlivePlayers().stream()
-                .min(Comparator.comparingDouble(player -> player.getBukkit().getLocation().distance(zombie.getEntity().getLocation())))
+                .min(Comparator.comparingDouble(player -> player.getBukkit().getLocation().distanceSquared(zombie.getEntity().getLocation())))
                 .orElse(null);
     }
 }

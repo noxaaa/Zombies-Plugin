@@ -130,6 +130,7 @@ public final class Systems {
 
             // Zombie
             new AngerZombiesSystem(),
+            new RetargetZombiesSystem(),
             new DamageZombieAfterAttackSystem(),
             new InitZombieEquipmentSystem(),
             new InitZombieHealthSystem(),
