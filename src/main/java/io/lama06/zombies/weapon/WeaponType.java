@@ -88,26 +88,29 @@ public enum WeaponType implements MenuDisplayableEnum {
     // 升级版武器
     KNIFE_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Knife II"))
+                    .setDisplayName(Component.text("Knife Ultimate"))
                     .setMaterial(Material.DIAMOND_SWORD)
                     .setMelee(new MeleeData(6))
                     .setAttack(new AttackData(8, false, 15))
                     .setDelay(new DelayData(8))
+                    .setGlowing()
     ),
     PISTOL_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Pistol II"))
+                    .setDisplayName(Component.text("Pistol Ultimate"))
                     .setMaterial(Material.WOODEN_HOE)
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.CRIT))
                     .setAttack(new AttackData(8, false, 15))
-                    .setAmmo(new AmmoData(400, 15))
-                    .setDelay(new DelayData(8))
+                    .setAmmo(new AmmoData(450, 14))  // 450总弹药, 14弹匣(7次连发×2)
+                    .setDelay(new DelayData(10))  // 0.5s
                     .setReload(new ReloadData(25))
+                    .setBurst(new BurstData(2, 2))  // 双连发, 间隔0.1s(2tick)
+                    .setGlowing()
     ),
     RIFLE_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Rifle II"))
+                    .setDisplayName(Component.text("Rifle Ultimate"))
                     .setMaterial(Material.STONE_HOE)
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
@@ -115,10 +118,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setAmmo(new AmmoData(400, 40))
                     .setDelay(new DelayData(3))
                     .setReload(new ReloadData(25))
+                    .setGlowing()
     ),
     SHOTGUN_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Shotgun II"))
+                    .setDisplayName(Component.text("Shotgun Ultimate"))
                     .setMaterial(Material.IRON_HOE)
                     .setShoot(new ShootData(12, 0.85))
                     .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
@@ -126,10 +130,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setAmmo(new AmmoData(85, 7))
                     .setDelay(new DelayData((int) (1.2 * 20)))
                     .setReload(new ReloadData((int) (1.2 * 20)))
+                    .setGlowing()
     ),
     SNIPER_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Sniper II"))
+                    .setDisplayName(Component.text("Sniper Ultimate"))
                     .setMaterial(Material.WOODEN_SHOVEL)
                     .setShoot(new ShootData(2, 1, 3))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
@@ -137,10 +142,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setAmmo(new AmmoData(60, 6))
                     .setDelay(new DelayData(25))
                     .setReload(new ReloadData(35))
+                    .setGlowing()
     ),
     FLAME_THROWER_UPGRADED(
             new WeaponData()
-                    .setDisplayName(Component.text("Flame Thrower II"))
+                    .setDisplayName(Component.text("Flame Thrower Ultimate"))
                     .setMaterial(Material.GOLDEN_HOE)
                     .setShoot(new ShootData(1, 0.95))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
@@ -148,10 +154,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setAmmo(new AmmoData(500, 70))
                     .setDelay(new DelayData(2))
                     .setReload(new ReloadData(25))
+                    .setGlowing()
     ),
     GOLD_DIGGER_V2(
             new WeaponData()
-                    .setDisplayName(Component.text("Gold Digger II").color(NamedTextColor.GOLD))
+                    .setDisplayName(Component.text("Gold Digger Ultimate I").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(8, false, 18))
                     .setShoot(new ShootData(1, 1))
@@ -159,10 +166,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDelay(new DelayData(10))  // 0.5s, DPS=16
                     .setReload(new ReloadData(28))
                     .setAmmo(new AmmoData(100, 10))
+                    .setGlowing()
     ),
     GOLD_DIGGER_V3(
             new WeaponData()
-                    .setDisplayName(Component.text("Gold Digger III").color(NamedTextColor.GOLD))
+                    .setDisplayName(Component.text("Gold Digger Ultimate II").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(10, false, 20))
                     .setShoot(new ShootData(1, 1))
@@ -170,10 +178,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDelay(new DelayData(8))  // 0.4s, DPS=25
                     .setReload(new ReloadData(26))
                     .setAmmo(new AmmoData(130, 13))
+                    .setGlowing()
     ),
     GOLD_DIGGER_V4(
             new WeaponData()
-                    .setDisplayName(Component.text("Gold Digger IV").color(NamedTextColor.GOLD))
+                    .setDisplayName(Component.text("Gold Digger Ultimate III").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(12, false, 22))
                     .setShoot(new ShootData(1, 1))
@@ -181,10 +190,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDelay(new DelayData(6))  // 0.3s, DPS=40
                     .setReload(new ReloadData(24))
                     .setAmmo(new AmmoData(170, 17))
+                    .setGlowing()
     ),
     GOLD_DIGGER_V5(
             new WeaponData()
-                    .setDisplayName(Component.text("Gold Digger V").color(NamedTextColor.GOLD))
+                    .setDisplayName(Component.text("Gold Digger Ultimate IV").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(15, false, 25))
                     .setShoot(new ShootData(1, 1))
@@ -192,10 +202,11 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDelay(new DelayData(6))  // 0.3s, DPS=50
                     .setReload(new ReloadData(22))
                     .setAmmo(new AmmoData(200, 20))
+                    .setGlowing()
     ),
     GOLD_DIGGER_V6(
             new WeaponData()
-                    .setDisplayName(Component.text("Gold Digger VI").color(NamedTextColor.GOLD))
+                    .setDisplayName(Component.text("Gold Digger Ultimate V").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(20, false, 30))
                     .setShoot(new ShootData(1, 1))
@@ -203,6 +214,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDelay(new DelayData(4))  // 0.2s, DPS=100
                     .setReload(new ReloadData(20))  // 1.0s
                     .setAmmo(new AmmoData(250, 25))
+                    .setGlowing()
     );
 
     static {

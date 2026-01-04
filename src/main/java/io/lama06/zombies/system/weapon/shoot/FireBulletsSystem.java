@@ -6,7 +6,9 @@ import io.lama06.zombies.event.GameEndEvent;
 import io.lama06.zombies.event.player.PlayerAttackZombieEvent;
 import io.lama06.zombies.event.weapon.WeaponShootEvent;
 import io.lama06.zombies.ZombiesPlayer;
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.util.VectorUtil;
+import io.lama06.zombies.weapon.BurstData;
 import io.lama06.zombies.weapon.DelayData;
 import io.lama06.zombies.weapon.ShootData;
 import io.lama06.zombies.weapon.Weapon;
@@ -111,6 +113,32 @@ public final class FireBulletsSystem implements Listener {
     }
 
     private void tryFire(final ZombiesPlayer player, final Weapon weapon) {
+        final BurstData burstData = weapon.getData().burst;
+        if (burstData != null) {
+            // 连发模式：发射第一发，然后调度后续发射
+            fireSingleShot(player, weapon, true);  // 第一发跳过延迟
+            for (int i = 1; i < burstData.count(); i++) {
+                final boolean isLastShot = (i == burstData.count() - 1);
+                final int delay = burstData.interval() * i;
+                Bukkit.getScheduler().runTaskLater(ZombiesPlugin.INSTANCE, () -> {
+                    // 确保玩家仍然存活且武器仍然有效
+                    if (!player.getWorld().isGameRunning() || !player.isAlive()) {
+                        return;
+                    }
+                    final Weapon currentWeapon = player.getWeapon(weapon.getSlot());
+                    if (currentWeapon == null || currentWeapon.getData().shoot == null) {
+                        return;
+                    }
+                    fireSingleShot(player, currentWeapon, !isLastShot);
+                }, delay);
+            }
+        } else {
+            // 普通模式
+            fireSingleShot(player, weapon, false);
+        }
+    }
+
+    private void fireSingleShot(final ZombiesPlayer player, final Weapon weapon, final boolean skipDelay) {
         final ShootData shootData = weapon.getData().shoot;
         final RandomGenerator rnd = ThreadLocalRandom.current();
         final List<WeaponShootEvent.Bullet> bulletsList = new ArrayList<>();
@@ -122,7 +150,7 @@ public final class FireBulletsSystem implements Listener {
             final Vector bulletDirection = VectorUtil.fromJawAndPitch(yaw, pitch);
             bulletsList.add(new WeaponShootEvent.Bullet(bulletDirection));
         }
-        if (!new WeaponShootEvent(weapon, bulletsList).callEvent()) {
+        if (!new WeaponShootEvent(weapon, bulletsList, skipDelay).callEvent()) {
             return;
         }
         for (final WeaponShootEvent.Bullet bullet : bulletsList) {

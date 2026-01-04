@@ -5,6 +5,7 @@ import io.lama06.zombies.perk.PlayerPerk;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.weapon.DelayData;
 import io.lama06.zombies.event.weapon.WeaponDelayChangeEvent;
+import io.lama06.zombies.event.weapon.WeaponShootEvent;
 import io.lama06.zombies.event.weapon.WeaponUseEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,10 @@ import org.bukkit.event.Listener;
 public final class StartDelayAfterWeaponUseSystem implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private void onWeaponUse(final WeaponUseEvent event) {
+        // 连发中间的射击不触发延迟
+        if (event instanceof WeaponShootEvent shootEvent && shootEvent.isSkipDelay()) {
+            return;
+        }
         final Weapon weapon = event.getWeapon();
         final Component delayComponent = weapon.getComponent(Weapon.DELAY);
         if (delayComponent == null) {

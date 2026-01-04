@@ -15,6 +15,8 @@ public final class WeaponData {
     public AttackData attack;
     public boolean inLuckyChest;
     public WeaponType upgradesTo;  // 升级后的武器类型，null 表示不可升级/已满级
+    public boolean glowing;  // 是否发光（升级版武器）
+    public BurstData burst;  // 连发数据，null 表示不连发
 
     public WeaponData setDisplayName(final Component displayName) {
         this.displayName = displayName;
@@ -68,6 +70,16 @@ public final class WeaponData {
 
     public WeaponData setUpgradesTo(final WeaponType upgradesTo) {
         this.upgradesTo = upgradesTo;
+        return this;
+    }
+
+    public WeaponData setGlowing() {
+        this.glowing = true;
+        return this;
+    }
+
+    public WeaponData setBurst(final BurstData burst) {
+        this.burst = burst;
         return this;
     }
 }

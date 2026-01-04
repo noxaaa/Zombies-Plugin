@@ -17,7 +17,9 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -70,6 +72,10 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         final ItemStack item = new ItemStack(type.data.material);
         final ItemMeta meta = item.getItemMeta();
         meta.displayName(type.data.displayName);
+        if (type.data.glowing) {
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
         item.setItemMeta(meta);
         final PlayerInventory inventory = player.getInventory();
         inventory.setItem(slot, item);
