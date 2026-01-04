@@ -1,9 +1,13 @@
 package io.lama06.zombies.system.weapon.shoot;
 
+import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import io.lama06.zombies.data.Component;
+import io.lama06.zombies.event.GameEndEvent;
 import io.lama06.zombies.event.player.PlayerAttackZombieEvent;
 import io.lama06.zombies.event.weapon.WeaponShootEvent;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.util.VectorUtil;
+import io.lama06.zombies.weapon.DelayData;
 import io.lama06.zombies.weapon.ShootData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
@@ -14,38 +18,100 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
 public final class FireBulletsSystem implements Listener {
+    private static final int HOLD_TIMEOUT_TICKS = 4;
+
+    private record HoldingState(int weaponSlot, int lastActivityTick) { }
+    private final Map<UUID, HoldingState> holdingFire = new HashMap<>();
+    private int currentTick = 0;
+
     @EventHandler
     private void onPlayerInteract(final PlayerInteractEvent event) {
         if (!event.getAction().isRightClick()) {
             return;
         }
-        onRightClick(event.getPlayer());
+        final Player player = event.getPlayer();
+        final ZombiesPlayer zombiesPlayer = new ZombiesPlayer(player);
+        if (!zombiesPlayer.getWorld().isGameRunning() || !zombiesPlayer.isAlive()) {
+            return;
+        }
+        final Weapon weapon = zombiesPlayer.getHeldWeapon();
+        if (weapon == null || weapon.getData().shoot == null) {
+            return;
+        }
+        holdingFire.put(player.getUniqueId(), new HoldingState(weapon.getSlot(), currentTick));
+        tryFire(zombiesPlayer, weapon);
     }
 
-    private void onRightClick(final Player bukkit) {
-        final ZombiesPlayer player = new ZombiesPlayer(bukkit);
-        if (!player.getWorld().isGameRunning() || !player.isAlive()) {
-            return;
+    @EventHandler
+    private void onServerTick(final ServerTickEndEvent event) {
+        currentTick++;
+        final Iterator<Map.Entry<UUID, HoldingState>> iterator = holdingFire.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Map.Entry<UUID, HoldingState> entry = iterator.next();
+            final Player bukkit = Bukkit.getPlayer(entry.getKey());
+            if (bukkit == null) {
+                iterator.remove();
+                continue;
+            }
+            final HoldingState state = entry.getValue();
+            if (currentTick - state.lastActivityTick > HOLD_TIMEOUT_TICKS) {
+                iterator.remove();
+                continue;
+            }
+            final ZombiesPlayer player = new ZombiesPlayer(bukkit);
+            if (!player.getWorld().isGameRunning() || !player.isAlive()) {
+                iterator.remove();
+                continue;
+            }
+            final Weapon weapon = player.getWeapon(state.weaponSlot);
+            if (weapon == null || weapon.getData().shoot == null) {
+                iterator.remove();
+                continue;
+            }
+            if (bukkit.getInventory().getHeldItemSlot() != state.weaponSlot) {
+                iterator.remove();
+                continue;
+            }
+            final Component delayComponent = weapon.getComponent(Weapon.DELAY);
+            if (delayComponent != null) {
+                final int remainingDelay = delayComponent.get(DelayData.REMAINING_DELAY);
+                if (remainingDelay > 0) {
+                    continue;
+                }
+            }
+            tryFire(player, weapon);
         }
-        final Weapon weapon = player.getHeldWeapon();
-        if (weapon == null) {
-            return;
+    }
+
+    @EventHandler
+    private void onPlayerQuit(final PlayerQuitEvent event) {
+        holdingFire.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    private void onPlayerItemHeld(final PlayerItemHeldEvent event) {
+        holdingFire.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    private void onGameEnd(final GameEndEvent event) {
+        for (final ZombiesPlayer player : event.getWorld().getPlayers()) {
+            holdingFire.remove(player.getBukkit().getUniqueId());
         }
+    }
+
+    private void tryFire(final ZombiesPlayer player, final Weapon weapon) {
         final ShootData shootData = weapon.getData().shoot;
-        if (shootData == null) {
-            return;
-        }
         final RandomGenerator rnd = ThreadLocalRandom.current();
         final List<WeaponShootEvent.Bullet> bulletsList = new ArrayList<>();
         for (int i = 0; i < shootData.bullets(); i++) {
