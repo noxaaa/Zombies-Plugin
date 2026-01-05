@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 public final class Door implements CheckableConfig {
     public String area1 = "";
     public String area2 = "";
-    public String displayName = "";
     public int gold = 750;
     public BlockArea position;
     public BlockArea templateOpen;
@@ -65,17 +64,6 @@ public final class Door implements CheckableConfig {
                         new TextInputType(),
                         area2 -> {
                             this.area2 = area2;
-                            openMenu(player, callback);
-                        },
-                        () -> openMenu(player, callback)
-                )),
-                new SelectionEntry(Component.text("Display Name: " + (displayName.isEmpty() ? "_" : displayName)), Material.NAME_TAG, () -> InputMenu.open(
-                        player,
-                        Component.text("Display Name"),
-                        displayName,
-                        new TextInputType(),
-                        displayName -> {
-                            this.displayName = displayName;
                             openMenu(player, callback);
                         },
                         () -> openMenu(player, callback)

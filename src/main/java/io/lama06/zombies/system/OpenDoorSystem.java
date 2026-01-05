@@ -46,9 +46,10 @@ public final class OpenDoorSystem implements Listener {
                 player.sendMessage(Component.text("You don't have enough gold to open this door").color(NamedTextColor.RED));
                 return;
             }
-            final String doorDisplayName = door.displayName.isEmpty() ? "a door" : door.displayName;
+            final String playerArea = world.getPlayerArea(player);
+            final String targetArea = door.area1.equals(playerArea) ? door.area2 : door.area1;
             final Component titleText = Component.text(player.getBukkit().getName() + " opened ").color(NamedTextColor.GRAY)
-                    .append(Component.text(doorDisplayName).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                    .append(Component.text(targetArea).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
                     .append(Component.text("!").color(NamedTextColor.GRAY));
             final Title title = Title.title(
                     titleText,
