@@ -15,6 +15,7 @@ import java.util.List;
 
 public final class WorldConfig implements CheckableConfig {
     public String startArea = "";
+    public final List<Area> areas = new ArrayList<>();
     public final List<Door> doors = new ArrayList<>();
     public final List<Window> windows = new ArrayList<>();
     public final List<WeaponShop> weaponShops = new ArrayList<>();
@@ -33,6 +34,7 @@ public final class WorldConfig implements CheckableConfig {
     @Override
     public void check() throws InvalidConfigException {
         InvalidConfigException.mustBeSet(startArea, "start area");
+        InvalidConfigException.checkList(areas, true, "areas");
         InvalidConfigException.checkList(doors, true, "doors");
         InvalidConfigException.checkList(windows, false, "windows");
         InvalidConfigException.checkList(weaponShops, true, "weapon shops");
@@ -63,6 +65,20 @@ public final class WorldConfig implements CheckableConfig {
                                     this.startArea = startArea;
                                     reopen.run();
                                 },
+                                reopen
+                        )
+                ),
+                new SelectionEntry(
+                        Component.text("Areas (" + areas.size() + ")"),
+                        Material.MAP,
+                        () -> ListConfigMenu.open(
+                                player,
+                                Component.text("Areas"),
+                                areas,
+                                Material.MAP,
+                                area -> Component.text("Area: " + (area.name.isEmpty() ? "_" : area.name)),
+                                Area::new,
+                                area -> area.openMenu(player, reopen),
                                 reopen
                         )
                 ),

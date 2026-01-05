@@ -123,6 +123,23 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
         return config.windows.stream().filter(window -> areas.contains(window.area)).toList();
     }
 
+    public String getAreaAt(final Location loc) {
+        final WorldConfig config = getConfig();
+        if (config == null) {
+            return null;
+        }
+        for (final Area area : config.areas) {
+            if (area.contains(loc)) {
+                return area.name;
+            }
+        }
+        return null;
+    }
+
+    public String getPlayerArea(final ZombiesPlayer player) {
+        return getAreaAt(player.getBukkit().getLocation());
+    }
+
     public Location getNextZombieSpawnPoint() {
         final RandomGenerator rnd = ThreadLocalRandom.current();
         final List<ZombiesPlayer> players = getPlayers();

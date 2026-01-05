@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.scoreboard.*;
 
 import java.util.ArrayList;
@@ -51,6 +52,12 @@ public final class RenderScoreboardSystem implements Listener {
 
         final Integer round = world.get(ZombiesWorld.ROUND);
         content.add(Component.text("Round " + (round != null ? round : 0)).color(NamedTextColor.RED));
+
+        final String currentArea = world.getPlayerArea(player);
+        if (currentArea != null) {
+            content.add(Component.text("Area: ").append(
+                    Component.text(currentArea).color(NamedTextColor.AQUA)));
+        }
 
         final int aliveZombies = world.getZombies().size();
         final int pendingZombies = getPendingZombies(world);
@@ -200,5 +207,21 @@ public final class RenderScoreboardSystem implements Listener {
         for (final ZombiesPlayer player : event.getWorld().getPlayers()) {
             player.getBukkit().setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
+    }
+
+    @EventHandler
+    private void onPlayerMove(final PlayerMoveEvent event) {
+        // Only check when block position changes
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() &&
+            event.getFrom().getBlockY() == event.getTo().getBlockY() &&
+            event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
+            return;
+        }
+        final ZombiesPlayer player = new ZombiesPlayer(event.getPlayer());
+        final ZombiesWorld world = player.getWorld();
+        if (!world.isGameRunning()) {
+            return;
+        }
+        updateScoreboard(player);
     }
 }
