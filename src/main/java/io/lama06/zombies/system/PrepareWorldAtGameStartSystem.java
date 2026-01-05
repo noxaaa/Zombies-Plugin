@@ -2,6 +2,7 @@ package io.lama06.zombies.system;
 
 import io.lama06.zombies.*;
 import io.lama06.zombies.data.Component;
+import io.lama06.zombies.PlaceholderItem;
 import io.lama06.zombies.event.GameStartEvent;
 import io.lama06.zombies.event.StartRoundEvent;
 import io.lama06.zombies.perk.GlobalPerk;
@@ -72,6 +73,10 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             bukkit.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, PotionEffect.INFINITE_DURATION, 1));
             player.giveWeapon(0, WeaponType.KNIFE);
             player.giveWeapon(1, WeaponType.PISTOL);
+            bukkit.getInventory().setItem(2, PlaceholderItem.createWeaponPlaceholder(2));
+            bukkit.getInventory().setItem(6, PlaceholderItem.createPerkPlaceholder(1));
+            bukkit.getInventory().setItem(7, PlaceholderItem.createPerkPlaceholder(2));
+            bukkit.getInventory().setItem(8, PlaceholderItem.createPerkPlaceholder(3));
         }
 
         // 显示回合1的 Title 和音效

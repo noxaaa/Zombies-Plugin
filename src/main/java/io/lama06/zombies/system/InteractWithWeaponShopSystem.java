@@ -1,5 +1,6 @@
 package io.lama06.zombies.system;
 
+import io.lama06.zombies.PlaceholderItem;
 import io.lama06.zombies.WeaponShop;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
@@ -8,6 +9,8 @@ import io.lama06.zombies.event.weapon.WeaponClipChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.weapon.*;
 import net.kyori.adventure.text.Component;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
@@ -50,12 +53,39 @@ public final class InteractWithWeaponShopSystem implements Listener {
             player.sendMessage(Component.text("You cannot afford this weapon").color(NamedTextColor.RED));
             return;
         }
-        final int slot = player.getBukkit().getInventory().getHeldItemSlot();
-        if (slot == 0 || slot > player.getLastWeaponSlot()) {
-            player.sendMessage(Component.text("Switch to a weapon slot").color(NamedTextColor.RED));
-            return;
+
+        final PlayerInventory inventory = player.getBukkit().getInventory();
+
+        // Find first empty slot (placeholder)
+        Integer emptySlot = null;
+        for (int slot = 1; slot <= player.getLastWeaponSlot(); slot++) {
+            final ItemStack item = inventory.getItem(slot);
+            if (PlaceholderItem.isPlaceholder(item)) {
+                emptySlot = slot;
+                break;
+            }
         }
-        player.giveWeapon(slot, shop.weaponType);
+
+        final int targetSlot;
+        if (emptySlot != null) {
+            // Has empty slot, buy directly to empty slot
+            targetSlot = emptySlot;
+        } else {
+            // No empty slot, must be holding a weapon to replace
+            final int heldSlot = inventory.getHeldItemSlot();
+            if (heldSlot == 0 || heldSlot > player.getLastWeaponSlot()) {
+                player.sendMessage(Component.text("No empty slot. Hold a weapon to replace.").color(NamedTextColor.RED));
+                return;
+            }
+            final Weapon heldWeapon = player.getHeldWeapon();
+            if (heldWeapon == null) {
+                player.sendMessage(Component.text("Hold a weapon to replace.").color(NamedTextColor.RED));
+                return;
+            }
+            targetSlot = heldSlot;
+        }
+
+        player.giveWeapon(targetSlot, shop.weaponType);
         player.set(ZombiesPlayer.GOLD, gold - shop.purchasePrice);
         Bukkit.getPluginManager().callEvent(new PlayerGoldChangeEvent(player, gold, gold - shop.purchasePrice));
         player.sendMessage(Component.text("Successfully bought the weapon").color(NamedTextColor.GREEN));

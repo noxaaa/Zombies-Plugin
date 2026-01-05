@@ -1,5 +1,6 @@
 package io.lama06.zombies.perk;
 
+import io.lama06.zombies.PlaceholderItem;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.data.AttributeId;
 import io.lama06.zombies.menu.MenuDisplayableEnum;
@@ -9,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -42,7 +44,23 @@ public enum PlayerPerk implements MenuDisplayableEnum {
             maxHealth.setBaseValue(20);
         }
     },
-    EXTRA_WEAPON(Material.CHEST, Component.text("Extra Weapon").color(NamedTextColor.GREEN)),
+    EXTRA_WEAPON(Material.CHEST, Component.text("Extra Weapon").color(NamedTextColor.GREEN)) {
+        @Override
+        public void enable(final ZombiesPlayer player) {
+            final ItemStack item = player.getBukkit().getInventory().getItem(3);
+            if (item == null || item.getType() == Material.AIR) {
+                player.getBukkit().getInventory().setItem(3, PlaceholderItem.createWeaponPlaceholder(3));
+            }
+        }
+
+        @Override
+        public void disable(final ZombiesPlayer player) {
+            final ItemStack item = player.getBukkit().getInventory().getItem(3);
+            if (PlaceholderItem.isPlaceholder(item)) {
+                player.getBukkit().getInventory().setItem(3, null);
+            }
+        }
+    },
     FAST_REVIVE(Material.COOKIE, Component.text("Fast Revive").color(NamedTextColor.BLUE));
 
     public static final AttributeId<Boolean> IS_PLAYER_PERK = new AttributeId<>("is_player_perk", PersistentDataType.BOOLEAN);

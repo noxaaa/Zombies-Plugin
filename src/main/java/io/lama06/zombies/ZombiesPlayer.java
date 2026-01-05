@@ -163,11 +163,11 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         final PlayerInventory inventory = player.getInventory();
         for (int slot = 6; slot < 9; slot++) {
             final PlayerPerk perk = getPerk(slot);
-            if (perk == null) {
-                continue;
+            if (perk != null) {
+                perk.disable(this);
             }
-            perk.disable(this);
-            inventory.setItem(slot, null);
+            // Restore placeholder
+            inventory.setItem(slot, PlaceholderItem.createPerkPlaceholder(slot - 5));
         }
     }
 
