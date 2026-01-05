@@ -14,14 +14,28 @@ public final class ZombieSpawnEvent extends ZombieEvent {
     }
 
     private final ZombieData data;
+    private final int healthOverride;  // 0 = 使用data.health
 
     public ZombieSpawnEvent(final Zombie zombie, final ZombieData data) {
+        this(zombie, data, 0);
+    }
+
+    public ZombieSpawnEvent(final Zombie zombie, final ZombieData data, final int healthOverride) {
         super(zombie);
         this.data = data;
+        this.healthOverride = healthOverride;
     }
 
     public ZombieData getData() {
         return data;
+    }
+
+    public int getHealthOverride() {
+        return healthOverride;
+    }
+
+    public int getEffectiveHealth() {
+        return healthOverride > 0 ? healthOverride : data.health;
     }
 
     @Override

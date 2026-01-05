@@ -61,12 +61,13 @@ public final class SpawnZombiesSystem implements Listener {
         for (final Map.Entry<ZombieType, Integer> entry : wave.zombies.entrySet()) {
             final ZombieType type = entry.getKey();
             final int count = entry.getValue();
+            final int health = wave.getHealthForType(type);
             for (int i = 0; i < count; i++) {
                 final Location spawnPoint = world.getNextZombieSpawnPoint();
                 if (spawnPoint == null) {
                     continue;
                 }
-                world.spawnZombie(spawnPoint, type);
+                world.spawnZombie(spawnPoint, type, health);
             }
         }
     }

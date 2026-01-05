@@ -76,6 +76,10 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
     }
 
     public Zombie spawnZombie(final Location location, final ZombieType type) {
+        return spawnZombie(location, type, 0);
+    }
+
+    public Zombie spawnZombie(final Location location, final ZombieType type, final int healthOverride) {
         final Entity entity = world.spawnEntity(location, type.data.entity, false);
         if (type.data.initializer != null) {
             type.data.initializer.accept(entity);
@@ -86,7 +90,7 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
         final Zombie zombie = new Zombie(entity);
         zombie.set(Zombie.IS_ZOMBIE, true);
         zombie.set(Zombie.TYPE, type);
-        Bukkit.getPluginManager().callEvent(new ZombieSpawnEvent(zombie, type.data));
+        Bukkit.getPluginManager().callEvent(new ZombieSpawnEvent(zombie, type.data, healthOverride));
         return zombie;
     }
 
