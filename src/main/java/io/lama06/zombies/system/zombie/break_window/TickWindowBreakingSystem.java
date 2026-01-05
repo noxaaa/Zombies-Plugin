@@ -7,7 +7,9 @@ import io.lama06.zombies.event.zombie.BreakWindowTickEvent;
 import io.lama06.zombies.zombie.BreakWindowData;
 import io.lama06.zombies.zombie.Zombie;
 import io.papermc.paper.math.BlockPosition;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -32,7 +34,9 @@ public final class TickWindowBreakingSystem implements Listener {
         if (remainingTime == 1) {
             breakWindowComponent.remove(BreakWindowData.REMAINING_TIME);
             breakWindowComponent.remove(BreakWindowData.BLOCK);
-            block.toLocation(zombie.getWorld().getBukkit()).getBlock().setType(Material.AIR);
+            final Location blockLocation = block.toLocation(zombie.getWorld().getBukkit());
+            blockLocation.getBlock().setType(Material.AIR);
+            zombie.getWorld().getBukkit().playSound(blockLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1.0f, 1.0f);
             return;
         }
         breakWindowComponent.set(BreakWindowData.REMAINING_TIME, remainingTime - 1);

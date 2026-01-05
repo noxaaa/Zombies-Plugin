@@ -54,7 +54,7 @@ public final class RepairWindowSystem implements Listener {
                 continue;
             }
             block.setType(Material.OAK_SLAB);
-            world.getBukkit().playSound(block.getLocation(), Sound.BLOCK_WOOD_PLACE, SoundCategory.BLOCKS, 1, 1);
+            world.getBukkit().playSound(block.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, SoundCategory.BLOCKS, 1.0f, 1.5f);
             final int gold = player.get(ZombiesPlayer.GOLD);
             final int goldAdd = (world.isPerkEnabled(GlobalPerk.DOUBLE_GOLD) ? 2 : 1) * GOLD;
             final int newGold = gold + goldAdd;
