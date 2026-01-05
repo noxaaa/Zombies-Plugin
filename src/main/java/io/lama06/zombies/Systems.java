@@ -57,6 +57,9 @@ public final class Systems {
             new TeamMachineSystem(),
             new UltimateMachineSystem(),
 
+            // Area
+            new AreaVisualizationSystem(),
+
             // Lucky Chest
             new InteractWithLuckyChestSystem(),
             new RemoveLuckyChestItemsSystem(),
