@@ -25,6 +25,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.BlocksAttacks;
+import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +97,15 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
             );
         }
         item.setItemMeta(meta);
+        // 近战武器添加格挡功能（减少50%伤害）
+        if (type.data.melee != null) {
+            item.setData(DataComponentTypes.BLOCKS_ATTACKS, BlocksAttacks.blocksAttacks()
+                    .blockDelaySeconds(0)
+                    .addDamageReduction(DamageReduction.damageReduction()
+                            .factor(0.5f)
+                            .build())
+                    .build());
+        }
         final PlayerInventory inventory = player.getInventory();
         inventory.setItem(slot, item);
         final Weapon weapon = new Weapon(this, slot);

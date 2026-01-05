@@ -18,7 +18,6 @@ import io.lama06.zombies.system.weapon.attack.ApplyAttackDamageSystem;
 import io.lama06.zombies.system.weapon.attack.GiveGoldAfterAttackSystem;
 import io.lama06.zombies.system.weapon.delay.*;
 import io.lama06.zombies.system.weapon.melee.AttackMeleeSystem;
-import io.lama06.zombies.system.weapon.melee.KnifeBlockingSystem;
 import io.lama06.zombies.system.weapon.melee.RenderMeleeLoreSystem;
 import io.lama06.zombies.system.weapon.reload.*;
 import io.lama06.zombies.system.weapon.shoot.FireBulletsSystem;
@@ -115,7 +114,6 @@ public final class Systems {
 
             // Melee
             new AttackMeleeSystem(),
-            new KnifeBlockingSystem(),
             new RenderMeleeLoreSystem(),
 
             // Reload
