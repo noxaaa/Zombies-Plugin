@@ -12,7 +12,7 @@ public enum ZombieType {
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
                     .setBreakWindow(new BreakWindowData(40))
-                    .setHealth(10)
+                    .setHealth(20)
     ),
     NORMAL_MEDIUM(
             new ZombieData()
@@ -20,7 +20,7 @@ public enum ZombieType {
                     .addEquipment(EquipmentSlot.CHEST, new ItemStack(Material.LEATHER_CHESTPLATE))
                     .addEquipment(EquipmentSlot.FEET, new ItemStack(Material.LEATHER_BOOTS))
                     .setBreakWindow(new BreakWindowData(30))
-                    .setHealth(12)
+                    .setHealth(20)
     ),
     NORMAL_HARD(
             new ZombieData()
@@ -29,12 +29,12 @@ public enum ZombieType {
                     .addEquipment(EquipmentSlot.LEGS, new ItemStack(Material.IRON_LEGGINGS))
                     .addEquipment(EquipmentSlot.HAND, new ItemStack(Material.DIAMOND_AXE))
                     .setBreakWindow(new BreakWindowData(20))
-                    .setHealth(15)
+                    .setHealth(20)
     ),
     PIG_ZOMBIE(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIFIED_PIGLIN)
-                    .setHealth(10)
+                    .setHealth(20)
                     .setBreakWindow(new BreakWindowData(20))
                     .setFireImmune(true)
     ),
@@ -49,7 +49,7 @@ public enum ZombieType {
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
                     .setBreakWindow(new BreakWindowData(20))
-                    .setHealth(7)
+                    .setHealth(20)
                     .setFireImmune(true)
                     .setDescendants(new DescendantsData(ZombieType.MAGMA_CUBE, 3))
                     .addEquipment(EquipmentSlot.HAND, new ItemStack(Material.GOLDEN_SWORD))
@@ -70,7 +70,7 @@ public enum ZombieType {
     FIRE_ZOMBIE(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
-                    .setHealth(10)
+                    .setHealth(20)
                     .setBreakWindow(new BreakWindowData(20))
                     .setFireImmune(true)
                     .setFireAttack(new FireAttackData(3*20))
@@ -86,7 +86,7 @@ public enum ZombieType {
     GUARDIAN_ZOMBIE(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
-                    .setHealth(13)
+                    .setHealth(20)
                     .setBreakWindow(new BreakWindowData(2*20))
                     .addEquipment(EquipmentSlot.HEAD, new ItemStack(Material.SEA_LANTERN))
                     .setLaserAttack(new LaserAttackData(3))
