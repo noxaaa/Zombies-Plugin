@@ -76,8 +76,8 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
 
         // 显示回合1的 Title 和音效
         final Title title = Title.title(
-                net.kyori.adventure.text.Component.text("Round").color(NamedTextColor.RED),
-                net.kyori.adventure.text.Component.text("1").color(NamedTextColor.RED),
+                net.kyori.adventure.text.Component.text("Round 1").color(NamedTextColor.RED),
+                net.kyori.adventure.text.Component.empty(),
                 Title.Times.times(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
         );
         for (final ZombiesPlayer player : world.getPlayers()) {

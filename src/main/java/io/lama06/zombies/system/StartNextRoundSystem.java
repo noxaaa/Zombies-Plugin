@@ -63,8 +63,8 @@ public final class StartNextRoundSystem implements Listener {
         world.set(ZombiesWorld.TRIGGERED_WAVES, 0);
 
         final Title title = Title.title(
-                Component.text("Round").color(NamedTextColor.RED),
-                Component.text(String.valueOf(round)).color(NamedTextColor.RED),
+                Component.text("Round " + round).color(NamedTextColor.RED),
+                Component.empty(),
                 Title.Times.times(Duration.ofMillis(500), Duration.ofSeconds(2), Duration.ofMillis(500))
         );
         for (final ZombiesPlayer player : world.getPlayers()) {
