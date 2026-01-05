@@ -33,9 +33,14 @@ public final class GiveGoldAfterAttackSystem implements Listener {
         final ZombiesPlayer player = event.getPlayer();
         final ZombiesWorld world = event.getWorld();
         final int goldBefore = player.get(ZombiesPlayer.GOLD);
-        int baseGold = attackData.gold();
-        if (event.isHeadshot()) {
-            baseGold += attackData.headshotBonusGold();
+        int baseGold;
+        if (world.isPerkEnabled(GlobalPerk.INSTANT_KILL)) {
+            baseGold = 50;
+        } else {
+            baseGold = attackData.gold();
+            if (event.isHeadshot()) {
+                baseGold += attackData.headshotBonusGold();
+            }
         }
         final int goldAdd = (world.isPerkEnabled(GlobalPerk.DOUBLE_GOLD) ? 2 : 1) * baseGold;
         final int goldAfter = goldBefore + goldAdd;
