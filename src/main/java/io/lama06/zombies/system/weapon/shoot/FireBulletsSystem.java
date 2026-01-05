@@ -193,7 +193,7 @@ public final class FireBulletsSystem implements Listener {
                     rayStart,
                     bullet.direction(),
                     searchDistance,
-                    entity -> !hitEntities.contains(entity)
+                    entity -> !hitEntities.contains(entity) && !(entity instanceof Player)  // Exclude all players
             );
             if (ray == null) {
                 break;

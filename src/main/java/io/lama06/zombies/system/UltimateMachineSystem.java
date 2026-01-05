@@ -62,37 +62,12 @@ public final class UltimateMachineSystem implements Listener {
         // 扣除金币
         player.pay(price);
 
-        // 计算弹药比例并升级武器
+        // 升级武器
         final WeaponType upgradedType = weaponData.upgradesTo;
         final int slot = heldWeapon.getSlot();
 
-        // 保留弹药比例
-        double ammoRatio = 1.0;
-        double clipRatio = 1.0;
-        if (weaponData.ammo != null) {
-            final var ammoComponent = heldWeapon.getComponent(Weapon.AMMO);
-            if (ammoComponent != null) {
-                final int currentAmmo = ammoComponent.get(io.lama06.zombies.weapon.AmmoData.AMMO);
-                final int currentClip = ammoComponent.get(io.lama06.zombies.weapon.AmmoData.CLIP);
-                ammoRatio = (double) currentAmmo / weaponData.ammo.ammo();
-                clipRatio = (double) currentClip / weaponData.ammo.clip();
-            }
-        }
-
-        // 给予升级后的武器
+        // 给予升级后的武器（满弹药）
         player.giveWeapon(slot, upgradedType);
-
-        // 恢复弹药比例
-        final Weapon newWeapon = player.getWeapon(slot);
-        if (newWeapon != null && upgradedType.data.ammo != null) {
-            final var newAmmoComponent = newWeapon.getComponent(Weapon.AMMO);
-            if (newAmmoComponent != null) {
-                final int newAmmo = (int) (upgradedType.data.ammo.ammo() * ammoRatio);
-                final int newClip = (int) (upgradedType.data.ammo.clip() * clipRatio);
-                newAmmoComponent.set(io.lama06.zombies.weapon.AmmoData.AMMO, Math.max(0, newAmmo));
-                newAmmoComponent.set(io.lama06.zombies.weapon.AmmoData.CLIP, Math.max(1, newClip));
-            }
-        }
 
         player.sendMessage(Component.text("Weapon upgraded to ").color(NamedTextColor.GREEN)
                 .append(upgradedType.data.displayName));
