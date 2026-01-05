@@ -54,30 +54,52 @@ public final class Area implements CheckableConfig {
                 new SelectionEntry(
                         Component.text("Bounds (" + bounds.size() + " regions)"),
                         Material.GLASS,
-                        () -> ListConfigMenu.open(
-                                player,
-                                Component.text("Area Bounds"),
-                                bounds,
-                                Material.STONE,
-                                bound -> Component.text(bound.toString()),
-                                () -> null,  // Will be replaced by BlockAreaSelection
-                                bound -> reopen.run(),  // No sub-edit for BlockArea
-                                reopen
-                        )
-                ),
-                new SelectionEntry(
-                        Component.text("Add Bound Region"),
-                        Material.GREEN_STAINED_GLASS_PANE,
-                        () -> BlockAreaSelection.open(
-                                player,
-                                Component.text("Select Bound Region"),
-                                reopen,
-                                bound -> {
-                                    bounds.add(bound);
-                                    reopen.run();
-                                }
-                        )
+                        () -> openBoundsMenu(player, reopen)
                 )
+        );
+    }
+
+    private void openBoundsMenu(final Player player, final Runnable callback) {
+        final Runnable reopen = () -> openBoundsMenu(player, callback);
+
+        final List<SelectionEntry> entries = new ArrayList<>();
+
+        // Add button
+        entries.add(new SelectionEntry(
+                Component.text("Add Region").color(net.kyori.adventure.text.format.NamedTextColor.GREEN),
+                Material.GREEN_STAINED_GLASS_PANE,
+                () -> BlockAreaSelection.open(
+                        player,
+                        Component.text("Select Bound Region"),
+                        reopen,
+                        bound -> {
+                            bounds.add(bound);
+                            reopen.run();
+                        }
+                )
+        ));
+
+        // Existing bounds with delete option
+        for (int i = 0; i < bounds.size(); i++) {
+            final int index = i;
+            final BlockArea bound = bounds.get(i);
+            entries.add(new SelectionEntry(
+                    Component.text("Region " + (i + 1) + ": " + bound.toString()),
+                    Material.STONE,
+                    reopen,  // Click does nothing, just reopens
+                    Component.text("Delete").color(net.kyori.adventure.text.format.NamedTextColor.RED),
+                    () -> {
+                        bounds.remove(index);
+                        reopen.run();
+                    }
+            ));
+        }
+
+        SelectionMenu.open(
+                player,
+                Component.text("Area Bounds"),
+                callback,
+                entries.toArray(SelectionEntry[]::new)
         );
     }
 }
