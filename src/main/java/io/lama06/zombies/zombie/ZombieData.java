@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 public final class ZombieData {
     public EntityType entity;
     public int health;
+    public double knockbackResistance;  // 0.0 = 无抗性, 1.0 = 完全免疫击退
     public Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
     public BreakWindowData breakWindow;
     public boolean fireImmune;
@@ -80,6 +81,11 @@ public final class ZombieData {
 
     public ZombieData setInitializer(final Consumer<? super Entity> initializer) {
         this.initializer = initializer;
+        return this;
+    }
+
+    public ZombieData setKnockbackResistance(final double knockbackResistance) {
+        this.knockbackResistance = knockbackResistance;
         return this;
     }
 }

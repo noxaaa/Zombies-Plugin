@@ -22,6 +22,7 @@ public final class PlayerAttackZombieEvent extends PlayerEvent {
     private boolean headshot;
     private double baseDamage;
     private double damageModifier = 1;
+    private double knockback;
 
     public PlayerAttackZombieEvent(final Weapon weapon, final Zombie zombie) {
         super(weapon.getPlayer());
@@ -79,6 +80,14 @@ public final class PlayerAttackZombieEvent extends PlayerEvent {
 
     public void setHeadshot(final boolean headshot) {
         this.headshot = headshot;
+    }
+
+    public double getKnockback() {
+        return knockback;
+    }
+
+    public void setKnockback(final double knockback) {
+        this.knockback = knockback;
     }
 
     @Override

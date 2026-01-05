@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 public final class DamageZombieAfterAttackSystem implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -24,12 +25,37 @@ public final class DamageZombieAfterAttackSystem implements Listener {
         if (event.isKill()) {
             living.setKiller(event.getPlayer().getBukkit());
             living.setHealth(0);
+            applyKnockback(event, living);
             return;
         }
         living.setNoDamageTicks(0);
         living.damage(event.getDamage(), event.getPlayer().getBukkit());
+        applyKnockback(event, living);
         if (event.isFreeze()) {
             living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 7 * 20, 2));
         }
+    }
+
+    private void applyKnockback(final PlayerAttackZombieEvent event, final LivingEntity target) {
+        final double knockback = event.getKnockback();
+        if (knockback <= 0) {
+            return;
+        }
+        final Vector playerPos = event.getPlayer().getBukkit().getLocation().toVector();
+        final Vector targetPos = target.getLocation().toVector();
+        Vector direction = targetPos.subtract(playerPos);
+        direction.setY(0);
+        if (direction.lengthSquared() > 0) {
+            direction = direction.normalize();
+        } else {
+            direction = event.getPlayer().getBukkit().getLocation().getDirection();
+            direction.setY(0);
+            if (direction.lengthSquared() > 0) {
+                direction = direction.normalize();
+            }
+        }
+        direction.multiply(knockback);
+        direction.setY(knockback * 0.3);  // 给一些向上的力
+        target.setVelocity(target.getVelocity().add(direction));
     }
 }
