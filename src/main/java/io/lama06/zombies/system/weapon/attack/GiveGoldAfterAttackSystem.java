@@ -41,7 +41,7 @@ public final class GiveGoldAfterAttackSystem implements Listener {
         final int goldAfter = goldBefore + goldAdd;
         player.set(ZombiesPlayer.GOLD, goldAfter);
         if (event.isHeadshot()) {
-            player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_PLAYER_HURT, 1.0f, 1.5f);
+            player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 1.5f);
             player.sendMessage(Component.text("HEADSHOT! +%s Gold".formatted(goldAdd)).color(NamedTextColor.RED));
         } else {
             player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 2.0f);
