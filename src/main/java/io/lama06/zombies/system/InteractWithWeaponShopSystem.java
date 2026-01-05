@@ -13,32 +13,44 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 public final class InteractWithWeaponShopSystem implements Listener {
     @EventHandler
-    private void onPlayerInteract(final PlayerInteractEvent event) {
-        if (!event.getAction().isRightClick()) {
+    private void onPlayerInteractAtEntity(final PlayerInteractAtEntityEvent event) {
+        if (!(event.getRightClicked() instanceof final ArmorStand armorStand)) {
             return;
         }
-        final Block clickedBlock = event.getClickedBlock();
-        if (clickedBlock == null) {
+
+        final PersistentDataContainer pdc = armorStand.getPersistentDataContainer();
+        if (!pdc.has(WeaponShopDisplaySystem.getWeaponShopKey(), PersistentDataType.BOOLEAN)) {
             return;
         }
+
+        final Integer shopIndex = pdc.get(WeaponShopDisplaySystem.getWeaponShopIndexKey(), PersistentDataType.INTEGER);
+        if (shopIndex == null) {
+            return;
+        }
+
         final ZombiesPlayer player = new ZombiesPlayer(event.getPlayer());
         final ZombiesWorld world = player.getWorld();
         if (!world.isGameRunning()) {
             return;
         }
-        final WeaponShop weaponShop = world.getConfig().weaponShops.stream()
-                .filter(shop -> shop.position.equals(clickedBlock.getLocation().toBlock()))
-                .findAny().orElse(null);
-        if (weaponShop == null) {
+
+        final var weaponShops = world.getConfig().weaponShops;
+        if (shopIndex < 0 || shopIndex >= weaponShops.size()) {
             return;
         }
+
+        final WeaponShop weaponShop = weaponShops.get(shopIndex);
+
         final Weapon heldWeapon = player.getHeldWeapon();
         // Use isSameFamily so PISTOL_UPGRADED can be refilled at PISTOL shop
         if (heldWeapon != null && heldWeapon.get(Weapon.TYPE).isSameFamily(weaponShop.weaponType)) {
@@ -114,7 +126,7 @@ public final class InteractWithWeaponShopSystem implements Listener {
         final int ammo = ammComponent.get(AmmoData.AMMO);
         final int maxAmmo = ammoData.ammo();
         final int maxClip = ammoData.clip();
-        if (ammo == maxAmmo) {
+        if (ammo == maxAmmo && clip == maxClip) {
             player.sendMessage(Component.text("This weapon is already refilled").color(NamedTextColor.RED));
             return;
         }

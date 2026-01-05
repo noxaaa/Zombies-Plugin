@@ -3,6 +3,7 @@ package io.lama06.zombies.weapon;
 import io.lama06.zombies.menu.MenuDisplayableEnum;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -56,7 +57,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Sniper"))
                     .setMaterial(Material.WOODEN_SHOVEL)
                     .setShoot(new ShootData(1, 1, 2))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.FIREWORK))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 2.0f))
                     .setAttack(new AttackData(20, false, 30, 10, 15, 0.6))  // 1.5x headshot, knockback 0.6
                     .setAmmo(new AmmoData(40, 4))
                     .setDelay(new DelayData(20))  // 1.0s
@@ -81,7 +83,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(6, false, 10, 3, 5, 0.25))  // 1.5x headshot, knockback 0.25
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(10))  // 0.5s, DPS=12
                     .setReload(new ReloadData(30))
                     .setAmmo(new AmmoData(70, 7))
@@ -142,7 +145,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Sniper Ultimate"))
                     .setMaterial(Material.WOODEN_SHOVEL)
                     .setShoot(new ShootData(2, 1, 3))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.FIREWORK))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 2.0f))
                     .setAttack(new AttackData(30, false, 30, 15, 15, 0.8))  // 1.5x headshot, knockback 0.8
                     .setAmmo(new AmmoData(60, 6))
                     .setDelay(new DelayData(25))
@@ -167,7 +171,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(8, false, 10, 4, 5, 0.28))  // 1.5x headshot, knockback 0.28
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(10))  // 0.5s, DPS=16
                     .setReload(new ReloadData(28))
                     .setAmmo(new AmmoData(100, 10))
@@ -179,7 +184,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(10, false, 10, 5, 5, 0.3))  // 1.5x headshot, knockback 0.3
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(8))  // 0.4s, DPS=25
                     .setReload(new ReloadData(26))
                     .setAmmo(new AmmoData(130, 13))
@@ -191,7 +197,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(12, false, 10, 6, 5, 0.32))  // 1.5x headshot, knockback 0.32
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(6))  // 0.3s, DPS=40
                     .setReload(new ReloadData(24))
                     .setAmmo(new AmmoData(170, 17))
@@ -203,7 +210,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(15, false, 10, 7.5, 5, 0.35))  // 1.5x headshot, knockback 0.35
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(6))  // 0.3s, DPS=50
                     .setReload(new ReloadData(22))
                     .setAmmo(new AmmoData(200, 20))
@@ -215,7 +223,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_PICKAXE)
                     .setAttack(new AttackData(20, false, 10, 10, 5, 0.4))  // 1.5x headshot, knockback 0.4
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.FLAME))
+                    .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
                     .setDelay(new DelayData(4))  // 0.2s, DPS=100
                     .setReload(new ReloadData(20))  // 1.0s
                     .setAmmo(new AmmoData(250, 25))
@@ -226,8 +235,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Zombie Zapper").color(NamedTextColor.AQUA))
                     .setMaterial(Material.DIAMOND_PICKAXE)
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.ELECTRIC_SPARK))
-                    .setShootSound(new ShootSoundData(Sound.BLOCK_BEACON_ACTIVATE, 2.0f))
+                    .setShootParticle(new ShootParticleData(Particle.ENCHANTED_HIT))
+                    .setShootSound(new ShootSoundData(Sound.ITEM_FLINTANDSTEEL_USE, 2.0f))
                     .setAttack(new AttackData(12, false, 15, 6, 5, 0.2))  // 12 base, 1.5x headshot = 18, gold 15/20
                     .setAmmo(new AmmoData(100, 10))
                     .setDelay(new DelayData(10))  // 0.5s
@@ -240,8 +249,8 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Zombie Zapper Ultimate").color(NamedTextColor.AQUA))
                     .setMaterial(Material.DIAMOND_PICKAXE)
                     .setShoot(new ShootData(1, 1))
-                    .setShootParticle(new ShootParticleData(Particle.ELECTRIC_SPARK))
-                    .setShootSound(new ShootSoundData(Sound.BLOCK_BEACON_ACTIVATE, 2.0f))
+                    .setShootParticle(new ShootParticleData(Particle.ENCHANTED_HIT))
+                    .setShootSound(new ShootSoundData(Sound.ITEM_FLINTANDSTEEL_USE, 2.0f))
                     .setAttack(new AttackData(18, false, 15, 9, 5, 0.25))  // 18 base, 1.5x headshot = 27, gold 15/20
                     .setAmmo(new AmmoData(120, 10))
                     .setDelay(new DelayData(10))  // 0.5s

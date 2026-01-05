@@ -24,7 +24,11 @@ public final class SpawnParticlesAfterShotSystem implements Listener {
             final Vector directionWithDistance = direction.multiply(shootParticleData.spacing());
             final Location particleLocation = player.getBukkit().getEyeLocation().add(directionWithDistance);
             for (int i = 0; i < shootParticleData.count(); i++) {
-                player.getWorld().getBukkit().spawnParticle(shootParticleData.particle(), particleLocation, 1, 0, 0, 0, 0);
+                if (shootParticleData.particleData() != null) {
+                    player.getWorld().getBukkit().spawnParticle(shootParticleData.particle(), particleLocation, 1, 0, 0, 0, 0, shootParticleData.particleData());
+                } else {
+                    player.getWorld().getBukkit().spawnParticle(shootParticleData.particle(), particleLocation, 1, 0, 0, 0, 0);
+                }
                 particleLocation.add(directionWithDistance);
                 if (!particleLocation.getBlock().getType().isEmpty()) {
                     break;

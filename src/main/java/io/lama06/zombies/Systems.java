@@ -48,6 +48,7 @@ public final class Systems {
             new EndGameWhenPlayersDeadSystem(),
             new HandleNewPlayersSystem(),
             new InteractWithWeaponShopSystem(),
+            new WeaponShopDisplaySystem(),
             new OpenDoorSystem(),
             new PrepareWorldAtGameStartSystem(),
             new PreventEventsSystem(),

@@ -5,9 +5,14 @@ import org.bukkit.Particle;
 public record ShootParticleData(
     Particle particle,
     int count,
-    double spacing
+    double spacing,
+    Object particleData
 ) {
     public ShootParticleData(final Particle particle) {
-        this(particle, 15, 1);
+        this(particle, 15, 1, null);
+    }
+
+    public ShootParticleData(final Particle particle, final Object particleData) {
+        this(particle, 15, 1, particleData);
     }
 }
