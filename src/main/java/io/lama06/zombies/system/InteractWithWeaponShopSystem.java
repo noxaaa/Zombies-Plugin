@@ -21,7 +21,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public final class InteractWithWeaponShopSystem implements Listener {
     @EventHandler
     private void onPlayerInteract(final PlayerInteractEvent event) {
-        if (!event.getAction().isLeftClick()) {
+        if (!event.getAction().isRightClick()) {
             return;
         }
         final Block clickedBlock = event.getClickedBlock();
