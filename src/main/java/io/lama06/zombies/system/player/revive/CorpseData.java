@@ -1,11 +1,13 @@
 package io.lama06.zombies.system.player.revive;
 
-import org.bukkit.entity.ArmorStand;
+import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.Location;
 
 import java.util.UUID;
 
 public final class CorpseData {
-    private final ArmorStand armorStand;
+    private final ServerPlayer npc;
+    private final Location location;
     private final UUID deadPlayerUUID;
     private int remainingTime;
     private int reviveProgress;
@@ -13,12 +15,14 @@ public final class CorpseData {
     private boolean reviveByClick;
 
     public CorpseData(
-            final ArmorStand armorStand,
+            final ServerPlayer npc,
+            final Location location,
             final UUID deadPlayerUUID,
             final int remainingTime,
             final int reviveProgress
     ) {
-        this.armorStand = armorStand;
+        this.npc = npc;
+        this.location = location;
         this.deadPlayerUUID = deadPlayerUUID;
         this.remainingTime = remainingTime;
         this.reviveProgress = reviveProgress;
@@ -26,8 +30,12 @@ public final class CorpseData {
         this.reviveByClick = false;
     }
 
-    public ArmorStand getArmorStand() {
-        return armorStand;
+    public ServerPlayer getNpc() {
+        return npc;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     public UUID getDeadPlayerUUID() {

@@ -20,6 +20,10 @@
             <id>sonatype-oss-snapshots1</id>
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>minecraft-libraries</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -27,6 +31,19 @@
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.5-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-server</artifactId>
+            <version>1.21.5-R0.1-SNAPSHOT</version>
+            <classifier>mojang-mapped</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>6.0.57</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

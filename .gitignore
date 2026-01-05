@@ -1,5 +1,6 @@
 server
 target
+libs/
 
 ### IntelliJ IDEA ###
 out/

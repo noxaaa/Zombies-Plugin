@@ -114,15 +114,6 @@ public final class ZombiesPlugin extends JavaPlugin implements Listener {
         return corpses.values();
     }
 
-    public CorpseData getCorpseByArmorStand(final org.bukkit.entity.ArmorStand armorStand) {
-        for (final CorpseData corpse : corpses.values()) {
-            if (corpse.getArmorStand() != null && corpse.getArmorStand().equals(armorStand)) {
-                return corpse;
-            }
-        }
-        return null;
-    }
-
     public void clearCorpses() {
         corpses.clear();
     }

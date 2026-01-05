@@ -40,7 +40,7 @@ public final class TickPlayerCorpseSystem implements Listener {
                 continue;
             }
 
-            final Location corpseLocation = corpse.getArmorStand().getLocation();
+            final Location corpseLocation = corpse.getLocation();
 
             // Handle sneak revive interruption
             if (corpse.hasReviver() && !corpse.isReviveByClick()) {
@@ -124,7 +124,7 @@ public final class TickPlayerCorpseSystem implements Listener {
 
     private void completeRevive(final CorpseData corpse, final Player deadPlayer,
                                 final ZombiesWorld world, final Player reviver) {
-        final Location corpseLocation = corpse.getArmorStand().getLocation();
+        final Location corpseLocation = corpse.getLocation();
 
         deadPlayer.setGameMode(GameMode.ADVENTURE);
         deadPlayer.teleport(corpseLocation);
