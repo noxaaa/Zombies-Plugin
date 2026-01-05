@@ -40,14 +40,21 @@ public final class InteractWithWeaponShopSystem implements Listener {
             return;
         }
         final Weapon heldWeapon = player.getHeldWeapon();
-        if (heldWeapon == null || !heldWeapon.get(Weapon.TYPE).equals(weaponShop.weaponType)) {
-            buyWeapon(player, weaponShop);
-        } else {
+        // Use isSameFamily so PISTOL_UPGRADED can be refilled at PISTOL shop
+        if (heldWeapon != null && heldWeapon.get(Weapon.TYPE).isSameFamily(weaponShop.weaponType)) {
             refillWeapon(player, weaponShop, heldWeapon);
+        } else {
+            buyWeapon(player, weaponShop);
         }
     }
 
     private void buyWeapon(final ZombiesPlayer player, final WeaponShop shop) {
+        // Check if player already has a weapon of the same type
+        if (player.hasWeaponOfSameType(shop.weaponType)) {
+            player.sendMessage(Component.text("You already have this weapon").color(NamedTextColor.RED));
+            return;
+        }
+
         final int gold = player.get(ZombiesPlayer.GOLD);
         if (gold < shop.purchasePrice) {
             player.sendMessage(Component.text("You cannot afford this weapon").color(NamedTextColor.RED));

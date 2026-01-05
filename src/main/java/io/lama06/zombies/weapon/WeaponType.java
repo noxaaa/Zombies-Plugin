@@ -281,4 +281,29 @@ public enum WeaponType implements MenuDisplayableEnum {
     public Material getDisplayMaterial() {
         return data.material;
     }
+
+    /**
+     * Gets the base (non-upgraded) type of this weapon.
+     * For example, PISTOL_UPGRADED.getBaseType() returns PISTOL.
+     * @return The base weapon type
+     */
+    public WeaponType getBaseType() {
+        // Find which weapon upgrades to this one
+        for (final WeaponType type : values()) {
+            if (type.data.upgradesTo == this) {
+                return type.getBaseType();
+            }
+        }
+        // No weapon upgrades to this one, so this is the base type
+        return this;
+    }
+
+    /**
+     * Checks if two weapon types are the same family (same base type).
+     * @param other The other weapon type
+     * @return true if they are the same type or upgrade variants
+     */
+    public boolean isSameFamily(final WeaponType other) {
+        return this.getBaseType() == other.getBaseType();
+    }
 }

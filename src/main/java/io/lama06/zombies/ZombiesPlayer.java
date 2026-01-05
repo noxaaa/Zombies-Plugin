@@ -75,6 +75,20 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         return hasPerk(PlayerPerk.EXTRA_WEAPON) ? 3 : 2;
     }
 
+    /**
+     * Checks if the player already has a weapon of the same family (base type).
+     * @param type The weapon type to check
+     * @return true if the player already has a weapon of the same family
+     */
+    public boolean hasWeaponOfSameType(final WeaponType type) {
+        for (final Weapon weapon : getWeapons()) {
+            if (weapon.get(Weapon.TYPE).isSameFamily(type)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Weapon giveWeapon(final int slot, final WeaponType type) {
         final ItemStack item = new ItemStack(type.data.material);
         final ItemMeta meta = item.getItemMeta();

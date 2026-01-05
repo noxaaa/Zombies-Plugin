@@ -1,11 +1,13 @@
 package io.lama06.zombies.system.lucky_chest;
 
 import io.lama06.zombies.LuckyChest;
+import io.lama06.zombies.PlaceholderItem;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.WeaponType;
+import org.bukkit.inventory.ItemStack;
 import io.papermc.paper.math.BlockPosition;
 import io.papermc.paper.math.FinePosition;
 import net.kyori.adventure.text.Component;
@@ -84,14 +86,44 @@ public final class InteractWithLuckyChestSystem implements Listener {
         if (weaponType == null) {
             return;
         }
-        final PlayerInventory inventory = player.getBukkit().getInventory();
-        final int slot = inventory.getHeldItemSlot();
-        if (slot == 0 || slot > player.getLastWeaponSlot()) {
-            player.sendMessage(Component.text("Select a weapon slot").color(NamedTextColor.RED));
+
+        // Check if player already has a weapon of the same type
+        if (player.hasWeaponOfSameType(weaponType)) {
+            player.sendMessage(Component.text("You already have this weapon").color(NamedTextColor.RED));
             return;
         }
+
+        final PlayerInventory inventory = player.getBukkit().getInventory();
+
+        // Find first empty slot (placeholder)
+        Integer emptySlot = null;
+        for (int slot = 1; slot <= player.getLastWeaponSlot(); slot++) {
+            final ItemStack item = inventory.getItem(slot);
+            if (PlaceholderItem.isPlaceholder(item)) {
+                emptySlot = slot;
+                break;
+            }
+        }
+
+        final int targetSlot;
+        if (emptySlot != null) {
+            targetSlot = emptySlot;
+        } else {
+            // No empty slot, must be holding a weapon to replace
+            final int heldSlot = inventory.getHeldItemSlot();
+            if (heldSlot == 0 || heldSlot > player.getLastWeaponSlot()) {
+                player.sendMessage(Component.text("No empty slot. Hold a weapon to replace.").color(NamedTextColor.RED));
+                return;
+            }
+            if (player.getHeldWeapon() == null) {
+                player.sendMessage(Component.text("Hold a weapon to replace.").color(NamedTextColor.RED));
+                return;
+            }
+            targetSlot = heldSlot;
+        }
+
         itemDisplay.remove();
-        player.giveWeapon(slot, weaponType);
+        player.giveWeapon(targetSlot, weaponType);
     }
 
     private ItemDisplay getShuffleItem(final LuckyChest chest, final World world) {
