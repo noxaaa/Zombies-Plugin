@@ -5,6 +5,8 @@ import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.title.Title;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,6 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+
+import java.time.Duration;
 
 public final class SpawnPlayerCorpseSystem implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
@@ -52,6 +56,25 @@ public final class SpawnPlayerCorpseSystem implements Listener {
         world.sendMessage(bukkit.displayName()
                 .append(Component.text(" is downed! ").color(NamedTextColor.RED))
                 .append(Component.text((PlayerCorpse.TIME / 20) + " seconds to revive").color(NamedTextColor.YELLOW)));
+
+        // Show title to other players
+        final String areaName = world.getPlayerArea(player);
+        final Component titleText = Component.text(bukkit.getName() + " is down in ").color(NamedTextColor.GRAY)
+                .append(Component.text(areaName != null ? areaName : "Unknown")
+                        .color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                .append(Component.text("!").color(NamedTextColor.GRAY));
+
+        final Title title = Title.title(
+                titleText,
+                Component.empty(),
+                Title.Times.times(Duration.ofMillis(200), Duration.ofSeconds(2), Duration.ofMillis(500))
+        );
+
+        for (final ZombiesPlayer otherPlayer : world.getPlayers()) {
+            if (!otherPlayer.getBukkit().getUniqueId().equals(bukkit.getUniqueId())) {
+                otherPlayer.getBukkit().showTitle(title);
+            }
+        }
 
         // Create the corpse NPC
         final CorpseData corpse = PlayerCorpseNPC.createCorpse(bukkit, deathLocation);
