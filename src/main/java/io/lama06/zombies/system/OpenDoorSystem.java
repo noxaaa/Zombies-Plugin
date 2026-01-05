@@ -5,12 +5,14 @@ import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,16 @@ public final class OpenDoorSystem implements Listener {
                 player.sendMessage(Component.text("You don't have enough gold to open this door").color(NamedTextColor.RED));
                 return;
             }
-            world.showTitle(Title.title(Component.text(player.getBukkit().getName() + " opened a door"), Component.empty()));
+            final String doorDisplayName = door.displayName.isEmpty() ? "a door" : door.displayName;
+            final Component titleText = Component.text(player.getBukkit().getName() + " opened ").color(NamedTextColor.GRAY)
+                    .append(Component.text(doorDisplayName).color(NamedTextColor.GREEN).decorate(TextDecoration.BOLD))
+                    .append(Component.text("!").color(NamedTextColor.GRAY));
+            final Title title = Title.title(
+                    titleText,
+                    Component.empty(),
+                    Title.Times.times(Duration.ofMillis(200), Duration.ofSeconds(2), Duration.ofMillis(500))
+            );
+            world.showTitle(title);
             door.setOpen(world, true);
             player.set(ZombiesPlayer.GOLD, gold - door.gold);
             Bukkit.getPluginManager().callEvent(new PlayerGoldChangeEvent(player, gold, gold - door.gold));
