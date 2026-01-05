@@ -119,29 +119,63 @@ public final class ArmorShop implements CheckableConfig {
     }
 
     public enum Quality implements MenuDisplayableEnum {
-        LEATHER(Map.of(
+        LEATHER(0, Map.of(
                 EquipmentSlot.HEAD, Material.LEATHER_HELMET,
                 EquipmentSlot.CHEST, Material.LEATHER_CHESTPLATE,
                 EquipmentSlot.LEGS, Material.LEATHER_LEGGINGS,
                 EquipmentSlot.FEET, Material.LEATHER_BOOTS
         )),
-        GOLD(Map.of(
+        GOLD(1, Map.of(
                 EquipmentSlot.HEAD, Material.GOLDEN_HELMET,
                 EquipmentSlot.CHEST, Material.GOLDEN_CHESTPLATE,
                 EquipmentSlot.LEGS, Material.GOLDEN_LEGGINGS,
                 EquipmentSlot.FEET, Material.GOLDEN_BOOTS
         )),
-        IRON(Map.of(
+        IRON(2, Map.of(
                 EquipmentSlot.HEAD, Material.IRON_HELMET,
                 EquipmentSlot.CHEST, Material.IRON_CHESTPLATE,
                 EquipmentSlot.LEGS, Material.IRON_LEGGINGS,
                 EquipmentSlot.FEET, Material.IRON_BOOTS
+        )),
+        DIAMOND(3, Map.of(
+                EquipmentSlot.HEAD, Material.DIAMOND_HELMET,
+                EquipmentSlot.CHEST, Material.DIAMOND_CHESTPLATE,
+                EquipmentSlot.LEGS, Material.DIAMOND_LEGGINGS,
+                EquipmentSlot.FEET, Material.DIAMOND_BOOTS
+        )),
+        NETHERITE(4, Map.of(
+                EquipmentSlot.HEAD, Material.NETHERITE_HELMET,
+                EquipmentSlot.CHEST, Material.NETHERITE_CHESTPLATE,
+                EquipmentSlot.LEGS, Material.NETHERITE_LEGGINGS,
+                EquipmentSlot.FEET, Material.NETHERITE_BOOTS
         ));
 
+        public final int tier;
         public final Map<EquipmentSlot, Material> materials;
 
-        Quality(final Map<EquipmentSlot, Material> materials) {
+        Quality(final int tier, final Map<EquipmentSlot, Material> materials) {
+            this.tier = tier;
             this.materials = materials;
+        }
+
+        /**
+         * Gets the tier level of a material. Returns -1 for non-armor or AIR.
+         */
+        public static int getTierOfMaterial(final Material material) {
+            if (material == null || material == Material.AIR) {
+                return -1;
+            }
+            for (final Quality quality : values()) {
+                if (quality.materials.containsValue(material)) {
+                    return quality.tier;
+                }
+            }
+            // Check chainmail separately (tier between leather and gold)
+            if (material == Material.CHAINMAIL_HELMET || material == Material.CHAINMAIL_CHESTPLATE ||
+                material == Material.CHAINMAIL_LEGGINGS || material == Material.CHAINMAIL_BOOTS) {
+                return 0; // Same tier as leather
+            }
+            return -1;
         }
 
         @Override
@@ -150,6 +184,8 @@ public final class ArmorShop implements CheckableConfig {
                 case LEATHER -> Component.text("Leather");
                 case GOLD -> Component.text("Gold").color(NamedTextColor.GOLD);
                 case IRON -> Component.text("Iron");
+                case DIAMOND -> Component.text("Diamond").color(NamedTextColor.AQUA);
+                case NETHERITE -> Component.text("Netherite").color(NamedTextColor.DARK_RED);
             };
         }
 
@@ -159,6 +195,8 @@ public final class ArmorShop implements CheckableConfig {
                 case LEATHER -> Material.LEATHER;
                 case GOLD -> Material.GOLD_INGOT;
                 case IRON -> Material.IRON_INGOT;
+                case DIAMOND -> Material.DIAMOND;
+                case NETHERITE -> Material.NETHERITE_INGOT;
             };
         }
     }
