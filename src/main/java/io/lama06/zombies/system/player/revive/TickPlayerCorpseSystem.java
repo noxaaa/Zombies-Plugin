@@ -51,12 +51,25 @@ public final class TickPlayerCorpseSystem implements Listener {
                 deadPlayer.sendActionBar(Component.text("Bleed out: %.1fs".formatted(remainingSeconds)).color(NamedTextColor.RED));
             }
 
-            // Handle sneak revive interruption
-            if (corpse.hasReviver() && !corpse.isReviveByClick()) {
+            // Handle revive interruption
+            if (corpse.hasReviver()) {
                 final Player reviver = Bukkit.getPlayer(corpse.getReviverUUID());
-                if (reviver == null || !reviver.isSneaking() ||
-                        reviver.getLocation().distance(corpseLocation) > PlayerCorpse.REVIVE_RADIUS) {
-                    // Sneak revive interrupted - clear reviver, reset progress AND reset bleed out timer
+                boolean interrupted = false;
+
+                // Check if reviver got downed or left (applies to all revive types)
+                if (reviver == null || reviver.getGameMode() != GameMode.ADVENTURE) {
+                    interrupted = true;
+                }
+                // Additional checks for sneak revive
+                else if (!corpse.isReviveByClick()) {
+                    if (!reviver.isSneaking() ||
+                            reviver.getLocation().distance(corpseLocation) > PlayerCorpse.REVIVE_RADIUS) {
+                        interrupted = true;
+                    }
+                }
+
+                if (interrupted) {
+                    // Revive interrupted - clear reviver, reset progress AND reset bleed out timer
                     corpse.clearReviver();
                     corpse.setReviveProgress(PlayerCorpse.REVIVE_TIME);
                     corpse.setRemainingTime(PlayerCorpse.TIME); // Reset 25s timer
