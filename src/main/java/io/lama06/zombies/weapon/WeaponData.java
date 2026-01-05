@@ -18,6 +18,7 @@ public final class WeaponData {
     public WeaponType upgradesTo;  // 升级后的武器类型，null 表示不可升级/已满级
     public boolean glowing;  // 是否发光（升级版武器）
     public BurstData burst;  // 连发数据，null 表示不连发
+    public SpreadDamageData spreadDamage;  // 扩散伤害数据，null 表示无扩散
 
     public WeaponData setDisplayName(final Component displayName) {
         this.displayName = displayName;
@@ -86,6 +87,11 @@ public final class WeaponData {
 
     public WeaponData setBurst(final BurstData burst) {
         this.burst = burst;
+        return this;
+    }
+
+    public WeaponData setSpreadDamage(final SpreadDamageData spreadDamage) {
+        this.spreadDamage = spreadDamage;
         return this;
     }
 }

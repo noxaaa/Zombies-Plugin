@@ -18,6 +18,7 @@ import io.lama06.zombies.system.player.revive.TickPlayerCorpseSystem;
 import io.lama06.zombies.system.weapon.RenderWeaponLoreSystem;
 import io.lama06.zombies.system.weapon.ammo.*;
 import io.lama06.zombies.system.weapon.attack.ApplyAttackDamageSystem;
+import io.lama06.zombies.system.weapon.attack.ApplySpreadDamageSystem;
 import io.lama06.zombies.system.weapon.attack.GiveGoldAfterAttackSystem;
 import io.lama06.zombies.system.weapon.delay.*;
 import io.lama06.zombies.system.weapon.melee.AttackMeleeSystem;
@@ -107,6 +108,7 @@ public final class Systems {
 
             // Attack
             new ApplyAttackDamageSystem(),
+            new ApplySpreadDamageSystem(),
             new GiveGoldAfterAttackSystem(),
             new RenderAmmoLoreSystem(),
 

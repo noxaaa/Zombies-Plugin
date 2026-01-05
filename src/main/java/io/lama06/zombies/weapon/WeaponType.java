@@ -220,6 +220,34 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setReload(new ReloadData(20))  // 1.0s
                     .setAmmo(new AmmoData(250, 25))
                     .setGlowing()
+    ),
+    ZOMBIE_ZAPPER(
+            new WeaponData()
+                    .setDisplayName(Component.text("Zombie Zapper").color(NamedTextColor.AQUA))
+                    .setMaterial(Material.DIAMOND_PICKAXE)
+                    .setShoot(new ShootData(1, 1))
+                    .setShootParticle(new ShootParticleData(Particle.ELECTRIC_SPARK))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_BEACON_ACTIVATE, 2.0f))
+                    .setAttack(new AttackData(12, false, 15, 6, 5, 0.2))  // 12 base, 1.5x headshot = 18, gold 15/20
+                    .setAmmo(new AmmoData(100, 10))
+                    .setDelay(new DelayData(10))  // 0.5s
+                    .setReload(new ReloadData(40))  // 2.0s
+                    .setSpreadDamage(new SpreadDamageData(3.0, 3))  // 3 blocks, max 3 extra targets (4 total)
+                    .includeInLuckyChest()
+    ),
+    ZOMBIE_ZAPPER_UPGRADED(
+            new WeaponData()
+                    .setDisplayName(Component.text("Zombie Zapper Ultimate").color(NamedTextColor.AQUA))
+                    .setMaterial(Material.DIAMOND_PICKAXE)
+                    .setShoot(new ShootData(1, 1))
+                    .setShootParticle(new ShootParticleData(Particle.ELECTRIC_SPARK))
+                    .setShootSound(new ShootSoundData(Sound.BLOCK_BEACON_ACTIVATE, 2.0f))
+                    .setAttack(new AttackData(18, false, 15, 9, 5, 0.25))  // 18 base, 1.5x headshot = 27, gold 15/20
+                    .setAmmo(new AmmoData(120, 10))
+                    .setDelay(new DelayData(10))  // 0.5s
+                    .setReload(new ReloadData(30))  // 1.5s
+                    .setSpreadDamage(new SpreadDamageData(3.0, 4))  // 3 blocks, max 4 extra targets (5 total)
+                    .setGlowing()
     );
 
     static {
@@ -235,6 +263,7 @@ public enum WeaponType implements MenuDisplayableEnum {
         GOLD_DIGGER_V3.data.upgradesTo = GOLD_DIGGER_V4;
         GOLD_DIGGER_V4.data.upgradesTo = GOLD_DIGGER_V5;
         GOLD_DIGGER_V5.data.upgradesTo = GOLD_DIGGER_V6;
+        ZOMBIE_ZAPPER.data.upgradesTo = ZOMBIE_ZAPPER_UPGRADED;
     }
 
     public final WeaponData data;
