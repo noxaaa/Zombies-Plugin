@@ -1,5 +1,6 @@
 package io.lama06.zombies;
 
+import io.lama06.zombies.system.player.revive.CorpseData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.Bukkit;
@@ -8,13 +9,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ZombiesPlugin extends JavaPlugin implements Listener {
     public static ZombiesPlugin INSTANCE;
 
     private ConfigManager configManager;
+    private final Map<UUID, CorpseData> corpses = new ConcurrentHashMap<>();
 
     @Override
     public void onEnable() {
@@ -93,5 +95,35 @@ public final class ZombiesPlugin extends JavaPlugin implements Listener {
 
     public List<Zombie> getZombies() {
         return getGameWorlds().stream().map(ZombiesWorld::getZombies).flatMap(Collection::stream).toList();
+    }
+
+    // Corpse management
+    public void addCorpse(final UUID deadPlayerUUID, final CorpseData corpse) {
+        corpses.put(deadPlayerUUID, corpse);
+    }
+
+    public void removeCorpse(final UUID deadPlayerUUID) {
+        corpses.remove(deadPlayerUUID);
+    }
+
+    public CorpseData getCorpse(final UUID deadPlayerUUID) {
+        return corpses.get(deadPlayerUUID);
+    }
+
+    public Collection<CorpseData> getCorpses() {
+        return corpses.values();
+    }
+
+    public CorpseData getCorpseByArmorStand(final org.bukkit.entity.ArmorStand armorStand) {
+        for (final CorpseData corpse : corpses.values()) {
+            if (corpse.getArmorStand() != null && corpse.getArmorStand().equals(armorStand)) {
+                return corpse;
+            }
+        }
+        return null;
+    }
+
+    public void clearCorpses() {
+        corpses.clear();
     }
 }
