@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
 public final class SpawnPerkItemsOnZombieDeathSystem implements Listener {
-    private static final int PERK_ITEM_TIME = 10 * 20;
+    private static final int PERK_ITEM_TIME = 60 * 20;  // 60秒
     private static final double PERK_PROBABILITY = 0.05;
 
     @EventHandler
