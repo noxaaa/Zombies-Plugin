@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
 
 public enum WeaponType implements MenuDisplayableEnum {
     KNIFE(
@@ -21,6 +22,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.WOODEN_HOE)
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.CRIT))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_IRON_GOLEM_HURT, 2.0f))
                     .setAttack(new AttackData(6, false, 10))
                     .setAmmo(new AmmoData(300, 10))
                     .setDelay(new DelayData(10))  // 0.5s
@@ -43,6 +45,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.IRON_HOE)
                     .setShoot(new ShootData(10, 0.85))
                     .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_GENERIC_EXPLODE, 2.0f))
                     .setAttack(new AttackData(6.5, false, 10))
                     .setAmmo(new AmmoData(65, 5))
                     .setDelay(new DelayData(28))  // 1.4s
@@ -101,6 +104,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.WOODEN_HOE)
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.CRIT))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_IRON_GOLEM_HURT, 2.0f))
                     .setAttack(new AttackData(8, false, 15))
                     .setAmmo(new AmmoData(450, 14))  // 450总弹药, 14弹匣(7次连发×2)
                     .setDelay(new DelayData(10))  // 0.5s
@@ -126,6 +130,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.IRON_HOE)
                     .setShoot(new ShootData(12, 0.85))
                     .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
+                    .setShootSound(new ShootSoundData(Sound.ENTITY_GENERIC_EXPLODE, 2.0f))
                     .setAttack(new AttackData(2.5, false, 12))
                     .setAmmo(new AmmoData(85, 7))
                     .setDelay(new DelayData((int) (1.2 * 20)))

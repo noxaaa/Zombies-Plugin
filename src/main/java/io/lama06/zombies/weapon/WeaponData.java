@@ -11,6 +11,7 @@ public final class WeaponData {
     public ReloadData reload;
     public ShootData shoot;
     public ShootParticleData shootParticle;
+    public ShootSoundData shootSound;
     public MeleeData melee;
     public AttackData attack;
     public boolean inLuckyChest;
@@ -50,6 +51,11 @@ public final class WeaponData {
 
     public WeaponData setShootParticle(final ShootParticleData shootParticle) {
         this.shootParticle = shootParticle;
+        return this;
+    }
+
+    public WeaponData setShootSound(final ShootSoundData shootSound) {
+        this.shootSound = shootSound;
         return this;
     }
 

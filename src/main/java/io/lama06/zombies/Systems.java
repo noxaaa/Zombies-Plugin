@@ -21,6 +21,7 @@ import io.lama06.zombies.system.weapon.melee.AttackMeleeSystem;
 import io.lama06.zombies.system.weapon.melee.RenderMeleeLoreSystem;
 import io.lama06.zombies.system.weapon.reload.*;
 import io.lama06.zombies.system.weapon.shoot.FireBulletsSystem;
+import io.lama06.zombies.system.weapon.shoot.PlaySoundAfterShotSystem;
 import io.lama06.zombies.system.weapon.shoot.RenderShootLoreSystem;
 import io.lama06.zombies.system.weapon.shoot.SpawnParticlesAfterShotSystem;
 import io.lama06.zombies.system.zombie.*;
@@ -126,6 +127,7 @@ public final class Systems {
 
             // Shoot
             new FireBulletsSystem(),
+            new PlaySoundAfterShotSystem(),
             new RenderShootLoreSystem(),
             new SpawnParticlesAfterShotSystem(),
 
