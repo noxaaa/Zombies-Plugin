@@ -2,6 +2,7 @@ package io.lama06.zombies.system.player.revive;
 
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ public final class CorpseData {
     private int reviveProgress;
     private UUID reviverUUID;
     private boolean reviveByClick;
+    private ItemStack[] savedInventory;
 
     public CorpseData(
             final ServerPlayer npc,
@@ -28,6 +30,7 @@ public final class CorpseData {
         this.reviveProgress = reviveProgress;
         this.reviverUUID = null;
         this.reviveByClick = false;
+        this.savedInventory = null;
     }
 
     public ServerPlayer getNpc() {
@@ -89,5 +92,13 @@ public final class CorpseData {
     public void clearReviver() {
         this.reviverUUID = null;
         this.reviveByClick = false;
+    }
+
+    public ItemStack[] getSavedInventory() {
+        return savedInventory;
+    }
+
+    public void setSavedInventory(final ItemStack[] savedInventory) {
+        this.savedInventory = savedInventory;
     }
 }

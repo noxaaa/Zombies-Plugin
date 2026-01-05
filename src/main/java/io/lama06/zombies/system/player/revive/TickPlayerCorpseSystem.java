@@ -42,13 +42,24 @@ public final class TickPlayerCorpseSystem implements Listener {
 
             final Location corpseLocation = corpse.getLocation();
 
+            // Show countdown to downed player
+            final float remainingSeconds = corpse.getRemainingTime() / 20f;
+            if (corpse.hasReviver()) {
+                final float reviveSeconds = corpse.getReviveProgress() / 20f;
+                deadPlayer.sendActionBar(Component.text("Being revived: %.1fs".formatted(reviveSeconds)).color(NamedTextColor.GREEN));
+            } else {
+                deadPlayer.sendActionBar(Component.text("Bleed out: %.1fs".formatted(remainingSeconds)).color(NamedTextColor.RED));
+            }
+
             // Handle sneak revive interruption
             if (corpse.hasReviver() && !corpse.isReviveByClick()) {
                 final Player reviver = Bukkit.getPlayer(corpse.getReviverUUID());
                 if (reviver == null || !reviver.isSneaking() ||
                         reviver.getLocation().distance(corpseLocation) > PlayerCorpse.REVIVE_RADIUS) {
-                    // Sneak revive interrupted - clear reviver but keep progress
+                    // Sneak revive interrupted - clear reviver, reset progress AND reset bleed out timer
                     corpse.clearReviver();
+                    corpse.setReviveProgress(PlayerCorpse.REVIVE_TIME);
+                    corpse.setRemainingTime(PlayerCorpse.TIME); // Reset 25s timer
                 }
             }
 
@@ -103,8 +114,20 @@ public final class TickPlayerCorpseSystem implements Listener {
                 }
             }
 
-            // Check if corpse expired
+            // Check if corpse expired (25 seconds timeout = true death)
             if (corpse.getRemainingTime() <= 0) {
+                // Restore inventory first
+                if (corpse.getSavedInventory() != null) {
+                    deadPlayer.getInventory().setContents(corpse.getSavedInventory());
+                }
+
+                // Clear perks but keep weapons
+                final ZombiesPlayer zombiesDeadPlayer = new ZombiesPlayer(deadPlayer);
+                zombiesDeadPlayer.clearPerks();
+
+                // Set to spectator mode (true death)
+                deadPlayer.setGameMode(GameMode.SPECTATOR);
+
                 world.sendMessage(Component.text("Failed to revive ")
                         .append(deadPlayer.displayName())
                         .color(NamedTextColor.RED));
@@ -124,11 +147,35 @@ public final class TickPlayerCorpseSystem implements Listener {
 
     private void completeRevive(final CorpseData corpse, final Player deadPlayer,
                                 final ZombiesWorld world, final Player reviver) {
-        final Location corpseLocation = corpse.getLocation();
+        // Click revive: respawn at reviver's current location
+        // Sneak revive: respawn at corpse location
+        final Location baseLocation = corpse.isReviveByClick()
+                ? reviver.getLocation()
+                : corpse.getLocation();
+
+        // Restore the view direction from when player was downed
+        final Location respawnLocation = new Location(
+                baseLocation.getWorld(),
+                baseLocation.getX(),
+                baseLocation.getY(),
+                baseLocation.getZ(),
+                corpse.getLocation().getYaw(),
+                corpse.getLocation().getPitch()
+        );
 
         deadPlayer.setGameMode(GameMode.ADVENTURE);
-        deadPlayer.teleport(corpseLocation);
-        deadPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 6 * 20, 2));
+        deadPlayer.teleport(respawnLocation);
+
+        // Restore inventory
+        if (corpse.getSavedInventory() != null) {
+            deadPlayer.getInventory().setContents(corpse.getSavedInventory());
+        }
+
+        // Show the real player again to other players
+        PlayerCorpseNPC.showRealPlayer(deadPlayer);
+
+        // Give speed effect to the reviver
+        reviver.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 6 * 20, 2));
 
         world.sendMessage(reviver.displayName()
                 .append(Component.text(" revived ").color(NamedTextColor.GREEN))

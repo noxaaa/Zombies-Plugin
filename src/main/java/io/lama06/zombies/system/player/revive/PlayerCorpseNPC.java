@@ -120,6 +120,54 @@ public final class PlayerCorpseNPC implements Listener {
         connection.send(new ClientboundPlayerInfoRemovePacket(List.of(npc.getUUID())));
     }
 
+    /**
+     * Hide the real player from all other online players.
+     * Used when a player is downed to only show the corpse NPC.
+     */
+    public static void hideRealPlayer(final Player downedPlayer) {
+        final ServerPlayer handle = ((CraftPlayer) downedPlayer).getHandle();
+        for (final Player viewer : Bukkit.getOnlinePlayers()) {
+            if (viewer.getUniqueId().equals(downedPlayer.getUniqueId())) {
+                continue; // Don't hide from self
+            }
+            final ServerPlayer viewerHandle = ((CraftPlayer) viewer).getHandle();
+            viewerHandle.connection.send(new ClientboundRemoveEntitiesPacket(handle.getId()));
+        }
+    }
+
+    /**
+     * Show the real player to all other online players.
+     * Used when a player is revived.
+     */
+    public static void showRealPlayer(final Player revivedPlayer) {
+        final ServerPlayer handle = ((CraftPlayer) revivedPlayer).getHandle();
+        for (final Player viewer : Bukkit.getOnlinePlayers()) {
+            if (viewer.getUniqueId().equals(revivedPlayer.getUniqueId())) {
+                continue; // Skip self
+            }
+            final ServerPlayer viewerHandle = ((CraftPlayer) viewer).getHandle();
+            final var connection = viewerHandle.connection;
+
+            // Add to player list
+            connection.send(new ClientboundPlayerInfoUpdatePacket(
+                    EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER),
+                    List.of(handle)
+            ));
+
+            // Spawn the entity
+            connection.send(new ClientboundAddEntityPacket(handle, 0, handle.blockPosition()));
+
+            // Send rotation
+            connection.send(new ClientboundRotateHeadPacket(handle, (byte) ((handle.getYRot() * 256) / 360)));
+
+            // Send metadata
+            final List<?> entityData = handle.getEntityData().getNonDefaultValues();
+            if (entityData != null && !entityData.isEmpty()) {
+                connection.send(new ClientboundSetEntityDataPacket(handle.getId(), (List) entityData));
+            }
+        }
+    }
+
     // Handle new players joining - spawn existing corpses for them
     @EventHandler
     private void onPlayerJoin(final PlayerJoinEvent event) {

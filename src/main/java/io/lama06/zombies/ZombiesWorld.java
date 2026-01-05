@@ -97,6 +97,7 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
     public List<ZombiesPlayer> getAlivePlayers() {
         return world.getPlayers().stream()
                 .filter(player -> player.getGameMode() == GameMode.ADVENTURE)
+                .filter(player -> ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) == null) // Exclude downed players
                 .map(ZombiesPlayer::new)
                 .toList();
     }

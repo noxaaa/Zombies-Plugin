@@ -19,7 +19,8 @@ public final class RespawnDeadPlayersAfterRoundSystem implements Listener {
             if (bukkit.getGameMode() != GameMode.SPECTATOR) {
                 continue;
             }
-            player.clearPerks();
+            // Don't clear perks here - they were already cleared when the player timed out
+            // Players keep their weapons but lose perks on true death (25s timeout)
             bukkit.setGameMode(GameMode.ADVENTURE);
             bukkit.teleport(world.getBukkit().getSpawnLocation());
             bukkit.setHealth(20);
