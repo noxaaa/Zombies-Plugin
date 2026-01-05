@@ -14,7 +14,10 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemFlag;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public final class ZombiesPlayer extends Storage implements ForwardingAudience {
@@ -75,6 +79,19 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         if (type.data.glowing) {
             meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        // 近战武器设置超高攻击速度（移除原版攻击冷却）
+        if (type.data.melee != null) {
+            meta.addAttributeModifier(
+                    Attribute.ATTACK_SPEED,
+                    new AttributeModifier(
+                            UUID.randomUUID(),
+                            "generic.attack_speed",
+                            1000,
+                            AttributeModifier.Operation.ADD_NUMBER,
+                            EquipmentSlot.HAND
+                    )
+            );
         }
         item.setItemMeta(meta);
         final PlayerInventory inventory = player.getInventory();
