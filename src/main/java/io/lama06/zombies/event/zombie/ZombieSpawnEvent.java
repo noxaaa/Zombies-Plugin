@@ -15,15 +15,24 @@ public final class ZombieSpawnEvent extends ZombieEvent {
 
     private final ZombieData data;
     private final int healthOverride;  // 0 = 使用data.health
+    private final double speedOverride;  // 0 = 使用默认速度
+    private final double damageOverride;  // 0 = 使用默认攻击力
 
     public ZombieSpawnEvent(final Zombie zombie, final ZombieData data) {
-        this(zombie, data, 0);
+        this(zombie, data, 0, 0, 0);
     }
 
     public ZombieSpawnEvent(final Zombie zombie, final ZombieData data, final int healthOverride) {
+        this(zombie, data, healthOverride, 0, 0);
+    }
+
+    public ZombieSpawnEvent(final Zombie zombie, final ZombieData data, final int healthOverride,
+                            final double speedOverride, final double damageOverride) {
         super(zombie);
         this.data = data;
         this.healthOverride = healthOverride;
+        this.speedOverride = speedOverride;
+        this.damageOverride = damageOverride;
     }
 
     public ZombieData getData() {
@@ -36,6 +45,14 @@ public final class ZombieSpawnEvent extends ZombieEvent {
 
     public int getEffectiveHealth() {
         return healthOverride > 0 ? healthOverride : data.health;
+    }
+
+    public double getSpeedOverride() {
+        return speedOverride;
+    }
+
+    public double getDamageOverride() {
+        return damageOverride;
     }
 
     @Override

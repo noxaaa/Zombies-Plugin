@@ -2203,6 +2203,12 @@
               },
               "zombieHealth": {
                 "NORMAL_EASY": 20
+              },
+              "zombieSpeed": {
+                "NORMAL_EASY": 0.2
+              },
+              "zombieDamage": {
+                "NORMAL_EASY": 2.0
               }
             },
             {
@@ -2212,6 +2218,12 @@
               },
               "zombieHealth": {
                 "NORMAL_EASY": 20
+              },
+              "zombieSpeed": {
+                "NORMAL_EASY": 0.2
+              },
+              "zombieDamage": {
+                "NORMAL_EASY": 2.0
               }
             }
           ]
@@ -2227,6 +2239,14 @@
               "zombieHealth": {
                 "NORMAL_EASY": 25,
                 "NORMAL_MEDIUM": 25
+              },
+              "zombieSpeed": {
+                "NORMAL_EASY": 0.22,
+                "NORMAL_MEDIUM": 0.24
+              },
+              "zombieDamage": {
+                "NORMAL_EASY": 2.5,
+                "NORMAL_MEDIUM": 3.0
               }
             },
             {
@@ -2238,6 +2258,14 @@
               "zombieHealth": {
                 "NORMAL_EASY": 25,
                 "NORMAL_MEDIUM": 25
+              },
+              "zombieSpeed": {
+                "NORMAL_EASY": 0.22,
+                "NORMAL_MEDIUM": 0.24
+              },
+              "zombieDamage": {
+                "NORMAL_EASY": 2.5,
+                "NORMAL_MEDIUM": 3.0
               }
             }
           ]
@@ -2253,6 +2281,14 @@
               "zombieHealth": {
                 "NORMAL_EASY": 30,
                 "NORMAL_MEDIUM": 30
+              },
+              "zombieSpeed": {
+                "NORMAL_EASY": 0.23,
+                "NORMAL_MEDIUM": 0.25
+              },
+              "zombieDamage": {
+                "NORMAL_EASY": 3.0,
+                "NORMAL_MEDIUM": 3.5
               }
             },
             {
@@ -2264,6 +2300,14 @@
               "zombieHealth": {
                 "NORMAL_MEDIUM": 30,
                 "NORMAL_HARD": 30
+              },
+              "zombieSpeed": {
+                "NORMAL_MEDIUM": 0.25,
+                "NORMAL_HARD": 0.27
+              },
+              "zombieDamage": {
+                "NORMAL_MEDIUM": 3.5,
+                "NORMAL_HARD": 4.0
               }
             },
             {
@@ -2273,6 +2317,12 @@
               },
               "zombieHealth": {
                 "NORMAL_HARD": 30
+              },
+              "zombieSpeed": {
+                "NORMAL_HARD": 0.27
+              },
+              "zombieDamage": {
+                "NORMAL_HARD": 4.0
               }
             }
           ]
@@ -2288,6 +2338,14 @@
               "zombieHealth": {
                 "NORMAL_MEDIUM": 40,
                 "NORMAL_HARD": 40
+              },
+              "zombieSpeed": {
+                "NORMAL_MEDIUM": 0.26,
+                "NORMAL_HARD": 0.28
+              },
+              "zombieDamage": {
+                "NORMAL_MEDIUM": 4.0,
+                "NORMAL_HARD": 5.0
               }
             },
             {
@@ -2299,6 +2357,14 @@
               "zombieHealth": {
                 "NORMAL_MEDIUM": 40,
                 "NORMAL_HARD": 40
+              },
+              "zombieSpeed": {
+                "NORMAL_MEDIUM": 0.26,
+                "NORMAL_HARD": 0.28
+              },
+              "zombieDamage": {
+                "NORMAL_MEDIUM": 4.0,
+                "NORMAL_HARD": 5.0
               }
             }
           ]
@@ -2314,6 +2380,14 @@
               "zombieHealth": {
                 "NORMAL_MEDIUM": 50,
                 "LITTLE_BOMBIE": 50
+              },
+              "zombieSpeed": {
+                "NORMAL_MEDIUM": 0.27,
+                "LITTLE_BOMBIE": 0.35
+              },
+              "zombieDamage": {
+                "NORMAL_MEDIUM": 4.5,
+                "LITTLE_BOMBIE": 6.0
               }
             },
             {
@@ -2325,6 +2399,14 @@
               "zombieHealth": {
                 "NORMAL_MEDIUM": 50,
                 "LITTLE_BOMBIE": 50
+              },
+              "zombieSpeed": {
+                "NORMAL_MEDIUM": 0.27,
+                "LITTLE_BOMBIE": 0.35
+              },
+              "zombieDamage": {
+                "NORMAL_MEDIUM": 4.5,
+                "LITTLE_BOMBIE": 6.0
               }
             }
           ]
@@ -2340,6 +2422,14 @@
               "zombieHealth": {
                 "ZOMBIE_WOLF": 60,
                 "NORMAL_HARD": 60
+              },
+              "zombieSpeed": {
+                "ZOMBIE_WOLF": 0.4,
+                "NORMAL_HARD": 0.29
+              },
+              "zombieDamage": {
+                "ZOMBIE_WOLF": 4.0,
+                "NORMAL_HARD": 5.5
               }
             },
             {
@@ -2353,6 +2443,16 @@
                 "ZOMBIE_WOLF": 60,
                 "NORMAL_HARD": 60,
                 "PIG_ZOMBIE": 60
+              },
+              "zombieSpeed": {
+                "ZOMBIE_WOLF": 0.4,
+                "NORMAL_HARD": 0.29,
+                "PIG_ZOMBIE": 0.28
+              },
+              "zombieDamage": {
+                "ZOMBIE_WOLF": 4.0,
+                "NORMAL_HARD": 5.5,
+                "PIG_ZOMBIE": 6.0
               }
             }
           ]
@@ -2368,6 +2468,14 @@
               "zombieHealth": {
                 "NORMAL_HARD": 70,
                 "PIG_ZOMBIE": 70
+              },
+              "zombieSpeed": {
+                "NORMAL_HARD": 0.3,
+                "PIG_ZOMBIE": 0.29
+              },
+              "zombieDamage": {
+                "NORMAL_HARD": 6.0,
+                "PIG_ZOMBIE": 6.5
               }
             },
             {
@@ -2381,6 +2489,16 @@
                 "NORMAL_HARD": 70,
                 "PIG_ZOMBIE": 70,
                 "GUARDIAN_ZOMBIE": 70
+              },
+              "zombieSpeed": {
+                "NORMAL_HARD": 0.3,
+                "PIG_ZOMBIE": 0.29,
+                "GUARDIAN_ZOMBIE": 0.25
+              },
+              "zombieDamage": {
+                "NORMAL_HARD": 6.0,
+                "PIG_ZOMBIE": 6.5,
+                "GUARDIAN_ZOMBIE": 8.0
               }
             }
           ]

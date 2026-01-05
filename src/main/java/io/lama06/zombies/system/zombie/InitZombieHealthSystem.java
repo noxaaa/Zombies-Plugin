@@ -35,5 +35,23 @@ public final class InitZombieHealthSystem implements Listener {
                 knockbackResist.setBaseValue(data.knockbackResistance);
             }
         }
+
+        // 设置速度
+        final double speed = event.getSpeedOverride();
+        if (speed > 0) {
+            final AttributeInstance movementSpeed = living.getAttribute(Attribute.MOVEMENT_SPEED);
+            if (movementSpeed != null) {
+                movementSpeed.setBaseValue(speed);
+            }
+        }
+
+        // 设置攻击力
+        final double damage = event.getDamageOverride();
+        if (damage > 0) {
+            final AttributeInstance attackDamage = living.getAttribute(Attribute.ATTACK_DAMAGE);
+            if (attackDamage != null) {
+                attackDamage.setBaseValue(damage);
+            }
+        }
     }
 }
