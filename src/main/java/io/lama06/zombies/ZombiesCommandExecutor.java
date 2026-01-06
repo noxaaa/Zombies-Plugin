@@ -67,6 +67,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             case "saveConfig" -> saveConfig(sender);
             case "checkConfig" -> checkConfig(sender);
             case "loadTemplate" -> loadTemplate(sender, remainingArgs);
+            case "saveTemplate" -> saveTemplate(sender, remainingArgs);
             case "start" -> start(sender);
             case "stop" -> stop(sender);
             case "giveGold" -> giveGold(sender, remainingArgs);
@@ -96,6 +97,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
                     "saveConfig",
                     "checkConfig",
                     "loadTemplate",
+                    "saveTemplate",
                     "start",
                     "stop",
                     "giveGold",
@@ -252,6 +254,40 @@ public final class ZombiesCommandExecutor implements TabExecutor {
         globalConfig.worlds.put(world.getBukkit().getName(), config);
         sender.sendMessage(Component.text("Template '" + templateName + "' loaded. Start the game: Click me!").color(NamedTextColor.GREEN)
                                    .clickEvent(ClickEvent.suggestCommand("/zombies start")));
+    }
+
+    private void saveTemplate(final CommandSender sender, final String[] args) {
+        if (!(sender instanceof final Player player)) {
+            return;
+        }
+        if (args.length == 0) {
+            sender.sendMessage(Component.text("Usage: /zombies saveTemplate <name>").color(NamedTextColor.YELLOW));
+            return;
+        }
+        final String templateName = args[0];
+        // 验证模板名称（只允许字母、数字、下划线、连字符）
+        if (!templateName.matches("[a-zA-Z0-9_-]+")) {
+            sender.sendMessage(Component.text("Invalid template name. Use only letters, numbers, _ and -").color(NamedTextColor.RED));
+            return;
+        }
+        final ZombiesWorld world = new ZombiesWorld(player.getWorld());
+        final WorldConfig config = world.getConfig();
+        if (config == null) {
+            sender.sendMessage(Component.text("This world has no configuration to save").color(NamedTextColor.RED));
+            return;
+        }
+        // 确保模板目录存在
+        final File templatesDir = new File(ZombiesPlugin.INSTANCE.getDataFolder(), TEMPLATES_DIR);
+        if (!templatesDir.exists()) {
+            templatesDir.mkdirs();
+        }
+        final File templateFile = new File(templatesDir, templateName + ".json");
+        try (final FileWriter writer = new FileWriter(templateFile)) {
+            ConfigManager.createGson().toJson(config, writer);
+            sender.sendMessage(Component.text("Template saved: " + templateFile.getPath()).color(NamedTextColor.GREEN));
+        } catch (final IOException e) {
+            sender.sendMessage(Component.text("Failed to save template: " + e.getMessage()).color(NamedTextColor.RED));
+        }
     }
 
     private void start(final CommandSender sender) {
