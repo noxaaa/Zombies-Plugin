@@ -114,6 +114,17 @@ public final class LuckyChestDisplaySystem implements Listener {
 
                 final LuckyChest chest = config.luckyChests.get(chestIndex);
 
+                // 检查是否是活跃的 Lucky Chest
+                final Integer activeChestIndex = world.get(ZombiesWorld.ACTIVE_LUCKY_CHEST);
+                final boolean isActive = activeChestIndex != null && activeChestIndex.equals(chestIndex);
+
+                if (!isActive) {
+                    // 非活跃箱子，隐藏文字
+                    textDisplay.text(Component.empty());
+                    removeCountdownDisplay(bukkit, chestIndex);
+                    continue;
+                }
+
                 // 查找对应的 ItemDisplay（正在抽奖的物品）
                 final ItemDisplay itemDisplay = findLuckyChestItem(chest, bukkit, chestIndex);
 

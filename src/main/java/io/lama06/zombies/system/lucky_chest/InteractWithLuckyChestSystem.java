@@ -28,6 +28,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class InteractWithLuckyChestSystem implements Listener {
     @EventHandler
@@ -68,6 +69,14 @@ public final class InteractWithLuckyChestSystem implements Listener {
             return;
         }
         event.setCancelled(true);
+
+        // 检查是否是活跃的 Lucky Chest
+        final Integer activeChestIndex = world.get(ZombiesWorld.ACTIVE_LUCKY_CHEST);
+        if (activeChestIndex == null || activeChestIndex != clickedChestIndex) {
+            player.sendMessage(Component.text("This Lucky Chest is not active").color(NamedTextColor.RED));
+            return;
+        }
+
         player.getBukkit().closeInventory();
         final ItemDisplay shuffleItem = getShuffleItem(clickedLuckyChest, world.getBukkit());
         if (shuffleItem == null) {
@@ -75,7 +84,7 @@ public final class InteractWithLuckyChestSystem implements Listener {
             openLuckyChest(player, world, clickedLuckyChest, clickedChestIndex);
         } else {
             // 右键领取
-            claimItem(player, world, clickedLuckyChest, shuffleItem);
+            claimItem(player, world, clickedLuckyChest, shuffleItem, clickedChestIndex);
         }
     }
 
@@ -104,7 +113,7 @@ public final class InteractWithLuckyChestSystem implements Listener {
         setChestOpen(chest, world.getBukkit(), true);
     }
 
-    private void claimItem(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest, final ItemDisplay itemDisplay) {
+    private void claimItem(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest, final ItemDisplay itemDisplay, final int chestIndex) {
         final PersistentDataContainer pdc = itemDisplay.getPersistentDataContainer();
         final Integer remainingTime = pdc.get(LuckyChestItem.getRemainingTimeKey(), PersistentDataType.INTEGER);
         if (remainingTime == null || remainingTime > 0) {
@@ -163,6 +172,38 @@ public final class InteractWithLuckyChestSystem implements Listener {
 
         // 关闭箱子
         setChestOpen(chest, world.getBukkit(), false);
+
+        // 增加使用次数并检查是否需要移动
+        incrementUsesAndMaybeMove(world, chestIndex);
+    }
+
+    private void incrementUsesAndMaybeMove(final ZombiesWorld world, final int currentChestIndex) {
+        final WorldConfig config = world.getConfig();
+        if (config == null || config.luckyChests.size() <= 1) {
+            return;
+        }
+
+        final int moveAfterUses = config.luckyChestMoveAfterUses;
+        if (moveAfterUses <= 0) {
+            // 不移动
+            return;
+        }
+
+        final Integer currentUses = world.get(ZombiesWorld.LUCKY_CHEST_USES);
+        final int newUses = (currentUses != null ? currentUses : 0) + 1;
+
+        if (newUses >= moveAfterUses) {
+            // 移动到下一个随机箱子
+            int newChestIndex;
+            do {
+                newChestIndex = ThreadLocalRandom.current().nextInt(config.luckyChests.size());
+            } while (newChestIndex == currentChestIndex);
+
+            world.set(ZombiesWorld.ACTIVE_LUCKY_CHEST, newChestIndex);
+            world.set(ZombiesWorld.LUCKY_CHEST_USES, 0);
+        } else {
+            world.set(ZombiesWorld.LUCKY_CHEST_USES, newUses);
+        }
     }
 
     private ItemDisplay getShuffleItem(final LuckyChest chest, final World world) {

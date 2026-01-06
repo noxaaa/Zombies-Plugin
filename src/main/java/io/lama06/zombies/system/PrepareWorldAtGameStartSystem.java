@@ -21,6 +21,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class PrepareWorldAtGameStartSystem implements Listener {
     @EventHandler
@@ -42,6 +43,13 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
         world.set(ZombiesWorld.ROUND_START_TIME, world.getBukkit().getGameTime());
         world.set(ZombiesWorld.TRIGGERED_WAVES, 0);
         world.set(ZombiesWorld.DRAGONS_WRATH_USED, 0);
+
+        // 初始化 Lucky Chest - 随机选择一个作为活跃箱子
+        if (!config.luckyChests.isEmpty()) {
+            final int activeChest = ThreadLocalRandom.current().nextInt(config.luckyChests.size());
+            world.set(ZombiesWorld.ACTIVE_LUCKY_CHEST, activeChest);
+            world.set(ZombiesWorld.LUCKY_CHEST_USES, 0);
+        }
 
         final Component perksComponent = world.addComponent(ZombiesWorld.PERKS_COMPONENT);
         for (final GlobalPerk perk : GlobalPerk.values()) {

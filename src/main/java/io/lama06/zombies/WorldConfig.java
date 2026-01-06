@@ -21,6 +21,7 @@ public final class WorldConfig implements CheckableConfig {
     public final List<WeaponShop> weaponShops = new ArrayList<>();
     public final List<ArmorShop> armorShops = new ArrayList<>();
     public final List<LuckyChest> luckyChests = new ArrayList<>();
+    public int luckyChestMoveAfterUses = 0;  // 0 = 不移动
     public final List<PerkMachine> perkMachines = new ArrayList<>();
     public PowerSwitch powerSwitch;
     public BlockPosition teamMachine;
@@ -150,6 +151,21 @@ public final class WorldConfig implements CheckableConfig {
                                 luckyChest -> Component.text("Lucky Chest at " + PositionUtil.format(luckyChest.position)),
                                 LuckyChest::new,
                                 luckChest -> luckChest.openMenu(player, reopen),
+                                reopen
+                        )
+                ),
+                new SelectionEntry(
+                        Component.text("Lucky Chest Move After Uses: " + luckyChestMoveAfterUses),
+                        Material.ENDER_PEARL,
+                        () -> InputMenu.open(
+                                player,
+                                Component.text("Lucky Chest Move After Uses (0 = never)"),
+                                luckyChestMoveAfterUses,
+                                new IntegerInputType(),
+                                uses -> {
+                                    this.luckyChestMoveAfterUses = uses;
+                                    reopen.run();
+                                },
                                 reopen
                         )
                 ),

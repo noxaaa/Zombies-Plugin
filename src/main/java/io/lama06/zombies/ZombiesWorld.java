@@ -40,6 +40,8 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
     public static final AttributeId<Integer> DRAGONS_WRATH_USED = new AttributeId<>("dragons_wrath_used", PersistentDataType.INTEGER);
     public static final AttributeId<Long> ROUND_START_TIME = new AttributeId<>("round_start_time", PersistentDataType.LONG);
     public static final AttributeId<Integer> TRIGGERED_WAVES = new AttributeId<>("triggered_waves", PersistentDataType.INTEGER);
+    public static final AttributeId<Integer> ACTIVE_LUCKY_CHEST = new AttributeId<>("active_lucky_chest", PersistentDataType.INTEGER);
+    public static final AttributeId<Integer> LUCKY_CHEST_USES = new AttributeId<>("lucky_chest_uses", PersistentDataType.INTEGER);
 
     public static final ComponentId PERKS_COMPONENT = new ComponentId("perks");
 
