@@ -39,16 +39,15 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public final class ZombiesCommandExecutor implements TabExecutor {
-    private static final String DEAD_END_TEMPLATE = "templates/dead_end.json";
+    private static final String TEMPLATES_DIR = "templates";
+    private static final List<String> BUILTIN_TEMPLATES = List.of("dead_end");
 
     @Override
     public boolean onCommand(
@@ -67,7 +66,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             case "config" -> config(sender);
             case "saveConfig" -> saveConfig(sender);
             case "checkConfig" -> checkConfig(sender);
-            case "loadTemplate" -> loadTemplate(sender);
+            case "loadTemplate" -> loadTemplate(sender, remainingArgs);
             case "start" -> start(sender);
             case "stop" -> stop(sender);
             case "giveGold" -> giveGold(sender, remainingArgs);
@@ -91,22 +90,62 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             final String label,
             final String[] args
     ) {
-        if (args.length != 1 && args.length != 0) {
-            return List.of();
+        if (args.length == 1) {
+            return List.of(
+                    "config",
+                    "saveConfig",
+                    "checkConfig",
+                    "loadTemplate",
+                    "start",
+                    "stop",
+                    "giveGold",
+                    "giveWeapon",
+                    "spawnZombie",
+                    "summonBuff",
+                    "nextround"
+            );
         }
-        return List.of(
-                "config",
-                "saveConfig",
-                "checkConfig",
-                "loadTemplate",
-                "start",
-                "stop",
-                "giveGold",
-                "giveWeapon",
-                "spawnZombie",
-                "summonBuff",
-                "nextround"
-        );
+        if (args.length == 2 && args[0].equals("loadTemplate")) {
+            return getAvailableTemplates();
+        }
+        return List.of();
+    }
+
+    private List<String> getAvailableTemplates() {
+        final List<String> templates = new ArrayList<>(BUILTIN_TEMPLATES);
+        // 扫描配置目录中的模板
+        final File templatesDir = new File(ZombiesPlugin.INSTANCE.getDataFolder(), TEMPLATES_DIR);
+        if (templatesDir.exists() && templatesDir.isDirectory()) {
+            final File[] files = templatesDir.listFiles((dir, name) -> name.endsWith(".json"));
+            if (files != null) {
+                for (final File file : files) {
+                    final String name = file.getName().replace(".json", "");
+                    if (!templates.contains(name)) {
+                        templates.add(name);
+                    }
+                }
+            }
+        }
+        return templates;
+    }
+
+    private Reader getTemplateReader(final String templateName) {
+        // 优先从配置目录加载
+        final File templatesDir = new File(ZombiesPlugin.INSTANCE.getDataFolder(), TEMPLATES_DIR);
+        final File templateFile = new File(templatesDir, templateName + ".json");
+        if (templateFile.exists()) {
+            try {
+                return new FileReader(templateFile);
+            } catch (final FileNotFoundException e) {
+                // 继续尝试从内置资源加载
+            }
+        }
+        // 从内置资源加载
+        final InputStream resource = ZombiesPlugin.INSTANCE.getResource(TEMPLATES_DIR + "/" + templateName + ".json");
+        if (resource != null) {
+            return new InputStreamReader(resource);
+        }
+        return null;
     }
 
     private void root(final CommandSender sender) {
@@ -179,26 +218,39 @@ public final class ZombiesCommandExecutor implements TabExecutor {
         sender.sendMessage(Component.text("No issues found").color(NamedTextColor.GREEN));
     }
 
-    private void loadTemplate(final CommandSender sender) {
+    private void loadTemplate(final CommandSender sender, final String[] args) {
         if (!(sender instanceof final Player player)) {
+            return;
+        }
+        final List<String> availableTemplates = getAvailableTemplates();
+        if (args.length == 0) {
+            sender.sendMessage(Component.text("Usage: /zombies loadTemplate <template>").color(NamedTextColor.YELLOW));
+            sender.sendMessage(Component.text("Available templates: " + String.join(", ", availableTemplates)).color(NamedTextColor.GRAY));
+            sender.sendMessage(Component.text("Put custom templates in: plugins/zombies/templates/").color(NamedTextColor.GRAY));
+            return;
+        }
+        final String templateName = args[0];
+        final Reader templateReader = getTemplateReader(templateName);
+        if (templateReader == null) {
+            sender.sendMessage(Component.text("Template not found: " + templateName).color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("Available templates: " + String.join(", ", availableTemplates)).color(NamedTextColor.GRAY));
             return;
         }
         final ZombiesWorld world = new ZombiesWorld(player.getWorld());
         final ZombiesConfig globalConfig = ZombiesPlugin.INSTANCE.getGlobalConfig();
-        final InputStream resource = ZombiesPlugin.INSTANCE.getResource(DEAD_END_TEMPLATE);
-        if (resource == null) {
-            sender.sendMessage(Component.text("Template unavailable. Please contact the plugins's author.").color(NamedTextColor.RED));
-            return;
-        }
         final WorldConfig config;
         try {
-            config = ConfigManager.createGson().fromJson(new InputStreamReader(resource), WorldConfig.class);
+            config = ConfigManager.createGson().fromJson(templateReader, WorldConfig.class);
         } catch (final JsonParseException e) {
-            sender.sendMessage(Component.text("Template malformed. Please contact the plugins's author."));
+            sender.sendMessage(Component.text("Template malformed: " + e.getMessage()).color(NamedTextColor.RED));
             return;
+        } finally {
+            try {
+                templateReader.close();
+            } catch (final IOException ignored) {}
         }
         globalConfig.worlds.put(world.getBukkit().getName(), config);
-        sender.sendMessage(Component.text("Template loaded. Start the game: Click me!").color(NamedTextColor.GREEN)
+        sender.sendMessage(Component.text("Template '" + templateName + "' loaded. Start the game: Click me!").color(NamedTextColor.GREEN)
                                    .clickEvent(ClickEvent.suggestCommand("/zombies start")));
     }
 
@@ -215,7 +267,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
                                     .color(NamedTextColor.BLUE))
                     .appendNewline()
                     .append(Component.text("> Load Dead End config (recommended) <")
-                                    .clickEvent(ClickEvent.runCommand("/zombies loadTemplate"))
+                                    .clickEvent(ClickEvent.runCommand("/zombies loadTemplate dead_end"))
                                     .color(NamedTextColor.GREEN));
             sender.sendMessage(msg);
             return;

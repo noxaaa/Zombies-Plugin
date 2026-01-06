@@ -7,6 +7,8 @@ import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
+import io.lama06.zombies.weapon.AmmoData;
+import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.weapon.WeaponType;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.inventory.ItemStack;
@@ -132,9 +134,14 @@ public final class InteractWithLuckyChestSystem implements Listener {
             return;
         }
 
-        // Check if player already has a weapon of the same type
-        if (player.hasWeaponOfSameType(weaponType)) {
-            player.sendMessage(Component.text("You already have this weapon").color(NamedTextColor.RED));
+        // Check if player already has a weapon of the same type - if so, refill ammo
+        final Weapon existingWeapon = player.getWeaponOfSameType(weaponType);
+        if (existingWeapon != null) {
+            itemDisplay.remove();
+            refillWeaponAmmo(existingWeapon);
+            player.sendMessage(Component.text("Ammo refilled!").color(NamedTextColor.GREEN));
+            setChestOpen(chest, world.getBukkit(), false);
+            incrementUsesAndMaybeMove(world, chestIndex);
             return;
         }
 
@@ -204,6 +211,21 @@ public final class InteractWithLuckyChestSystem implements Listener {
         } else {
             world.set(ZombiesWorld.LUCKY_CHEST_USES, newUses);
         }
+    }
+
+    private void refillWeaponAmmo(final Weapon weapon) {
+        final WeaponType type = weapon.get(Weapon.TYPE);
+        if (type == null || type.data.ammo == null) {
+            return;
+        }
+        final io.lama06.zombies.data.Component ammoComponent = weapon.getComponent(Weapon.AMMO);
+        if (ammoComponent == null) {
+            return;
+        }
+        // 填满弹药
+        ammoComponent.set(AmmoData.AMMO, type.data.ammo.ammo());
+        ammoComponent.set(AmmoData.CLIP, type.data.ammo.clip());
+        weapon.getItem().setAmount(type.data.ammo.clip());
     }
 
     private ItemDisplay getShuffleItem(final LuckyChest chest, final World world) {

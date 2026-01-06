@@ -81,12 +81,21 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
      * @return true if the player already has a weapon of the same family
      */
     public boolean hasWeaponOfSameType(final WeaponType type) {
+        return getWeaponOfSameType(type) != null;
+    }
+
+    /**
+     * Gets the weapon of the same family (base type) if the player has one.
+     * @param type The weapon type to check
+     * @return the weapon of the same family, or null if not found
+     */
+    public Weapon getWeaponOfSameType(final WeaponType type) {
         for (final Weapon weapon : getWeapons()) {
             if (weapon.get(Weapon.TYPE).isSameFamily(type)) {
-                return true;
+                return weapon;
             }
         }
-        return false;
+        return null;
     }
 
     public Weapon giveWeapon(final int slot, final WeaponType type) {
