@@ -7,7 +7,7 @@ final class LuckyChestItem {
     static final int TOTAL_SHUFFLES = 20;
     static final double START_INTERVAL = 0.3;  // 秒
     static final double END_INTERVAL = 0.75;   // 秒
-    static final float[] PITCH_CYCLE = {1.0f, 1.4f, 1.7f, 1.4f};
+    static final float[] PITCH_CYCLE = {0.65f, 1.0f, 1.5f, 1.0f};
 
     // 计算第 n 次切换的间隔（秒），n 从 1 开始
     static double getIntervalForShuffle(int n) {
