@@ -70,7 +70,10 @@ public final class InteractWithLuckyChestSystem implements Listener {
         final FinePosition itemPosition = chest.getItemPosition(world.getBukkit());
         final ItemDisplay itemDisplay = world.getBukkit().spawn(itemPosition.toLocation(world.getBukkit()), ItemDisplay.class);
         final PersistentDataContainer pdc = itemDisplay.getPersistentDataContainer();
-        pdc.set(LuckyChestItem.getRemainingTimeKey(), PersistentDataType.INTEGER, LuckyChestItem.SHUFFLE_TIME);
+        // 初始化抽奖状态
+        pdc.set(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER, 0);
+        pdc.set(LuckyChestItem.getNextShuffleTimeKey(), PersistentDataType.INTEGER, 0); // 立即开始第一次切换
+        pdc.set(LuckyChestItem.getRemainingTimeKey(), PersistentDataType.INTEGER, 1); // 非0表示进行中
         final int newGold = gold - chest.gold;
         player.set(ZombiesPlayer.GOLD, newGold);
         Bukkit.getPluginManager().callEvent(new PlayerGoldChangeEvent(player, gold, newGold));
@@ -130,8 +133,8 @@ public final class InteractWithLuckyChestSystem implements Listener {
         final Collection<ItemDisplay> nearbyItemDisplays = chest.position.toLocation(world).getNearbyEntitiesByType(ItemDisplay.class, 5);
         for (final ItemDisplay itemDisplay : nearbyItemDisplays) {
             final PersistentDataContainer pdc = itemDisplay.getPersistentDataContainer();
-            if (!pdc.has(LuckyChestItem.getRemainingTimeKey(), PersistentDataType.INTEGER)) {
-                return null;
+            if (!pdc.has(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER)) {
+                continue;
             }
             return itemDisplay;
         }
