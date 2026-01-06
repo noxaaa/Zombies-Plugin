@@ -68,7 +68,8 @@ public final class RenderScoreboardSystem implements Listener {
 
         content.add(Component.text("Gold:").color(NamedTextColor.GOLD));
         for (final ZombiesPlayer otherPlayer : world.getPlayers()) {
-            final int coins = otherPlayer.get(ZombiesPlayer.GOLD);
+            final Integer coinsValue = otherPlayer.get(ZombiesPlayer.GOLD);
+            final int coins = coinsValue != null ? coinsValue : 0;
             final TextComponent.Builder coinsComponent = Component.text();
             coinsComponent.append(Component.text(otherPlayer.getBukkit().getName()));
             coinsComponent.append(Component.text(": "));
@@ -78,7 +79,8 @@ public final class RenderScoreboardSystem implements Listener {
 
         content.add(Component.empty());
 
-        final int kills = player.get(ZombiesPlayer.KILLS);
+        final Integer killsValue = player.get(ZombiesPlayer.KILLS);
+        final int kills = killsValue != null ? killsValue : 0;
         content.add(Component.text("Zombie Kills: ").append(Component.text(kills).color(NamedTextColor.GREEN)));
 
         return content;
@@ -110,7 +112,8 @@ public final class RenderScoreboardSystem implements Listener {
 
         final ZombiesWorld world = player.getWorld();
         for (final ZombiesPlayer otherPlayer : world.getPlayers()) {
-            final int kills = otherPlayer.get(ZombiesPlayer.KILLS);
+            final Integer killsValue = otherPlayer.get(ZombiesPlayer.KILLS);
+            final int kills = killsValue != null ? killsValue : 0;
             final Score score = killsObjective.getScore(otherPlayer.getBukkit());
             score.setScore(kills);
         }
