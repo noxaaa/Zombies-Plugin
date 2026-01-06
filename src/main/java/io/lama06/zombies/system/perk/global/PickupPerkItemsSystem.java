@@ -16,14 +16,14 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.Collection;
 
 public final class PickupPerkItemsSystem implements Listener {
-    private static final double PICKUP_RADIUS = 3;
+    private static final double PICKUP_RADIUS = 1;
 
     @EventHandler
     private void onTick(final ServerTickEndEvent event) {
         for (final ZombiesPlayer player : ZombiesPlugin.INSTANCE.getAlivePlayers()) {
             final Collection<ItemDisplay> nearbyDisplayItems = player.getBukkit().getWorld().getNearbyEntitiesByType(
                     ItemDisplay.class,
-                    player.getBukkit().getLocation(),
+                    player.getBukkit().getEyeLocation(),
                     PICKUP_RADIUS
             );
             for (final ItemDisplay nearbyDisplayItem : nearbyDisplayItems) {
@@ -43,6 +43,12 @@ public final class PickupPerkItemsSystem implements Listener {
                         .append(Component.text(" picked up "))
                         .append(perk.getDisplayName());
                 player.getWorld().sendMessage(announcement);
+                player.getBukkit().getWorld().playSound(
+                        nearbyDisplayItem.getLocation(),
+                        perk.getPickupSound(),
+                        1.0f,
+                        perk.getPickupPitch()
+                );
                 nearbyDisplayItem.remove();
             }
         }

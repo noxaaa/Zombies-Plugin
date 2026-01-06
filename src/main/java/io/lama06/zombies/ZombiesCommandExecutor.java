@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import io.lama06.zombies.event.player.PlayerCancelCommandEvent;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
+import io.lama06.zombies.perk.GlobalPerk;
 import io.lama06.zombies.perk.PerkMachine;
+import io.lama06.zombies.system.perk.global.PerkItem;
 import io.lama06.zombies.util.PositionUtil;
 import io.lama06.zombies.weapon.WeaponType;
 import io.lama06.zombies.zombie.Zombie;
@@ -28,7 +30,14 @@ import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,6 +77,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             case "placeSigns" -> placeSigns(sender, remainingArgs);
             case "dumpWorldConfig" -> dumpWorldConfig(sender);
             case "nextround" -> nextRound(sender);
+            case "summonBuff" -> summonBuff(sender, remainingArgs);
             default -> sender.sendMessage(Component.text("unknown command").color(NamedTextColor.RED));
         }
 
@@ -94,6 +104,7 @@ public final class ZombiesCommandExecutor implements TabExecutor {
                 "giveGold",
                 "giveWeapon",
                 "spawnZombie",
+                "summonBuff",
                 "nextround"
         );
     }
@@ -480,5 +491,50 @@ public final class ZombiesCommandExecutor implements TabExecutor {
         final RoundConfig roundConfig = config.rounds.get(currentRound - 1);
         world.set(ZombiesWorld.TRIGGERED_WAVES, roundConfig.waves.size());
         sender.sendMessage(Component.text("已跳过当前回合").color(NamedTextColor.GREEN));
+    }
+
+    private static final int PERK_ITEM_TIME = 60 * 20;
+
+    private void summonBuff(final CommandSender sender, final String[] args) {
+        if (!(sender instanceof final Player player)) {
+            return;
+        }
+        if (args.length == 0) {
+            sender.sendMessage(Component.text("用法: /zombies summonBuff <BUFF名称>").color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("可用: INSTANT_KILL, MAX_AMMO, DOUBLE_GOLD").color(NamedTextColor.GRAY));
+            return;
+        }
+        final GlobalPerk perk;
+        try {
+            perk = GlobalPerk.valueOf(args[0].toUpperCase());
+        } catch (final IllegalArgumentException e) {
+            sender.sendMessage(Component.text("无效的Buff名称: " + args[0]).color(NamedTextColor.RED));
+            sender.sendMessage(Component.text("可用: INSTANT_KILL, MAX_AMMO, DOUBLE_GOLD").color(NamedTextColor.GRAY));
+            return;
+        }
+
+        // 记录玩家当前位置
+        final org.bukkit.Location spawnLocation = player.getLocation().clone().add(0, 2, 0);
+        final World world = player.getWorld();
+
+        sender.sendMessage(Component.text("3秒后将在此位置生成 ").color(NamedTextColor.GREEN)
+                .append(perk.getDisplayName()));
+
+        // 3秒后生成buff
+        Bukkit.getScheduler().runTaskLater(ZombiesPlugin.INSTANCE, () -> {
+            final ItemDisplay display = world.spawn(spawnLocation, ItemDisplay.class);
+            display.setCustomNameVisible(true);
+            display.customName(perk.getDisplayName());
+            display.setItemStack(new ItemStack(perk.getMaterial()));
+            display.setTransformation(new Transformation(
+                    new Vector3f(0, 0, 0),
+                    new AxisAngle4f(0, 0, 0, 1),
+                    new Vector3f(0.6f, 0.6f, 0.6f),
+                    new AxisAngle4f(0, 0, 0, 1)
+            ));
+            final PersistentDataContainer pdc = display.getPersistentDataContainer();
+            pdc.set(PerkItem.getPerkNameKey(), PersistentDataType.STRING, perk.name());
+            pdc.set(PerkItem.getRemainingTimeKey(), PersistentDataType.INTEGER, PERK_ITEM_TIME);
+        }, 3 * 20L); // 3秒 = 60 ticks
     }
 }

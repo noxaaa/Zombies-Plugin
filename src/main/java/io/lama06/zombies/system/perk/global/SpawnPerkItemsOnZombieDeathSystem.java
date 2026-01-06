@@ -16,6 +16,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
@@ -38,14 +41,20 @@ public final class SpawnPerkItemsOnZombieDeathSystem implements Listener {
         final GlobalPerk perk = perks[rnd.nextInt(perks.length)];
         final World world = event.getEntity().getWorld();
 
-        // Calculate spawn location and adjust if inside a window
-        Location spawnLocation = zombie.getEntity().getLocation().clone().add(0, 1, 0);
+        // Calculate spawn location (head height) and adjust if inside a window
+        Location spawnLocation = zombie.getEntity().getLocation().clone().add(0, 2, 0);
         spawnLocation = adjustLocationIfInsideWindow(world, spawnLocation);
 
         final ItemDisplay display = world.spawn(spawnLocation, ItemDisplay.class);
         display.setCustomNameVisible(true);
         display.customName(perk.getDisplayName());
         display.setItemStack(new ItemStack(perk.getMaterial()));
+        display.setTransformation(new Transformation(
+                new Vector3f(0, 0, 0),
+                new AxisAngle4f(0, 0, 0, 1),
+                new Vector3f(0.6f, 0.6f, 0.6f),
+                new AxisAngle4f(0, 0, 0, 1)
+        ));
         final PersistentDataContainer pdc = display.getPersistentDataContainer();
         pdc.set(PerkItem.getPerkNameKey(), PersistentDataType.STRING, perk.name());
         pdc.set(PerkItem.getRemainingTimeKey(), PersistentDataType.INTEGER, PERK_ITEM_TIME);
@@ -66,10 +75,10 @@ public final class SpawnPerkItemsOnZombieDeathSystem implements Listener {
 
         for (final Window window : config.windows) {
             if (window.blocks != null && window.blocks.containsBlock(blockPos)) {
-                // Inside a window, move to repairArea center
+                // Inside a window, move to repairArea center at head height
                 if (window.repairArea != null) {
                     final double centerX = (window.repairArea.getLowerX() + window.repairArea.getUpperX()) / 2.0 + 0.5;
-                    final double centerY = window.repairArea.getUpperY() + 1.5;
+                    final double centerY = window.repairArea.getUpperY() + 2.5;
                     final double centerZ = (window.repairArea.getLowerZ() + window.repairArea.getUpperZ()) / 2.0 + 0.5;
                     return new Location(world, centerX, centerY, centerZ);
                 }
