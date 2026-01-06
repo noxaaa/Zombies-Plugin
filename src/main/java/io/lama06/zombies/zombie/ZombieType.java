@@ -1,19 +1,21 @@
 package io.lama06.zombies.zombie;
 
+import io.lama06.zombies.menu.MenuDisplayableEnum;
 import io.lama06.zombies.util.PlayerHeads;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-public enum ZombieType {
+public enum ZombieType implements MenuDisplayableEnum {
     NORMAL_EASY(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
                     .setBreakWindow(new BreakWindowData(40))
                     .setHealth(20)
-                    .setKnockbackResistance(0.1)
+                    .setKnockbackResistance(0.8)
     ),
     NORMAL_MEDIUM(
             new ZombieData()
@@ -126,5 +128,23 @@ public enum ZombieType {
 
     ZombieType(final ZombieData data) {
         this.data = data;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.text(name());
+    }
+
+    @Override
+    public Material getDisplayMaterial() {
+        return switch (this) {
+            case NORMAL_EASY, NORMAL_MEDIUM, NORMAL_HARD -> Material.ZOMBIE_HEAD;
+            case PIG_ZOMBIE -> Material.PIGLIN_HEAD;
+            case MAGMA_CUBE, MAGMA_ZOMBIE -> Material.MAGMA_CREAM;
+            case LITTLE_BOMBIE, BOMBIE -> Material.TNT;
+            case FIRE_ZOMBIE, INFERNO -> Material.BLAZE_ROD;
+            case ZOMBIE_WOLF -> Material.BONE;
+            case GUARDIAN_ZOMBIE -> Material.SEA_LANTERN;
+        };
     }
 }

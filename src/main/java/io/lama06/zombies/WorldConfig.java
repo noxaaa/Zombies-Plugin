@@ -243,6 +243,20 @@ public final class WorldConfig implements CheckableConfig {
                             preventBuilding = !preventBuilding;
                             reopen.run();
                         }
+                ),
+                new SelectionEntry(
+                        Component.text("Rounds (" + rounds.size() + ")"),
+                        Material.ZOMBIE_HEAD,
+                        () -> ListConfigMenu.open(
+                                player,
+                                Component.text("Rounds"),
+                                rounds,
+                                Material.ZOMBIE_HEAD,
+                                round -> Component.text("Round: " + round.waves.size() + " waves, " + round.getTotalZombies() + " zombies"),
+                                RoundConfig::new,
+                                round -> round.openMenu(player, reopen),
+                                reopen
+                        )
                 )
         );
     }

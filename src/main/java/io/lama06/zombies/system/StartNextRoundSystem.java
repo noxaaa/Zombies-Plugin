@@ -69,7 +69,7 @@ public final class StartNextRoundSystem implements Listener {
         );
         for (final ZombiesPlayer player : world.getPlayers()) {
             player.getBukkit().showTitle(title);
-            player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
+            player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 0.5f);
         }
 
         Bukkit.getPluginManager().callEvent(new StartRoundEvent(world, round));
