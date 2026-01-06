@@ -67,6 +67,7 @@ public final class InteractWithLuckyChestSystem implements Listener {
         if (!event.getAction().isRightClick()) {
             return;
         }
+        event.setCancelled(true);
         player.getBukkit().closeInventory();
         final ItemDisplay shuffleItem = getShuffleItem(clickedLuckyChest, world.getBukkit());
         if (shuffleItem == null) {
