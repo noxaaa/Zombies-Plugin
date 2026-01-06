@@ -14,7 +14,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Knife"))
                     .setMaterial(Material.IRON_SWORD)
                     .setMelee(new MeleeData(5))
-                    .setAttack(new AttackData(5, false, 10, 2.5, 0, 0.5))  // 1.5x headshot, knockback 0.5
+                    .setAttack(new AttackData(5, false, 10, 2.5, 0, 0.5))  // 1.5x headshot, knockback 0.8
                     .setDelay(new DelayData(10))
     ),
     PISTOL(
@@ -47,7 +47,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setShoot(new ShootData(10, 0.85))
                     .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
                     .setShootSound(new ShootSoundData(Sound.ENTITY_GENERIC_EXPLODE, 2.0f))
-                    .setAttack(new AttackData(4.5, false, 8, 2.25, 4, 0.1))  // 1.5x headshot, knockback 0.1 per bullet
+                    .setAttack(new AttackData(4.5, false, 8, 2.25, 4, 0.2))  // 1.5x headshot, knockback 0.1 per bullet
                     .setAmmo(new AmmoData(65, 5))
                     .setDelay(new DelayData(28))  // 1.4s
                     .setReload(new ReloadData(30))  // 1.5s
@@ -97,7 +97,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setDisplayName(Component.text("Knife Ultimate"))
                     .setMaterial(Material.DIAMOND_SWORD)
                     .setMelee(new MeleeData(6))
-                    .setAttack(new AttackData(8, false, 15, 4, 0, 0.6))  // 1.5x headshot, knockback 0.6
+                    .setAttack(new AttackData(8, false, 15, 4, 0, 0.5))  // 1.5x headshot, knockback same as normal
                     .setDelay(new DelayData(8))
                     .setGlowing()
     ),
@@ -108,7 +108,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.CRIT))
                     .setShootSound(new ShootSoundData(Sound.ENTITY_IRON_GOLEM_HURT, 2.0f))
-                    .setAttack(new AttackData(8, false, 10, 4, 5, 0.25))  // 1.5x headshot, knockback 0.25
+                    .setAttack(new AttackData(8, false, 10, 4, 5, 0.2))  // 1.5x headshot, knockback 0.25
                     .setAmmo(new AmmoData(450, 14))  // 450总弹药, 14弹匣(7次连发×2)
                     .setDelay(new DelayData(10))  // 0.5s
                     .setReload(new ReloadData(25))
@@ -121,7 +121,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.STONE_HOE)
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
-                    .setAttack(new AttackData(8, false, 7, 4, 3, 0.2))  // 1.5x headshot, knockback 0.2
+                    .setAttack(new AttackData(8, false, 7, 4, 3, 0.15))  // 1.5x headshot, knockback same as normal
                     .setAmmo(new AmmoData(400, 40))
                     .setDelay(new DelayData(3))
                     .setReload(new ReloadData(25))
@@ -134,7 +134,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setShoot(new ShootData(10, 0.85))
                     .setShootParticle(new ShootParticleData(Particle.LARGE_SMOKE))
                     .setShootSound(new ShootSoundData(Sound.ENTITY_GENERIC_EXPLODE, 2.0f))
-                    .setAttack(new AttackData(4.5, false, 8, 2.25, 4, 0.12))  // 1.5x headshot, knockback 0.12 per bullet
+                    .setAttack(new AttackData(4.5, false, 8, 2.25, 4, 0.2))  // 1.5x headshot, knockback 0.12 per bullet
                     .setAmmo(new AmmoData(85, 7))
                     .setDelay(new DelayData((int) (1.2 * 20)))
                     .setReload(new ReloadData((int) (1.2 * 20)))
@@ -147,7 +147,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setShoot(new ShootData(2, 1, 3))
                     .setShootParticle(new ShootParticleData(Particle.FIREWORK))
                     .setShootSound(new ShootSoundData(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 2.0f))
-                    .setAttack(new AttackData(30, false, 30, 15, 15, 0.8))  // 1.5x headshot, knockback 0.8
+                    .setAttack(new AttackData(30, false, 30, 15, 15, 0.6))  // 1.5x headshot, knockback same as normal
                     .setAmmo(new AmmoData(60, 6))
                     .setDelay(new DelayData(25))
                     .setReload(new ReloadData(35))
@@ -159,7 +159,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setMaterial(Material.GOLDEN_HOE)
                     .setShoot(new ShootData(1, 0.95))
                     .setShootParticle(new ShootParticleData(Particle.FLAME))
-                    .setAttack(new AttackData(4, true, 4, 2, 2, 0.08))  // 1.5x headshot, knockback 0.08
+                    .setAttack(new AttackData(4, true, 4, 2, 2, 0.05))  // 1.5x headshot, knockback same as normal
                     .setAmmo(new AmmoData(500, 70))
                     .setDelay(new DelayData(2))
                     .setReload(new ReloadData(25))
@@ -169,7 +169,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Gold Digger Ultimate I").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
-                    .setAttack(new AttackData(8, false, 10, 4, 5, 0.28))  // 1.5x headshot, knockback 0.28
+                    .setAttack(new AttackData(8, false, 10, 4, 5, 0.25))  // 1.5x headshot, knockback same as normal
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
                     .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
@@ -182,7 +182,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Gold Digger Ultimate II").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
-                    .setAttack(new AttackData(10, false, 10, 5, 5, 0.3))  // 1.5x headshot, knockback 0.3
+                    .setAttack(new AttackData(10, false, 10, 5, 5, 0.25))  // 1.5x headshot, knockback same as normal
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
                     .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
@@ -195,7 +195,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Gold Digger Ultimate III").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
-                    .setAttack(new AttackData(12, false, 10, 6, 5, 0.32))  // 1.5x headshot, knockback 0.32
+                    .setAttack(new AttackData(12, false, 10, 6, 5, 0.25))  // 1.5x headshot, knockback same as normal
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
                     .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
@@ -208,7 +208,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Gold Digger Ultimate IV").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
-                    .setAttack(new AttackData(15, false, 10, 7.5, 5, 0.35))  // 1.5x headshot, knockback 0.35
+                    .setAttack(new AttackData(15, false, 10, 7.5, 5, 0.25))  // 1.5x headshot, knockback same as normal
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
                     .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
@@ -221,7 +221,7 @@ public enum WeaponType implements MenuDisplayableEnum {
             new WeaponData()
                     .setDisplayName(Component.text("Gold Digger Ultimate V").color(NamedTextColor.GOLD))
                     .setMaterial(Material.GOLDEN_PICKAXE)
-                    .setAttack(new AttackData(20, false, 10, 10, 5, 0.4))  // 1.5x headshot, knockback 0.4
+                    .setAttack(new AttackData(20, false, 10, 10, 5, 0.25))  // 1.5x headshot, knockback same as normal
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.DUST, new Particle.DustOptions(Color.YELLOW, 1.0f)))
                     .setShootSound(new ShootSoundData(Sound.BLOCK_STONE_BREAK, 2.0f))
@@ -251,7 +251,7 @@ public enum WeaponType implements MenuDisplayableEnum {
                     .setShoot(new ShootData(1, 1))
                     .setShootParticle(new ShootParticleData(Particle.ENCHANTED_HIT))
                     .setShootSound(new ShootSoundData(Sound.ITEM_FLINTANDSTEEL_USE, 2.0f))
-                    .setAttack(new AttackData(18, false, 15, 9, 5, 0.25))  // 18 base, 1.5x headshot = 27, gold 15/20
+                    .setAttack(new AttackData(18, false, 15, 9, 5, 0.2))  // 18 base, 1.5x headshot = 27, knockback same as normal
                     .setAmmo(new AmmoData(120, 10))
                     .setDelay(new DelayData(10))  // 0.5s
                     .setReload(new ReloadData(30))  // 1.5s
