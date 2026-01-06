@@ -64,6 +64,7 @@ public final class Systems {
 
             // Lucky Chest
             new InteractWithLuckyChestSystem(),
+            new LuckyChestDisplaySystem(),
             new RemoveLuckyChestItemsSystem(),
             new ShuffleLuckyChestItemSystem(),
 
