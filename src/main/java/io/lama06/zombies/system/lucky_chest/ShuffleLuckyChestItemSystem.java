@@ -1,6 +1,7 @@
 package io.lama06.zombies.system.lucky_chest;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
@@ -28,6 +29,7 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
     @EventHandler
     private void onServerTick(final ServerTickEndEvent event) {
         for (final ZombiesWorld world : ZombiesPlugin.INSTANCE.getGameWorlds()) {
+            final WorldConfig config = world.getConfig();
             final Collection<ItemDisplay> itemDisplays = world.getBukkit().getEntitiesByClass(ItemDisplay.class);
             for (final ItemDisplay itemDisplay : itemDisplays) {
                 final PersistentDataContainer pdc = itemDisplay.getPersistentDataContainer();
@@ -59,9 +61,14 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 final int newShuffleCount = shuffleCount + 1;
                 pdc.set(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER, newShuffleCount);
 
-                // 随机选择武器
-                final List<WeaponType> weaponTypes = Arrays.stream(WeaponType.values())
-                        .filter(weaponType -> weaponType.data.inLuckyChest).toList();
+                // 随机选择武器（优先使用配置，否则使用默认）
+                final List<WeaponType> weaponTypes;
+                if (config != null && !config.luckyChestWeapons.isEmpty()) {
+                    weaponTypes = config.luckyChestWeapons;
+                } else {
+                    weaponTypes = Arrays.stream(WeaponType.values())
+                            .filter(weaponType -> weaponType.data.inLuckyChest).toList();
+                }
                 final RandomGenerator rnd = ThreadLocalRandom.current();
                 final WeaponType weaponType = weaponTypes.get(rnd.nextInt(weaponTypes.size()));
                 pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), weaponType);

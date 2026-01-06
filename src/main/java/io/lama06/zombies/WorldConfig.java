@@ -3,6 +3,7 @@ package io.lama06.zombies;
 import io.lama06.zombies.menu.*;
 import io.lama06.zombies.perk.PerkMachine;
 import io.lama06.zombies.util.PositionUtil;
+import io.lama06.zombies.weapon.WeaponType;
 import io.papermc.paper.math.BlockPosition;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,6 +23,7 @@ public final class WorldConfig implements CheckableConfig {
     public final List<ArmorShop> armorShops = new ArrayList<>();
     public final List<LuckyChest> luckyChests = new ArrayList<>();
     public int luckyChestMoveAfterUses = 0;  // 0 = 不移动
+    public final List<WeaponType> luckyChestWeapons = new ArrayList<>();  // 空 = 使用默认
     public final List<PerkMachine> perkMachines = new ArrayList<>();
     public PowerSwitch powerSwitch;
     public BlockPosition teamMachine;
@@ -170,6 +172,11 @@ public final class WorldConfig implements CheckableConfig {
                         )
                 ),
                 new SelectionEntry(
+                        Component.text("Lucky Chest Weapons (" + luckyChestWeapons.size() + ")"),
+                        Material.DIAMOND_SWORD,
+                        () -> openLuckyChestWeaponsMenu(player, reopen)
+                ),
+                new SelectionEntry(
                         Component.text("Perk Machines"),
                         Material.COMMAND_BLOCK,
                         () -> ListConfigMenu.open(
@@ -274,6 +281,62 @@ public final class WorldConfig implements CheckableConfig {
                                 reopen
                         )
                 )
+        );
+    }
+
+    private void openLuckyChestWeaponsMenu(final Player player, final Runnable callback) {
+        final Runnable reopen = () -> openLuckyChestWeaponsMenu(player, callback);
+
+        final java.util.List<SelectionEntry> entries = new java.util.ArrayList<>();
+
+        // 添加按钮
+        entries.add(new SelectionEntry(
+                Component.text("Add Weapon").color(NamedTextColor.GREEN),
+                Material.GREEN_STAINED_GLASS_PANE,
+                () -> EnumSelectionMenu.open(
+                        WeaponType.class,
+                        player,
+                        Component.text("Select Weapon"),
+                        reopen,
+                        weaponType -> {
+                            if (!luckyChestWeapons.contains(weaponType)) {
+                                luckyChestWeapons.add(weaponType);
+                            }
+                            reopen.run();
+                        }
+                )
+        ));
+
+        // 显示已选武器
+        for (int i = 0; i < luckyChestWeapons.size(); i++) {
+            final int index = i;
+            final WeaponType weapon = luckyChestWeapons.get(i);
+            entries.add(new SelectionEntry(
+                    weapon.getDisplayName(),
+                    weapon.getDisplayMaterial(),
+                    () -> {},  // 点击无操作
+                    Component.text("Remove").color(NamedTextColor.RED),
+                    () -> {
+                        luckyChestWeapons.remove(index);
+                        reopen.run();
+                    }
+            ));
+        }
+
+        // 提示信息
+        if (luckyChestWeapons.isEmpty()) {
+            entries.add(new SelectionEntry(
+                    Component.text("Empty = use default (inLuckyChest)").color(NamedTextColor.GRAY),
+                    Material.PAPER,
+                    () -> {}
+            ));
+        }
+
+        SelectionMenu.open(
+                player,
+                Component.text("Lucky Chest Weapons").color(NamedTextColor.GOLD),
+                callback,
+                entries.toArray(SelectionEntry[]::new)
         );
     }
 }
