@@ -2,6 +2,7 @@ package io.lama06.zombies;
 
 import io.lama06.zombies.system.*;
 import io.lama06.zombies.system.lucky_chest.InteractWithLuckyChestSystem;
+import io.lama06.zombies.system.lucky_chest.LuckyChestTimeoutSystem;
 import io.lama06.zombies.system.lucky_chest.RemoveLuckyChestItemsSystem;
 import io.lama06.zombies.system.lucky_chest.ShuffleLuckyChestItemSystem;
 import io.lama06.zombies.system.perk.global.*;
@@ -65,6 +66,7 @@ public final class Systems {
             // Lucky Chest
             new InteractWithLuckyChestSystem(),
             new LuckyChestDisplaySystem(),
+            new LuckyChestTimeoutSystem(),
             new RemoveLuckyChestItemsSystem(),
             new ShuffleLuckyChestItemSystem(),
 

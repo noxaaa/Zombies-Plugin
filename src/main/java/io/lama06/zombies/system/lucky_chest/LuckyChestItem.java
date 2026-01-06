@@ -3,11 +3,12 @@ package io.lama06.zombies.system.lucky_chest;
 import io.lama06.zombies.ZombiesPlugin;
 import org.bukkit.NamespacedKey;
 
-final class LuckyChestItem {
-    static final int TOTAL_SHUFFLES = 20;
+public final class LuckyChestItem {
+    public static final int TOTAL_SHUFFLES = 20;
     static final double START_INTERVAL = 0.3;  // 秒
     static final double END_INTERVAL = 0.75;   // 秒
     static final float[] PITCH_CYCLE = {0.65f, 1.0f, 1.5f, 1.0f};
+    public static final int CLAIM_TIMEOUT_TICKS = 10 * 20;  // 10秒
 
     // 计算第 n 次切换的间隔（秒），n 从 1 开始
     static double getIntervalForShuffle(int n) {
@@ -26,11 +27,11 @@ final class LuckyChestItem {
         return PITCH_CYCLE[(n - 1) % PITCH_CYCLE.length];
     }
 
-    static NamespacedKey getRemainingTimeKey() {
+    public static NamespacedKey getRemainingTimeKey() {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_remaining_time");
     }
 
-    static NamespacedKey getShuffleCountKey() {
+    public static NamespacedKey getShuffleCountKey() {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_shuffle_count");
     }
 
@@ -38,7 +39,27 @@ final class LuckyChestItem {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_next_shuffle_time");
     }
 
-    static NamespacedKey getWeaponKey() {
+    public static NamespacedKey getWeaponKey() {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_weapon");
+    }
+
+    // 开箱玩家的 UUID
+    public static NamespacedKey getOwnerUuidKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_owner_uuid");
+    }
+
+    // 开箱玩家的名字（用于显示）
+    public static NamespacedKey getOwnerNameKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_owner_name");
+    }
+
+    // 领取倒计时（ticks）
+    public static NamespacedKey getClaimTimeoutKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_claim_timeout");
+    }
+
+    // Lucky Chest 在配置中的索引
+    public static NamespacedKey getChestIndexKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_index");
     }
 }

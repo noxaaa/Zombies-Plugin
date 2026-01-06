@@ -7,12 +7,16 @@ import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.WeaponType;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,10 +66,17 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 final WeaponType weaponType = weaponTypes.get(rnd.nextInt(weaponTypes.size()));
                 pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), weaponType);
 
-                // 更新显示
+                // 更新显示（缩小到0.5倍）
                 itemDisplay.setItemStack(new ItemStack(weaponType.getDisplayMaterial()));
                 itemDisplay.setCustomNameVisible(true);
                 itemDisplay.customName(weaponType.getDisplayName());
+                itemDisplay.setBillboard(Display.Billboard.VERTICAL);
+                itemDisplay.setTransformation(new Transformation(
+                        new Vector3f(0, 0, 0),
+                        new AxisAngle4f(0, 0, 0, 1),
+                        new Vector3f(0.5f, 0.5f, 0.5f),
+                        new AxisAngle4f(0, 0, 0, 1)
+                ));
 
                 // 播放音效（循环 pitch）
                 final float pitch = LuckyChestItem.getPitchForShuffle(newShuffleCount);
@@ -77,9 +88,10 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                     pdc.set(LuckyChestItem.getNextShuffleTimeKey(), PersistentDataType.INTEGER, nextInterval);
                 }
 
-                // 完成后标记 remainingTime 为 0（用于 claimItem 检测）
+                // 完成后设置领取倒计时
                 if (newShuffleCount >= LuckyChestItem.TOTAL_SHUFFLES) {
                     pdc.set(LuckyChestItem.getRemainingTimeKey(), PersistentDataType.INTEGER, 0);
+                    pdc.set(LuckyChestItem.getClaimTimeoutKey(), PersistentDataType.INTEGER, LuckyChestItem.CLAIM_TIMEOUT_TICKS);
                 }
             }
         }
