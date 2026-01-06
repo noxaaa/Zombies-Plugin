@@ -67,8 +67,12 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
     }
 
     public void endGame() {
+        endGame(false);
+    }
+
+    public void endGame(final boolean victory) {
         set(GAME_RUNNING, false);
-        Bukkit.getPluginManager().callEvent(new GameEndEvent(this));
+        Bukkit.getPluginManager().callEvent(new GameEndEvent(this, victory));
     }
 
     public List<Zombie> getZombies() {

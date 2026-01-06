@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.time.Duration;
+import java.util.UUID;
 
 public final class SpawnPlayerCorpseSystem implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
@@ -93,5 +95,35 @@ public final class SpawnPlayerCorpseSystem implements Listener {
 
         // Hide the real player from other players, only show the corpse NPC
         PlayerCorpseNPC.hideRealPlayer(bukkit);
+
+        // Check if this was the last alive player - if so, trigger game over
+        // Need to use scheduler since getAlivePlayers() won't update until after event completes
+        Bukkit.getScheduler().runTask(ZombiesPlugin.INSTANCE, () -> {
+            if (!world.isGameRunning()) {
+                return;
+            }
+            if (world.getAlivePlayers().isEmpty()) {
+                triggerGameOver(world);
+            }
+        });
+    }
+
+    private void triggerGameOver(final ZombiesWorld world) {
+        // Kill all downed players - set them to spectator and remove corpses
+        for (final CorpseData corpseData : ZombiesPlugin.INSTANCE.getCorpses()) {
+            final UUID playerUUID = corpseData.getDeadPlayerUUID();
+            final Player downedPlayer = Bukkit.getPlayer(playerUUID);
+            if (downedPlayer != null) {
+                // Show real player before changing mode
+                PlayerCorpseNPC.showRealPlayer(downedPlayer);
+                downedPlayer.setGameMode(GameMode.SPECTATOR);
+            }
+            // Remove the corpse NPC entity
+            PlayerCorpseNPC.despawnCorpse(corpseData);
+        }
+        ZombiesPlugin.INSTANCE.clearCorpses();
+
+        // End the game with defeat
+        world.endGame(false);
     }
 }

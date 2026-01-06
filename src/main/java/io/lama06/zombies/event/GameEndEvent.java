@@ -12,8 +12,19 @@ public final class GameEndEvent extends ZombiesEvent {
         return HANDLERS;
     }
 
+    private final boolean victory;
+
     public GameEndEvent(final ZombiesWorld world) {
+        this(world, false);
+    }
+
+    public GameEndEvent(final ZombiesWorld world, final boolean victory) {
         super(world);
+        this.victory = victory;
+    }
+
+    public boolean isVictory() {
+        return victory;
     }
 
     @Override
