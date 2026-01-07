@@ -16,6 +16,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setBreakWindow(new BreakWindowData(40))
                     .setHealth(20)
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(3)
     ),
     NORMAL_MEDIUM(
             new ZombieData()
@@ -25,6 +26,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setBreakWindow(new BreakWindowData(30))
                     .setHealth(20)
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(4)
     ),
     NORMAL_HARD(
             new ZombieData()
@@ -35,6 +37,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setBreakWindow(new BreakWindowData(20))
                     .setHealth(20)
                     .setKnockbackResistance(0.95)
+                    .setMeleeDamage(5)
     ),
     PIG_ZOMBIE(
             new ZombieData()
@@ -43,6 +46,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setBreakWindow(new BreakWindowData(20))
                     .setFireImmune(true)
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(5)
     ),
     MAGMA_CUBE(
             new ZombieData()
@@ -51,6 +55,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setFireImmune(true)
                     .setInitializer(entity -> ((MagmaCube) entity).setSize(2))
                     .setKnockbackResistance(0.0)
+                    .setMeleeDamage(2)
     ),
     MAGMA_ZOMBIE(
             new ZombieData()
@@ -65,6 +70,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .addEquipment(EquipmentSlot.LEGS, new ItemStack(Material.GOLDEN_LEGGINGS))
                     .addEquipment(EquipmentSlot.FEET, new ItemStack(Material.GOLDEN_BOOTS))
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(4)
     ),
     LITTLE_BOMBIE(
             new ZombieData()

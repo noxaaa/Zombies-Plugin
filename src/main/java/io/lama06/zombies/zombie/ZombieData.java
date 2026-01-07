@@ -13,6 +13,7 @@ public final class ZombieData {
     public EntityType entity;
     public int health;
     public double knockbackResistance;  // 0.0 = 无抗性, 1.0 = 完全免疫击退
+    public Double meleeDamage;  // null = 使用原版伤害, 非null = 覆盖近战伤害
     public Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
     public BreakWindowData breakWindow;
     public boolean fireImmune;
@@ -86,6 +87,11 @@ public final class ZombieData {
 
     public ZombieData setKnockbackResistance(final double knockbackResistance) {
         this.knockbackResistance = knockbackResistance;
+        return this;
+    }
+
+    public ZombieData setMeleeDamage(final double meleeDamage) {
+        this.meleeDamage = meleeDamage;
         return this;
     }
 }
