@@ -34,6 +34,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
         world.getBukkit().setGameRule(GameRule.DO_FIRE_TICK, false);
         world.getBukkit().setGameRule(GameRule.MOB_GRIEFING, false);
         world.getBukkit().setGameRule(GameRule.DISABLE_RAIDS, true);
+        world.getBukkit().setGameRule(GameRule.NATURAL_REGENERATION, false);
 
         world.set(ZombiesWorld.GAME_ID, gameId);
         world.set(ZombiesWorld.ROUND, 1);
@@ -78,7 +79,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             bukkit.setGameMode(GameMode.ADVENTURE);
             bukkit.setLevel(0);
             bukkit.setExp(0);
-            bukkit.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, PotionEffect.INFINITE_DURATION, 1));
+            bukkit.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, PotionEffect.INFINITE_DURATION, 0));
             player.giveWeapon(0, WeaponType.KNIFE);
             player.giveWeapon(1, WeaponType.PISTOL);
             bukkit.getInventory().setItem(2, PlaceholderItem.createWeaponPlaceholder(2));

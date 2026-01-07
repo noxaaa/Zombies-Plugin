@@ -106,7 +106,7 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
             meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        // 近战武器设置超高攻击速度（移除原版攻击冷却）
+        // 近战武器设置超高攻击速度（移除原版攻击冷却）并设为不可损坏
         if (type.data.melee != null) {
             meta.addAttributeModifier(
                     Attribute.ATTACK_SPEED,
@@ -118,6 +118,8 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
                             EquipmentSlot.HAND
                     )
             );
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         }
         item.setItemMeta(meta);
         // 近战武器添加格挡功能（减少50%伤害）
