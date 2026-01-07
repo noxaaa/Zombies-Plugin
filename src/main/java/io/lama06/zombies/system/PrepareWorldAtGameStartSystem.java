@@ -44,6 +44,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
         world.set(ZombiesWorld.ROUND_START_TIME, world.getBukkit().getGameTime());
         world.set(ZombiesWorld.TRIGGERED_WAVES, 0);
         world.set(ZombiesWorld.DRAGONS_WRATH_USED, 0);
+        world.set(ZombiesWorld.DROPPED_PERKS, List.of());
 
         // 初始化 Lucky Chest - 随机选择一个作为活跃箱子
         if (!config.luckyChests.isEmpty()) {

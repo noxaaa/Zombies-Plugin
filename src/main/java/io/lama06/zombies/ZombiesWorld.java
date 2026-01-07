@@ -18,6 +18,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +43,7 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
     public static final AttributeId<Integer> TRIGGERED_WAVES = new AttributeId<>("triggered_waves", PersistentDataType.INTEGER);
     public static final AttributeId<Integer> ACTIVE_LUCKY_CHEST = new AttributeId<>("active_lucky_chest", PersistentDataType.INTEGER);
     public static final AttributeId<Integer> LUCKY_CHEST_USES = new AttributeId<>("lucky_chest_uses", PersistentDataType.INTEGER);
+    public static final AttributeId<List<String>> DROPPED_PERKS = new AttributeId<>("dropped_perks", PersistentDataType.LIST.strings());
 
     public static final ComponentId PERKS_COMPONENT = new ComponentId("perks");
 
@@ -123,6 +125,27 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
             return false;
         }
         return perksComponent.get(perk.getRemainingTimeAttribute()) != 0;
+    }
+
+    public boolean hasPerkDropped(final GlobalPerk perk) {
+        final List<String> droppedPerks = get(DROPPED_PERKS);
+        if (droppedPerks == null) {
+            return false;
+        }
+        return droppedPerks.contains(perk.name());
+    }
+
+    public void markPerkAsDropped(final GlobalPerk perk) {
+        List<String> droppedPerks = get(DROPPED_PERKS);
+        if (droppedPerks == null) {
+            droppedPerks = new ArrayList<>();
+        } else {
+            droppedPerks = new ArrayList<>(droppedPerks);
+        }
+        if (!droppedPerks.contains(perk.name())) {
+            droppedPerks.add(perk.name());
+            set(DROPPED_PERKS, droppedPerks);
+        }
     }
 
     public List<Window> getAvailableWindows() {

@@ -80,6 +80,7 @@ public final class Systems {
             new RenderTemporaryPerkBossBarsSystem(),
             new SpawnPerkItemsOnZombieDeathSystem(),
             new RemovePerkItemsSystem(),
+            new ClearPerkItemsOnRoundStartSystem(),
             new TickTemporaryPerksSystem(),
 
             // Player Perks
