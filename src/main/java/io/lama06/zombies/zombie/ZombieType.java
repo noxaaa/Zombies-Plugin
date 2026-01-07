@@ -3,16 +3,21 @@ package io.lama06.zombies.zombie;
 import io.lama06.zombies.menu.MenuDisplayableEnum;
 import io.lama06.zombies.util.PlayerHeads;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public enum ZombieType implements MenuDisplayableEnum {
     NORMAL_EASY(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
+                    .addEquipment(EquipmentSlot.CHEST, createColoredLeatherArmor(Material.LEATHER_CHESTPLATE, Color.GREEN))
+                    .addEquipment(EquipmentSlot.LEGS, createColoredLeatherArmor(Material.LEATHER_LEGGINGS, Color.GREEN))
+                    .addEquipment(EquipmentSlot.FEET, createColoredLeatherArmor(Material.LEATHER_BOOTS, Color.GREEN))
                     .setBreakWindow(new BreakWindowData(40))
                     .setHealth(20)
                     .setKnockbackResistance(0.8)
@@ -21,8 +26,9 @@ public enum ZombieType implements MenuDisplayableEnum {
     NORMAL_MEDIUM(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
-                    .addEquipment(EquipmentSlot.CHEST, new ItemStack(Material.LEATHER_CHESTPLATE))
-                    .addEquipment(EquipmentSlot.FEET, new ItemStack(Material.LEATHER_BOOTS))
+                    .addEquipment(EquipmentSlot.HEAD, createColoredLeatherArmor(Material.LEATHER_HELMET, Color.BLACK))
+                    .addEquipment(EquipmentSlot.CHEST, new ItemStack(Material.CHAINMAIL_CHESTPLATE))
+                    .addEquipment(EquipmentSlot.FEET, new ItemStack(Material.CHAINMAIL_BOOTS))
                     .setBreakWindow(new BreakWindowData(30))
                     .setHealth(20)
                     .setKnockbackResistance(0.8)
@@ -158,5 +164,13 @@ public enum ZombieType implements MenuDisplayableEnum {
             case ZOMBIE_WOLF -> Material.BONE;
             case GUARDIAN_ZOMBIE -> Material.SEA_LANTERN;
         };
+    }
+
+    private static ItemStack createColoredLeatherArmor(final Material material, final Color color) {
+        final ItemStack item = new ItemStack(material);
+        final LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+        meta.setColor(color);
+        item.setItemMeta(meta);
+        return item;
     }
 }
