@@ -81,6 +81,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .addEquipment(EquipmentSlot.HEAD, new ItemStack(Material.TNT))
                     .setInitializer(entity -> ((Zombie) entity).setBaby())
                     .setKnockbackResistance(0.5)
+                    .setMeleeDamage(2)
     ),
     FIRE_ZOMBIE(
             new ZombieData()
@@ -91,6 +92,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setFireAttack(new FireAttackData(3*20))
                     .addEquipment(EquipmentSlot.HAND, new ItemStack(Material.BLAZE_ROD))
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(4)
     ),
     ZOMBIE_WOLF(
             new ZombieData()
@@ -99,6 +101,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setBreakWindow(new BreakWindowData(20))
                     .setInitializer(entity -> ((Wolf) entity).setAngry(true))
                     .setKnockbackResistance(0.3)
+                    .setMeleeDamage(3)
     ),
     GUARDIAN_ZOMBIE(
             new ZombieData()
@@ -108,6 +111,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .addEquipment(EquipmentSlot.HEAD, new ItemStack(Material.SEA_LANTERN))
                     .setLaserAttack(new LaserAttackData(3))
                     .setKnockbackResistance(0.8)
+                    .setMeleeDamage(4)
     ),
     INFERNO(
             new ZombieData()
@@ -120,6 +124,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setFireBallAttack(new FireBallAttackData(4, 40))
                     .setFireAttack(new FireAttackData(40))
                     .setKnockbackResistance(1.0)
+                    .setMeleeDamage(6)
     ),
     BOMBIE(
             new ZombieData()
@@ -128,6 +133,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setExplosionAttack(ExplosionAttackData.explodePeriodically(2*20 + 10, 4))
                     .setBreakWindow(new BreakWindowData(20))
                     .setKnockbackResistance(1.0)
+                    .setMeleeDamage(5)
     );
 
     public final ZombieData data;
