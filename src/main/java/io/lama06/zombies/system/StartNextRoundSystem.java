@@ -50,7 +50,8 @@ public final class StartNextRoundSystem implements Listener {
 
         final int nextRound = currentRound + 1;
         if (nextRound > config.rounds.size()) {
-            world.endGame();
+            world.sendMessage(Component.text("Victory!").color(NamedTextColor.GREEN));
+            world.endGame(true);
             return;
         }
 
