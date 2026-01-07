@@ -18,6 +18,7 @@ public final class Wave {
     public Map<ZombieType, Integer> zombieHealth = new HashMap<>();  // 每种僵尸的血量覆盖, 0或不存在 = 使用僵尸类型默认血量
     public Map<ZombieType, Double> zombieSpeed = new HashMap<>();    // 每种僵尸的速度覆盖, 0或不存在 = 使用默认速度
     public Map<ZombieType, Double> zombieDamage = new HashMap<>();   // 每种僵尸的攻击力覆盖, 0或不存在 = 使用默认攻击力
+    public Map<ZombieType, Double> zombieDefense = new HashMap<>(); // 每种僵尸的防御力覆盖, 0或不存在 = 使用默认防御力
 
     public int getTotalZombies() {
         return zombies.values().stream().mapToInt(i -> i).sum();
@@ -33,6 +34,10 @@ public final class Wave {
 
     public double getDamageForType(final ZombieType type) {
         return zombieDamage.getOrDefault(type, 0.0);
+    }
+
+    public double getDefenseForType(final ZombieType type) {
+        return zombieDefense.getOrDefault(type, 0.0);
     }
 
     public void openMenu(final Player player, final Runnable callback) {
@@ -76,6 +81,11 @@ public final class Wave {
                         Component.text("Zombie Damage Overrides"),
                         Material.IRON_SWORD,
                         () -> openDamageMenu(player, reopen)
+                ),
+                new SelectionEntry(
+                        Component.text("Zombie Defense Overrides"),
+                        Material.SHIELD,
+                        () -> openDefenseMenu(player, reopen)
                 )
         );
     }
@@ -291,5 +301,59 @@ public final class Wave {
         }
 
         SelectionMenu.open(player, Component.text("Damage Overrides"), callback, entries.toArray(SelectionEntry[]::new));
+    }
+
+    private void openDefenseMenu(final Player player, final Runnable callback) {
+        final Runnable reopen = () -> openDefenseMenu(player, callback);
+
+        final List<SelectionEntry> entries = new ArrayList<>();
+        entries.add(new SelectionEntry(
+                Component.text("Add Defense Override").color(NamedTextColor.GREEN),
+                Material.GREEN_STAINED_GLASS_PANE,
+                () -> EnumSelectionMenu.open(
+                        ZombieType.class,
+                        player,
+                        Component.text("Select Zombie Type"),
+                        reopen,
+                        type -> InputMenu.open(
+                                player,
+                                Component.text(type.name() + " Defense"),
+                                type.data.defense,
+                                new DoubleInputType(0.0, 20.0),
+                                defense -> {
+                                    zombieDefense.put(type, defense);
+                                    reopen.run();
+                                },
+                                reopen
+                        )
+                )
+        ));
+
+        for (final var entry : zombieDefense.entrySet()) {
+            final ZombieType type = entry.getKey();
+            final double defense = entry.getValue();
+            entries.add(new SelectionEntry(
+                    Component.text(type.name() + ": " + defense + " def"),
+                    Material.SHIELD,
+                    () -> InputMenu.open(
+                            player,
+                            Component.text(type.name() + " Defense"),
+                            defense,
+                            new DoubleInputType(0.0, 20.0),
+                            newDefense -> {
+                                zombieDefense.put(type, newDefense);
+                                reopen.run();
+                            },
+                            reopen
+                    ),
+                    Component.text("Delete").color(NamedTextColor.RED),
+                    () -> {
+                        zombieDefense.remove(type);
+                        reopen.run();
+                    }
+            ));
+        }
+
+        SelectionMenu.open(player, Component.text("Defense Overrides"), callback, entries.toArray(SelectionEntry[]::new));
     }
 }

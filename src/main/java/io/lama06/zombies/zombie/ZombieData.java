@@ -14,6 +14,7 @@ public final class ZombieData {
     public int health;
     public double knockbackResistance;  // 0.0 = 无抗性, 1.0 = 完全免疫击退
     public Double meleeDamage;  // null = 使用原版伤害, 非null = 覆盖近战伤害
+    public double defense = 0;  // 自定义防御力, 使用公式 damage * (1 - min(20, defense) / 25)
     public Map<EquipmentSlot, ItemStack> equipment = new HashMap<>();
     public BreakWindowData breakWindow;
     public boolean fireImmune;
@@ -92,6 +93,11 @@ public final class ZombieData {
 
     public ZombieData setMeleeDamage(final double meleeDamage) {
         this.meleeDamage = meleeDamage;
+        return this;
+    }
+
+    public ZombieData setDefense(final double defense) {
+        this.defense = defense;
         return this;
     }
 }

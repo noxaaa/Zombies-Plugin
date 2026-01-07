@@ -150,8 +150,10 @@ public final class Systems {
 
             // Zombie
             new AngerZombiesSystem(),
+            new ApplyCustomDefenseSystem(),
             new RetargetZombiesSystem(),
             new DamageZombieAfterAttackSystem(),
+            new InitZombieDefenseSystem(),
             new InitZombieEquipmentSystem(),
             new InitZombieHealthSystem(),
             new MakeZombiesGlowSystem(),

@@ -64,12 +64,13 @@ public final class SpawnZombiesSystem implements Listener {
             final int health = wave.getHealthForType(type);
             final double speed = wave.getSpeedForType(type);
             final double damage = wave.getDamageForType(type);
+            final double defense = wave.getDefenseForType(type);
             for (int i = 0; i < count; i++) {
                 final Location spawnPoint = world.getNextZombieSpawnPoint();
                 if (spawnPoint == null) {
                     continue;
                 }
-                world.spawnZombie(spawnPoint, type, health, speed, damage);
+                world.spawnZombie(spawnPoint, type, health, speed, damage, defense);
             }
         }
     }
