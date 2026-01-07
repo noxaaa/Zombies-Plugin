@@ -29,7 +29,11 @@ public final class DamageZombieAfterAttackSystem implements Listener {
             return;
         }
         living.setNoDamageTicks(0);
+        if (event.isHeadshot()) {
+            zombie.set(Zombie.IGNORE_DEFENSE, true);
+        }
         living.damage(event.getDamage(), event.getPlayer().getBukkit());
+        zombie.remove(Zombie.IGNORE_DEFENSE);
         applyKnockback(event, living);
         if (event.isFreeze()) {
             living.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 7 * 20, 2));

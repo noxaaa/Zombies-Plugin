@@ -4,16 +4,11 @@ public record AttackData(
         double damage,
         boolean fire,
         int gold,
-        double headshotBonusDamage,  // 爆头额外伤害
         int headshotBonusGold,       // 爆头额外金币
         double knockback             // 击退强度
 ) {
     // 兼容旧构造函数
     public AttackData(double damage, boolean fire, int gold) {
-        this(damage, fire, gold, 0, 0, 0);
-    }
-
-    public AttackData(double damage, boolean fire, int gold, double headshotBonusDamage, int headshotBonusGold) {
-        this(damage, fire, gold, headshotBonusDamage, headshotBonusGold, 0);
+        this(damage, fire, gold, 0, 0);
     }
 }

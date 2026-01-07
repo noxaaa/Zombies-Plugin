@@ -15,6 +15,7 @@ public final class Zombie extends Storage {
     public static final AttributeId<Boolean> IS_ZOMBIE = new AttributeId<>("is_zombie", PersistentDataType.BOOLEAN);
     public static final AttributeId<ZombieType> TYPE = new AttributeId<>("type", new EnumPersistentDataType<>(ZombieType.class));
     public static final AttributeId<Double> DEFENSE = new AttributeId<>("defense", PersistentDataType.DOUBLE);
+    public static final AttributeId<Boolean> IGNORE_DEFENSE = new AttributeId<>("ignore_defense", PersistentDataType.BOOLEAN);
 
     public static final ComponentId BREAK_WINDOW = new ComponentId("break_window");
     public static final ComponentId LASER_ATTACK = new ComponentId("laser_attack");

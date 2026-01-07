@@ -24,6 +24,12 @@ public final class ApplyCustomDefenseSystem implements Listener {
             return;
         }
 
+        // 检查是否无视防御力（暴击/爆头攻击）
+        final Boolean ignoreDefense = zombie.get(Zombie.IGNORE_DEFENSE);
+        if (Boolean.TRUE.equals(ignoreDefense)) {
+            return;
+        }
+
         final Double defense = zombie.get(Zombie.DEFENSE);
         if (defense == null) {
             return;
