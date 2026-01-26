@@ -6,10 +6,8 @@ import io.lama06.zombies.data.Component;
 import io.lama06.zombies.zombie.BreakWindowData;
 import io.lama06.zombies.zombie.Zombie;
 import io.papermc.paper.math.BlockPosition;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.level.pathfinder.Path;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -80,13 +78,12 @@ public final class ZombieBreakWindowGoal extends Goal {
         if (targetWindow == null) {
             return;
         }
-        final Path path = mob.getNavigation().createPath(
-            new BlockPos(targetWindow.blockX(), targetWindow.blockY(), targetWindow.blockZ()),
-            0
+        mob.getNavigation().moveTo(
+            targetWindow.blockX() + 0.5,
+            targetWindow.blockY(),
+            targetWindow.blockZ() + 0.5,
+            1.0
         );
-        if (path != null) {
-            mob.getNavigation().moveTo(path, 1.0);
-        }
     }
 
     private BlockPosition findNearestWindow() {

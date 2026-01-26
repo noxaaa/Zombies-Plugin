@@ -3,7 +3,6 @@ package io.lama06.zombies.system.zombie.pathfinding;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.pathfinder.Path;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -58,13 +57,7 @@ public final class ZombieChasePlayerGoal extends Goal {
 
         if (--retargetCooldown <= 0) {
             retargetCooldown = 10;
-            final Path path = mob.getNavigation().createPath(target, 1);
-            if (path != null) {
-                mob.getNavigation().moveTo(path, speed);
-            } else {
-                mob.getNavigation().moveTo(
-                    target.getX(), target.getY(), target.getZ(), speed);
-            }
+            mob.getNavigation().moveTo(target, speed);
         }
 
         checkStuck();
