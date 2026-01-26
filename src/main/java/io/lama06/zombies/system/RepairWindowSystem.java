@@ -17,7 +17,7 @@ import org.bukkit.event.Listener;
 import java.util.List;
 
 public final class RepairWindowSystem implements Listener {
-    private static final int DELAY = 30;
+    private static final int DELAY = 20;
     private static final int GOLD = 10;
 
     @EventHandler
