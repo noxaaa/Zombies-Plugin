@@ -47,8 +47,8 @@ public final class InitZombieGoalsSystem implements Listener {
             ));
         }
 
-        // 2. Chase player
-        nmsMob.goalSelector.addGoal(2, new ZombieChasePlayerGoal(nmsMob, 1.0, 48.0));
+        // 2. Chase player (uses flow field for complex navigation)
+        nmsMob.goalSelector.addGoal(2, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0, 48.0));
 
         // 3. Ranged attack (reserved for future, based on ZombieData configuration)
         // if (data.rangedAttack != null) {

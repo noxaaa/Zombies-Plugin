@@ -33,6 +33,7 @@ import io.lama06.zombies.system.weapon.shoot.SpawnParticlesAfterShotSystem;
 import io.lama06.zombies.system.zombie.*;
 import io.lama06.zombies.system.zombie.break_window.*;
 import io.lama06.zombies.system.zombie.pathfinding.InitZombieGoalsSystem;
+import io.lama06.zombies.system.zombie.pathfinding.UpdateFlowFieldSystem;
 import io.lama06.zombies.system.zombie.explosion_attack.ExplodeOnDeathSystem;
 import io.lama06.zombies.system.zombie.explosion_attack.ExplodePeriodicallySystem;
 import io.lama06.zombies.system.zombie.fireball_attack.DamagePlayerWhenFireballExplodesSystem;
@@ -160,6 +161,7 @@ public final class Systems {
 
             // Zombie
             new InitZombieGoalsSystem(),
+            new UpdateFlowFieldSystem(),
             new ApplyCustomDefenseSystem(),
             new DamageZombieAfterAttackSystem(),
             new InitZombieDefenseSystem(),

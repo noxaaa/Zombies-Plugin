@@ -1,23 +1,34 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.zombie.Zombie;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * Chase player using flow field pathfinding for complex terrain navigation.
+ * Falls back to vanilla navigation when close to target.
+ */
 public final class ZombieChasePlayerGoal extends Goal {
+    private static final double DIRECT_CHASE_DISTANCE = 5.0; // Use vanilla nav when this close
+
     private final Mob mob;
+    private final Zombie zombie;
     private final double speed;
     private final double chaseRange;
     private Player target;
-    private int retargetCooldown;
     private int stuckTicks;
     private double lastX, lastY, lastZ;
 
-    public ZombieChasePlayerGoal(final Mob mob, final double speed, final double range) {
+    public ZombieChasePlayerGoal(final Mob mob, final Zombie zombie, final double speed, final double range) {
         this.mob = mob;
+        this.zombie = zombie;
         this.speed = speed;
         this.chaseRange = range;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -42,7 +53,6 @@ public final class ZombieChasePlayerGoal extends Goal {
 
     @Override
     public void start() {
-        retargetCooldown = 0;
         stuckTicks = 0;
         recordPosition();
     }
@@ -55,12 +65,39 @@ public final class ZombieChasePlayerGoal extends Goal {
 
         mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
-        if (--retargetCooldown <= 0) {
-            retargetCooldown = 10;
+        final double distanceToTarget = mob.distanceTo(target);
+
+        // When close enough, use direct navigation
+        if (distanceToTarget < DIRECT_CHASE_DISTANCE) {
             mob.getNavigation().moveTo(target, speed);
+        } else {
+            // Use flow field for long-distance navigation
+            navigateWithFlowField();
         }
 
         checkStuck();
+    }
+
+    private void navigateWithFlowField() {
+        final Location zombieLoc = new Location(
+            zombie.getWorld().getBukkit(),
+            mob.getX(), mob.getY(), mob.getZ()
+        );
+
+        final ZombiesWorld world = zombie.getWorld();
+        final Vector direction = FlowFieldManager.INSTANCE.getDirectionToNearestPlayer(zombieLoc, world);
+
+        if (direction != null) {
+            // Move in the flow field direction
+            final double targetX = mob.getX() + direction.getX() * 2;
+            final double targetY = mob.getY() + direction.getY() * 2;
+            final double targetZ = mob.getZ() + direction.getZ() * 2;
+
+            mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
+        } else if (target != null) {
+            // Fallback to vanilla navigation if no flow field data
+            mob.getNavigation().moveTo(target, speed);
+        }
     }
 
     private void checkStuck() {
@@ -71,7 +108,7 @@ public final class ZombieChasePlayerGoal extends Goal {
 
         if (moved < 0.01) {
             stuckTicks++;
-            if (stuckTicks > 40) {
+            if (stuckTicks > 60) { // 3 seconds stuck
                 unstuck();
                 stuckTicks = 0;
             }
@@ -82,13 +119,13 @@ public final class ZombieChasePlayerGoal extends Goal {
     }
 
     private void unstuck() {
+        // Try jumping and moving in a random direction
         mob.getNavigation().stop();
         mob.setDeltaMovement(
-            (Math.random() - 0.5) * 0.5,
-            0.2,
-            (Math.random() - 0.5) * 0.5
+            (Math.random() - 0.5) * 0.6,
+            0.3,
+            (Math.random() - 0.5) * 0.6
         );
-        mob.getNavigation().recomputePath();
     }
 
     private void recordPosition() {
