@@ -6,6 +6,8 @@ import io.lama06.zombies.data.StorageSession;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.event.weapon.WeaponCreateEvent;
 import io.lama06.zombies.perk.PlayerPerk;
+import io.lama06.zombies.skill.Skill;
+import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.weapon.WeaponType;
 import net.kyori.adventure.audience.Audience;
@@ -194,6 +196,29 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
             // Restore placeholder
             inventory.setItem(slot, PlaceholderItem.createPerkPlaceholder(slot - 5));
         }
+    }
+
+    public Skill getSkill() {
+        final Skill skill = new Skill(this);
+        if (!skill.isSkill()) {
+            return null;
+        }
+        return skill;
+    }
+
+    public void giveSkill(final SkillType type) {
+        final ItemStack item = new ItemStack(type.data.material);
+        final ItemMeta meta = item.getItemMeta();
+        meta.displayName(type.data.displayName);
+        final PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(Skill.IS_SKILL.getKey(), Skill.IS_SKILL.type(), true);
+        pdc.set(Skill.TYPE.getKey(), Skill.TYPE.type(), type);
+        item.setItemMeta(meta);
+        player.getInventory().setItem(Skill.SLOT, item);
+    }
+
+    public void clearSkill() {
+        player.getInventory().setItem(Skill.SLOT, PlaceholderItem.createSkillPlaceholder());
     }
 
     public boolean requireGold(final int gold) {

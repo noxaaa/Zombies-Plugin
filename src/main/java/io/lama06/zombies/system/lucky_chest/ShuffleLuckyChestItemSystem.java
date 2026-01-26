@@ -4,6 +4,8 @@ import com.destroystokyo.paper.event.server.ServerTickEndEvent;
 import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.menu.MenuDisplayableEnum;
+import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.WeaponType;
 import org.bukkit.Sound;
@@ -19,6 +21,7 @@ import org.bukkit.util.Transformation;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +29,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
 public final class ShuffleLuckyChestItemSystem implements Listener {
+    private record LuckyChestEntry(String type, MenuDisplayableEnum item) {}
+
     @EventHandler
     private void onServerTick(final ServerTickEndEvent event) {
         for (final ZombiesWorld world : ZombiesPlugin.INSTANCE.getGameWorlds()) {
@@ -61,7 +66,10 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 final int newShuffleCount = shuffleCount + 1;
                 pdc.set(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER, newShuffleCount);
 
-                // 随机选择武器（优先使用配置，否则使用默认）
+                // 收集所有可用的武器和技能
+                final List<LuckyChestEntry> entries = new ArrayList<>();
+
+                // 武器（优先使用配置，否则使用默认）
                 final List<WeaponType> weaponTypes;
                 if (config != null && !config.luckyChestWeapons.isEmpty()) {
                     weaponTypes = config.luckyChestWeapons;
@@ -69,14 +77,37 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                     weaponTypes = Arrays.stream(WeaponType.values())
                             .filter(weaponType -> weaponType.data.inLuckyChest).toList();
                 }
+                for (final WeaponType weaponType : weaponTypes) {
+                    entries.add(new LuckyChestEntry("WEAPON", weaponType));
+                }
+
+                // 技能
+                final List<SkillType> skillTypes = Arrays.stream(SkillType.values())
+                        .filter(skillType -> skillType.data.inLuckyChest).toList();
+                for (final SkillType skillType : skillTypes) {
+                    entries.add(new LuckyChestEntry("SKILL", skillType));
+                }
+
+                // 随机选择
                 final RandomGenerator rnd = ThreadLocalRandom.current();
-                final WeaponType weaponType = weaponTypes.get(rnd.nextInt(weaponTypes.size()));
-                pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), weaponType);
+                final LuckyChestEntry entry = entries.get(rnd.nextInt(entries.size()));
+
+                // 设置 PDC
+                pdc.set(LuckyChestItem.getItemTypeKey(), PersistentDataType.STRING, entry.type);
+                if ("WEAPON".equals(entry.type)) {
+                    final WeaponType weaponType = (WeaponType) entry.item;
+                    pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), weaponType);
+                    pdc.remove(LuckyChestItem.getSkillKey());
+                } else {
+                    final SkillType skillType = (SkillType) entry.item;
+                    pdc.set(LuckyChestItem.getSkillKey(), new EnumPersistentDataType<>(SkillType.class), skillType);
+                    pdc.remove(LuckyChestItem.getWeaponKey());
+                }
 
                 // 更新显示（缩小到0.5倍）
-                itemDisplay.setItemStack(new ItemStack(weaponType.getDisplayMaterial()));
+                itemDisplay.setItemStack(new ItemStack(entry.item.getDisplayMaterial()));
                 itemDisplay.setCustomNameVisible(true);
-                itemDisplay.customName(weaponType.getDisplayName());
+                itemDisplay.customName(entry.item.getDisplayName());
                 itemDisplay.setBillboard(Display.Billboard.VERTICAL);
                 itemDisplay.setTransformation(new Transformation(
                         new Vector3f(0, 0, 0),

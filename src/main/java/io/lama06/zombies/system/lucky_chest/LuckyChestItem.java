@@ -43,6 +43,14 @@ public final class LuckyChestItem {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_weapon");
     }
 
+    public static NamespacedKey getSkillKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_skill");
+    }
+
+    public static NamespacedKey getItemTypeKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_item_type");
+    }
+
     // 开箱玩家的 UUID
     public static NamespacedKey getOwnerUuidKey() {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_owner_uuid");

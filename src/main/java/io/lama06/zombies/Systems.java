@@ -6,6 +6,7 @@ import io.lama06.zombies.system.lucky_chest.LuckyChestTimeoutSystem;
 import io.lama06.zombies.system.lucky_chest.RemoveLuckyChestItemsSystem;
 import io.lama06.zombies.system.lucky_chest.ShuffleLuckyChestItemSystem;
 import io.lama06.zombies.system.perk.global.*;
+import io.lama06.zombies.system.skill.*;
 import io.lama06.zombies.system.perk.player.BuyPerkSystem;
 import io.lama06.zombies.system.perk.player.RemovePerksOnDeathSystem;
 import io.lama06.zombies.system.perk.player.RunFlameBulletsPerkSystem;
@@ -88,6 +89,14 @@ public final class Systems {
             new RemovePerksOnDeathSystem(),
             new RunFlameBulletsPerkSystem(),
             new RunFrozenBulletsPerkSystem(),
+
+            // Skills
+            new UseSkillSystem(),
+            new PreventSkillUseDuringCooldownSystem(),
+            new StartSkillCooldownSystem(),
+            new TickSkillCooldownSystem(),
+            new RenderSkillCooldownSystem(),
+            new PerformHealSkillSystem(),
 
             // Player
             new DetectPlayerKillsZombieSystem(),

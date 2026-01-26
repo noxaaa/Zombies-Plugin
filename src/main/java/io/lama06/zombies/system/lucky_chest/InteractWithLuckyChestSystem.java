@@ -6,6 +6,8 @@ import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
+import io.lama06.zombies.skill.Skill;
+import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.AmmoData;
 import io.lama06.zombies.weapon.Weapon;
@@ -129,6 +131,17 @@ public final class InteractWithLuckyChestSystem implements Listener {
             return;
         }
 
+        // 检查物品类型
+        final String itemType = pdc.get(LuckyChestItem.getItemTypeKey(), PersistentDataType.STRING);
+
+        if ("SKILL".equals(itemType)) {
+            claimSkill(player, world, chest, itemDisplay, pdc, chestIndex);
+        } else {
+            claimWeapon(player, world, chest, itemDisplay, pdc, chestIndex);
+        }
+    }
+
+    private void claimWeapon(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest, final ItemDisplay itemDisplay, final PersistentDataContainer pdc, final int chestIndex) {
         final WeaponType weaponType = pdc.get(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class));
         if (weaponType == null) {
             return;
@@ -176,6 +189,30 @@ public final class InteractWithLuckyChestSystem implements Listener {
 
         itemDisplay.remove();
         player.giveWeapon(targetSlot, weaponType);
+
+        // 关闭箱子
+        setChestOpen(chest, world.getBukkit(), false);
+
+        // 增加使用次数并检查是否需要移动
+        incrementUsesAndMaybeMove(world, chestIndex);
+    }
+
+    private void claimSkill(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest, final ItemDisplay itemDisplay, final PersistentDataContainer pdc, final int chestIndex) {
+        final SkillType skillType = pdc.get(LuckyChestItem.getSkillKey(), new EnumPersistentDataType<>(SkillType.class));
+        if (skillType == null) {
+            return;
+        }
+
+        // Check if player already has the same skill
+        final Skill existingSkill = player.getSkill();
+        if (existingSkill != null && existingSkill.getType() == skillType) {
+            player.sendMessage(Component.text("You already have this skill!").color(NamedTextColor.RED));
+            return;
+        }
+
+        itemDisplay.remove();
+        player.giveSkill(skillType);
+        player.sendMessage(Component.text("You obtained: ").color(NamedTextColor.GREEN).append(skillType.data.displayName));
 
         // 关闭箱子
         setChestOpen(chest, world.getBukkit(), false);

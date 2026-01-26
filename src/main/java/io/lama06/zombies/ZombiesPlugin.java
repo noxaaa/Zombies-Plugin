@@ -1,5 +1,6 @@
 package io.lama06.zombies;
 
+import io.lama06.zombies.skill.Skill;
 import io.lama06.zombies.system.player.revive.CorpseData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
@@ -91,6 +92,10 @@ public final class ZombiesPlugin extends JavaPlugin implements Listener {
 
     public List<Weapon> getWeapons() {
         return getAlivePlayers().stream().map(ZombiesPlayer::getWeapons).flatMap(Collection::stream).toList();
+    }
+
+    public List<Skill> getSkills() {
+        return getAlivePlayers().stream().map(ZombiesPlayer::getSkill).filter(java.util.Objects::nonNull).toList();
     }
 
     public List<Zombie> getZombies() {
