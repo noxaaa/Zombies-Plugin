@@ -108,6 +108,7 @@ public final class ZombiesWorld extends Storage implements ForwardingAudience {
         final Zombie zombie = new Zombie(entity);
         zombie.set(Zombie.IS_ZOMBIE, true);
         zombie.set(Zombie.TYPE, type);
+        zombie.set(Zombie.SPAWN_LOCATION, io.papermc.paper.math.Position.block(location));
         Bukkit.getPluginManager().callEvent(new ZombieSpawnEvent(zombie, type.data, healthOverride, speedOverride, damageOverride, defenseOverride));
         return zombie;
     }
