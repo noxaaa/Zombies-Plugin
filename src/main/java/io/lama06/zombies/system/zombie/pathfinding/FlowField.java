@@ -17,7 +17,7 @@ import java.util.Queue;
  * Zombies follow the field to reach the target through any complex terrain.
  */
 public final class FlowField {
-    private static final int MAX_DISTANCE = 128;
+    private static final int MAX_DISTANCE = 512;
     private static final BlockFace[] HORIZONTAL_FACES = {
         BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST
     };

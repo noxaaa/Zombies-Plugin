@@ -55,8 +55,8 @@ public final class InitZombieGoalsSystem implements Listener {
             ));
         }
 
-        // 3. Chase player (uses flow field for complex navigation)
-        nmsMob.goalSelector.addGoal(3, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0, 48.0));
+        // 3. Chase player (uses flow field for complex navigation, unlimited range)
+        nmsMob.goalSelector.addGoal(3, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0));
 
         // Target selector: target nearest player
         nmsMob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nmsMob, Player.class, true));

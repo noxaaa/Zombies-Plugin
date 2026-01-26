@@ -1,54 +1,40 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.zombie.Zombie;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.player.Player;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.List;
 
 /**
  * Chase player using flow field pathfinding for complex terrain navigation.
- * Falls back to vanilla navigation when close to target.
+ * Works at any distance - flow field handles long-range pathfinding.
  */
 public final class ZombieChasePlayerGoal extends Goal {
-    private static final double DIRECT_CHASE_DISTANCE = 5.0; // Use vanilla nav when this close
+    private static final double DIRECT_CHASE_DISTANCE_SQ = 25.0; // 5 blocks squared
 
     private final Mob mob;
     private final Zombie zombie;
     private final double speed;
-    private final double chaseRange;
-    private Player target;
     private int stuckTicks;
     private double lastX, lastY, lastZ;
 
-    public ZombieChasePlayerGoal(final Mob mob, final Zombie zombie, final double speed, final double range) {
+    public ZombieChasePlayerGoal(final Mob mob, final Zombie zombie, final double speed) {
         this.mob = mob;
         this.zombie = zombie;
         this.speed = speed;
-        this.chaseRange = range;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
     @Override
     public boolean canUse() {
-        final List<Player> players = mob.level().getEntitiesOfClass(
-            Player.class,
-            mob.getBoundingBox().inflate(chaseRange),
-            p -> !p.isSpectator() && p.isAlive()
-        );
-        if (!players.isEmpty()) {
-            target = players.stream()
-                .min((a, b) -> Double.compare(
-                    mob.distanceToSqr(a), mob.distanceToSqr(b)))
-                .orElse(null);
-            return target != null;
-        }
-        return false;
+        // Always active if there are alive players - flow field handles distance
+        return !zombie.getWorld().getAlivePlayers().isEmpty();
     }
 
     @Override
@@ -59,32 +45,40 @@ public final class ZombieChasePlayerGoal extends Goal {
 
     @Override
     public void tick() {
-        if (target == null || !target.isAlive()) {
-            return;
-        }
+        final ZombiesWorld world = zombie.getWorld();
+        final Location zombieLoc = new Location(
+            world.getBukkit(),
+            mob.getX(), mob.getY(), mob.getZ()
+        );
 
-        mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        // Find nearest player for looking direction
+        final ZombiesPlayer nearestPlayer = world.getAlivePlayers().stream()
+            .min(Comparator.comparingDouble(p ->
+                p.getBukkit().getLocation().distanceSquared(zombieLoc)))
+            .orElse(null);
 
-        final double distanceToTarget = mob.distanceTo(target);
+        if (nearestPlayer != null) {
+            final Location playerLoc = nearestPlayer.getBukkit().getLocation();
+            mob.getLookControl().setLookAt(playerLoc.getX(), playerLoc.getY() + 1, playerLoc.getZ());
 
-        // When close enough, use direct navigation
-        if (distanceToTarget < DIRECT_CHASE_DISTANCE) {
-            mob.getNavigation().moveTo(target, speed);
+            final double distanceSq = zombieLoc.distanceSquared(playerLoc);
+
+            // When close enough, use direct navigation
+            if (distanceSq < DIRECT_CHASE_DISTANCE_SQ) {
+                mob.getNavigation().moveTo(playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), speed);
+            } else {
+                // Use flow field for long-distance navigation
+                navigateWithFlowField(zombieLoc, world);
+            }
         } else {
-            // Use flow field for long-distance navigation
-            navigateWithFlowField();
+            // No players, just use flow field
+            navigateWithFlowField(zombieLoc, world);
         }
 
         checkStuck();
     }
 
-    private void navigateWithFlowField() {
-        final Location zombieLoc = new Location(
-            zombie.getWorld().getBukkit(),
-            mob.getX(), mob.getY(), mob.getZ()
-        );
-
-        final ZombiesWorld world = zombie.getWorld();
+    private void navigateWithFlowField(final Location zombieLoc, final ZombiesWorld world) {
         final Vector direction = FlowFieldManager.INSTANCE.getDirectionToNearestPlayer(zombieLoc, world);
 
         if (direction != null) {
@@ -94,10 +88,8 @@ public final class ZombieChasePlayerGoal extends Goal {
             final double targetZ = mob.getZ() + direction.getZ() * 2;
 
             mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
-        } else if (target != null) {
-            // Fallback to vanilla navigation if no flow field data
-            mob.getNavigation().moveTo(target, speed);
         }
+        // If no flow field data, navigation will be idle until field is calculated
     }
 
     private void checkStuck() {
@@ -136,13 +128,12 @@ public final class ZombieChasePlayerGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return target != null && target.isAlive() && !target.isSpectator()
-            && mob.distanceToSqr(target) < chaseRange * chaseRange;
+        // Continue as long as there are alive players
+        return !zombie.getWorld().getAlivePlayers().isEmpty();
     }
 
     @Override
     public void stop() {
-        target = null;
         mob.getNavigation().stop();
     }
 
