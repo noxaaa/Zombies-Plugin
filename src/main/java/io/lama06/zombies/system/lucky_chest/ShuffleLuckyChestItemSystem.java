@@ -1,10 +1,10 @@
 package io.lama06.zombies.system.lucky_chest;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import io.lama06.zombies.LuckyChestItemEntry;
 import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
-import io.lama06.zombies.menu.MenuDisplayableEnum;
 import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.WeaponType;
@@ -22,15 +22,12 @@ import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
 public final class ShuffleLuckyChestItemSystem implements Listener {
-    private record LuckyChestEntry(String type, MenuDisplayableEnum item) {}
-
     @EventHandler
     private void onServerTick(final ServerTickEndEvent event) {
         for (final ZombiesWorld world : ZombiesPlugin.INSTANCE.getGameWorlds()) {
@@ -66,48 +63,44 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 final int newShuffleCount = shuffleCount + 1;
                 pdc.set(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER, newShuffleCount);
 
-                // 收集所有可用的武器和技能
-                final List<LuckyChestEntry> entries = new ArrayList<>();
+                // 收集所有可用的物品（武器和技能）
+                final List<LuckyChestItemEntry> entries = new ArrayList<>();
 
-                // 武器（优先使用配置，否则使用默认）
-                final List<WeaponType> weaponTypes;
-                if (config != null && !config.luckyChestWeapons.isEmpty()) {
-                    weaponTypes = config.luckyChestWeapons;
+                if (config != null && !config.luckyChestItems.isEmpty()) {
+                    // 使用配置中的物品
+                    entries.addAll(config.luckyChestItems);
                 } else {
-                    weaponTypes = Arrays.stream(WeaponType.values())
-                            .filter(weaponType -> weaponType.data.inLuckyChest).toList();
-                }
-                for (final WeaponType weaponType : weaponTypes) {
-                    entries.add(new LuckyChestEntry("WEAPON", weaponType));
-                }
-
-                // 技能
-                final List<SkillType> skillTypes = Arrays.stream(SkillType.values())
-                        .filter(skillType -> skillType.data.inLuckyChest).toList();
-                for (final SkillType skillType : skillTypes) {
-                    entries.add(new LuckyChestEntry("SKILL", skillType));
+                    // 使用默认（所有 inLuckyChest=true 的武器和技能）
+                    for (final WeaponType weaponType : WeaponType.values()) {
+                        if (weaponType.data.inLuckyChest) {
+                            entries.add(new LuckyChestItemEntry(weaponType));
+                        }
+                    }
+                    for (final SkillType skillType : SkillType.values()) {
+                        if (skillType.data.inLuckyChest) {
+                            entries.add(new LuckyChestItemEntry(skillType));
+                        }
+                    }
                 }
 
                 // 随机选择
                 final RandomGenerator rnd = ThreadLocalRandom.current();
-                final LuckyChestEntry entry = entries.get(rnd.nextInt(entries.size()));
+                final LuckyChestItemEntry entry = entries.get(rnd.nextInt(entries.size()));
 
                 // 设置 PDC
                 pdc.set(LuckyChestItem.getItemTypeKey(), PersistentDataType.STRING, entry.type);
-                if ("WEAPON".equals(entry.type)) {
-                    final WeaponType weaponType = (WeaponType) entry.item;
-                    pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), weaponType);
+                if (entry.isWeapon()) {
+                    pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), entry.weapon);
                     pdc.remove(LuckyChestItem.getSkillKey());
                 } else {
-                    final SkillType skillType = (SkillType) entry.item;
-                    pdc.set(LuckyChestItem.getSkillKey(), new EnumPersistentDataType<>(SkillType.class), skillType);
+                    pdc.set(LuckyChestItem.getSkillKey(), new EnumPersistentDataType<>(SkillType.class), entry.skill);
                     pdc.remove(LuckyChestItem.getWeaponKey());
                 }
 
                 // 更新显示（缩小到0.5倍）
-                itemDisplay.setItemStack(new ItemStack(entry.item.getDisplayMaterial()));
+                itemDisplay.setItemStack(new ItemStack(entry.getDisplayMaterial()));
                 itemDisplay.setCustomNameVisible(true);
-                itemDisplay.customName(entry.item.getDisplayName());
+                itemDisplay.customName(entry.getDisplayName());
                 itemDisplay.setBillboard(Display.Billboard.VERTICAL);
                 itemDisplay.setTransformation(new Transformation(
                         new Vector3f(0, 0, 0),

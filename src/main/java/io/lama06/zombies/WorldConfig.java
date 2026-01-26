@@ -2,6 +2,7 @@ package io.lama06.zombies;
 
 import io.lama06.zombies.menu.*;
 import io.lama06.zombies.perk.PerkMachine;
+import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.PositionUtil;
 import io.lama06.zombies.weapon.WeaponType;
 import io.papermc.paper.math.BlockPosition;
@@ -23,7 +24,7 @@ public final class WorldConfig implements CheckableConfig {
     public final List<ArmorShop> armorShops = new ArrayList<>();
     public final List<LuckyChest> luckyChests = new ArrayList<>();
     public int luckyChestMoveAfterUses = 0;  // 0 = 不移动
-    public final List<WeaponType> luckyChestWeapons = new ArrayList<>();  // 空 = 使用默认
+    public final List<LuckyChestItemEntry> luckyChestItems = new ArrayList<>();  // 空 = 使用默认
     public final List<PerkMachine> perkMachines = new ArrayList<>();
     public PowerSwitch powerSwitch;
     public BlockPosition teamMachine;
@@ -172,9 +173,9 @@ public final class WorldConfig implements CheckableConfig {
                         )
                 ),
                 new SelectionEntry(
-                        Component.text("Lucky Chest Weapons (" + luckyChestWeapons.size() + ")"),
-                        Material.DIAMOND_SWORD,
-                        () -> openLuckyChestWeaponsMenu(player, reopen)
+                        Component.text("Lucky Chest Items (" + luckyChestItems.size() + ")"),
+                        Material.NETHER_STAR,
+                        () -> openLuckyChestItemsMenu(player, reopen)
                 ),
                 new SelectionEntry(
                         Component.text("Perk Machines"),
@@ -284,47 +285,64 @@ public final class WorldConfig implements CheckableConfig {
         );
     }
 
-    private void openLuckyChestWeaponsMenu(final Player player, final Runnable callback) {
-        final Runnable reopen = () -> openLuckyChestWeaponsMenu(player, callback);
+    private void openLuckyChestItemsMenu(final Player player, final Runnable callback) {
+        final Runnable reopen = () -> openLuckyChestItemsMenu(player, callback);
 
         final java.util.List<SelectionEntry> entries = new java.util.ArrayList<>();
 
-        // 添加按钮
+        // 添加武器按钮
         entries.add(new SelectionEntry(
                 Component.text("Add Weapon").color(NamedTextColor.GREEN),
-                Material.GREEN_STAINED_GLASS_PANE,
+                Material.DIAMOND_SWORD,
                 () -> EnumSelectionMenu.open(
                         WeaponType.class,
                         player,
                         Component.text("Select Weapon"),
                         reopen,
                         weaponType -> {
-                            if (!luckyChestWeapons.contains(weaponType)) {
-                                luckyChestWeapons.add(weaponType);
-                            }
+                            luckyChestItems.add(new LuckyChestItemEntry(weaponType));
                             reopen.run();
                         }
                 )
         ));
 
-        // 显示已选武器
-        for (int i = 0; i < luckyChestWeapons.size(); i++) {
+        // 添加技能按钮
+        entries.add(new SelectionEntry(
+                Component.text("Add Skill").color(NamedTextColor.GOLD),
+                Material.GOLDEN_APPLE,
+                () -> EnumSelectionMenu.open(
+                        SkillType.class,
+                        player,
+                        Component.text("Select Skill"),
+                        reopen,
+                        skillType -> {
+                            luckyChestItems.add(new LuckyChestItemEntry(skillType));
+                            reopen.run();
+                        }
+                )
+        ));
+
+        // 显示已选物品
+        for (int i = 0; i < luckyChestItems.size(); i++) {
             final int index = i;
-            final WeaponType weapon = luckyChestWeapons.get(i);
+            final LuckyChestItemEntry item = luckyChestItems.get(i);
+            final Component prefix = item.isWeapon()
+                    ? Component.text("[Weapon] ").color(NamedTextColor.AQUA)
+                    : Component.text("[Skill] ").color(NamedTextColor.GOLD);
             entries.add(new SelectionEntry(
-                    weapon.getDisplayName(),
-                    weapon.getDisplayMaterial(),
+                    prefix.append(item.getDisplayName()),
+                    item.getDisplayMaterial(),
                     () -> {},  // 点击无操作
                     Component.text("Remove").color(NamedTextColor.RED),
                     () -> {
-                        luckyChestWeapons.remove(index);
+                        luckyChestItems.remove(index);
                         reopen.run();
                     }
             ));
         }
 
         // 提示信息
-        if (luckyChestWeapons.isEmpty()) {
+        if (luckyChestItems.isEmpty()) {
             entries.add(new SelectionEntry(
                     Component.text("Empty = use default (inLuckyChest)").color(NamedTextColor.GRAY),
                     Material.PAPER,
@@ -334,7 +352,7 @@ public final class WorldConfig implements CheckableConfig {
 
         SelectionMenu.open(
                 player,
-                Component.text("Lucky Chest Weapons").color(NamedTextColor.GOLD),
+                Component.text("Lucky Chest Items").color(NamedTextColor.GOLD),
                 callback,
                 entries.toArray(SelectionEntry[]::new)
         );
