@@ -54,7 +54,8 @@ public final class ZombieBreakWindowGoal extends Goal {
     }
 
     /**
-     * Find the window that this zombie spawned at by matching spawn location.
+     * Find the window that this zombie spawned at by finding the window
+     * with blocks closest to the spawn location.
      */
     private Window findSpawnWindow() {
         final BlockPosition spawnLoc = zombie.get(Zombie.SPAWN_LOCATION);
@@ -71,12 +72,15 @@ public final class ZombieBreakWindowGoal extends Goal {
         double minDist = Double.MAX_VALUE;
 
         for (final Window window : world.getConfig().windows) {
-            if (window.spawnLocation == null) continue;
-            final org.bukkit.util.Vector windowSpawn = window.spawnLocation.toBukkit(world.getBukkit()).toVector();
-            final double dist = windowSpawn.distance(spawnVector);
-            if (dist < minDist) {
-                minDist = dist;
-                closest = window;
+            if (window.blocks == null) continue;
+
+            // Find the minimum distance from spawn to any block in this window
+            for (final BlockPosition blockPos : window.blocks.getBlocks()) {
+                final double dist = blockPos.toCenter().toVector().distance(spawnVector);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = window;
+                }
             }
         }
 
