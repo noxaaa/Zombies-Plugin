@@ -68,17 +68,14 @@ public final class ZombieChasePlayerGoal extends Goal {
                 mob.getNavigation().moveTo(playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), speed);
             } else {
                 // Use flow field for long-distance navigation
-                navigateWithFlowField(zombieLoc, world);
+                navigateWithFlowField(zombieLoc, world, playerLoc);
             }
-        } else {
-            // No players, just use flow field
-            navigateWithFlowField(zombieLoc, world);
         }
 
         checkStuck();
     }
 
-    private void navigateWithFlowField(final Location zombieLoc, final ZombiesWorld world) {
+    private void navigateWithFlowField(final Location zombieLoc, final ZombiesWorld world, final Location playerLoc) {
         final Vector direction = FlowFieldManager.INSTANCE.getDirectionToNearestPlayer(zombieLoc, world);
 
         if (direction != null) {
@@ -88,8 +85,15 @@ public final class ZombieChasePlayerGoal extends Goal {
             final double targetZ = mob.getZ() + direction.getZ() * 2;
 
             mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
+        } else {
+            // Fallback: move towards player direction (won't avoid obstacles, but stuck detection will handle it)
+            final Vector toPlayer = playerLoc.toVector().subtract(zombieLoc.toVector()).normalize();
+            final double targetX = mob.getX() + toPlayer.getX() * 3;
+            final double targetY = mob.getY();
+            final double targetZ = mob.getZ() + toPlayer.getZ() * 3;
+
+            mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
         }
-        // If no flow field data, navigation will be idle until field is calculated
     }
 
     private void checkStuck() {

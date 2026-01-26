@@ -78,6 +78,23 @@ public final class FlowFieldManager {
     }
 
     /**
+     * Pre-calculate flow fields for all players synchronously.
+     * Call this at round start to ensure zombies have valid data immediately.
+     */
+    public void preCalculateForAllPlayers(final ZombiesWorld world) {
+        for (final ZombiesPlayer player : world.getAlivePlayers()) {
+            final UUID playerId = player.getBukkit().getUniqueId();
+            final Location currentLoc = player.getBukkit().getLocation();
+
+            // Calculate synchronously
+            final FlowField newField = new FlowField(currentLoc);
+            flowFields.put(playerId, newField);
+            lastPlayerLocations.put(playerId, currentLoc.clone());
+            calculating.remove(playerId); // Clear any pending async calculation
+        }
+    }
+
+    /**
      * Get the best direction for a zombie to move towards any player.
      * Returns the direction to the nearest reachable player.
      */
