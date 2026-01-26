@@ -3,8 +3,11 @@ package io.lama06.zombies.system.zombie.pathfinding;
 import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieData;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.player.Player;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.entity.CraftMob;
 import org.bukkit.entity.PigZombie;
@@ -22,7 +25,7 @@ public final class InitZombieGoalsSystem implements Listener {
             return;
         }
 
-        final Mob nmsMob = ((CraftMob) bukkitMob).getHandle();
+        final var nmsMob = ((CraftMob) bukkitMob).getHandle();
         final ZombieData data = zombie.getData();
 
         // Clear all vanilla goals
@@ -40,19 +43,22 @@ public final class InitZombieGoalsSystem implements Listener {
         // 0. Float in water (basic behavior)
         nmsMob.goalSelector.addGoal(0, new FloatGoal(nmsMob));
 
-        // 1. Window breaking (if zombie is configured with breakWindow)
+        // 1. Melee attack (highest priority when in range)
+        if (nmsMob instanceof final PathfinderMob pathfinderMob) {
+            nmsMob.goalSelector.addGoal(1, new MeleeAttackGoal(pathfinderMob, 1.0, false));
+        }
+
+        // 2. Window breaking (if zombie is configured with breakWindow)
         if (data.breakWindow != null) {
-            nmsMob.goalSelector.addGoal(1, new ZombieBreakWindowGoal(
+            nmsMob.goalSelector.addGoal(2, new ZombieBreakWindowGoal(
                 nmsMob, zombie, data.breakWindow.maxDistance() + 10
             ));
         }
 
-        // 2. Chase player (uses flow field for complex navigation)
-        nmsMob.goalSelector.addGoal(2, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0, 48.0));
+        // 3. Chase player (uses flow field for complex navigation)
+        nmsMob.goalSelector.addGoal(3, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0, 48.0));
 
-        // 3. Ranged attack (reserved for future, based on ZombieData configuration)
-        // if (data.rangedAttack != null) {
-        //     nmsMob.goalSelector.addGoal(3, new ZombieRangedAttackGoal(...));
-        // }
+        // Target selector: target nearest player
+        nmsMob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nmsMob, Player.class, true));
     }
 }

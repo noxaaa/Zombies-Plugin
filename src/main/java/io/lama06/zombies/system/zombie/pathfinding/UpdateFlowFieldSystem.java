@@ -15,15 +15,15 @@ public final class UpdateFlowFieldSystem implements Listener {
 
     @EventHandler
     private void onServerTick(final ServerTickEndEvent event) {
-        // Update every 10 ticks (0.5 seconds)
-        if (++tickCounter < 10) {
+        // Update every 20 ticks (1 second)
+        if (++tickCounter < 20) {
             return;
         }
         tickCounter = 0;
 
         for (final ZombiesWorld world : ZombiesPlugin.INSTANCE.getGameWorlds()) {
             for (final ZombiesPlayer player : world.getAlivePlayers()) {
-                FlowFieldManager.INSTANCE.updateForPlayer(player);
+                FlowFieldManager.INSTANCE.updateForPlayer(player, ZombiesPlugin.INSTANCE);
             }
         }
     }

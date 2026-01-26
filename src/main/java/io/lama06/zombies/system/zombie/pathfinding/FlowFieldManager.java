@@ -2,35 +2,47 @@ package io.lama06.zombies.system.zombie.pathfinding;
 
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Manages flow fields for all players in zombies worlds.
- * Flow fields are recalculated periodically when players move.
+ * Flow fields are recalculated asynchronously to avoid blocking the main thread.
  */
 public final class FlowFieldManager {
     public static final FlowFieldManager INSTANCE = new FlowFieldManager();
 
-    private static final long RECALCULATE_INTERVAL_MS = 1500; // Recalculate every 1.5 seconds
+    private static final long RECALCULATE_INTERVAL_MS = 2000; // Recalculate every 2 seconds
     private static final double MOVE_THRESHOLD = 3.0; // Recalculate if player moved more than 3 blocks
 
     private final Map<UUID, FlowField> flowFields = new ConcurrentHashMap<>();
     private final Map<UUID, Location> lastPlayerLocations = new ConcurrentHashMap<>();
+    private final Set<UUID> calculating = ConcurrentHashMap.newKeySet();
+    private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
     private FlowFieldManager() {}
 
     /**
      * Update flow field for a player if needed.
-     * Should be called periodically (e.g., every tick or every few ticks).
+     * Calculation is done asynchronously.
      */
-    public void updateForPlayer(final ZombiesPlayer player) {
+    public void updateForPlayer(final ZombiesPlayer player, final Plugin plugin) {
         final UUID playerId = player.getBukkit().getUniqueId();
         final Location currentLoc = player.getBukkit().getLocation();
+
+        // Skip if already calculating for this player
+        if (calculating.contains(playerId)) {
+            return;
+        }
 
         final FlowField existing = flowFields.get(playerId);
         final Location lastLoc = lastPlayerLocations.get(playerId);
@@ -46,8 +58,22 @@ public final class FlowFieldManager {
         }
 
         if (needsRecalculate) {
-            flowFields.put(playerId, new FlowField(currentLoc));
+            calculating.add(playerId);
             lastPlayerLocations.put(playerId, currentLoc.clone());
+
+            // Calculate async
+            executor.submit(() -> {
+                try {
+                    final FlowField newField = new FlowField(currentLoc);
+                    // Update on main thread
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        flowFields.put(playerId, newField);
+                        calculating.remove(playerId);
+                    });
+                } catch (final Exception e) {
+                    calculating.remove(playerId);
+                }
+            });
         }
     }
 
