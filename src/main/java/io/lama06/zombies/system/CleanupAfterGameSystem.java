@@ -9,6 +9,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -100,6 +101,7 @@ public final class CleanupAfterGameSystem implements Listener {
             playerBukkit.setLevel(0);
             playerBukkit.setExp(0);
             playerBukkit.clearActivePotionEffects();
+            playerBukkit.getAttribute(Attribute.MAX_HEALTH).setBaseValue(20);
             playerBukkit.setHealth(20);
             playerBukkit.setFoodLevel(20);
             playerBukkit.setFireTicks(0);
