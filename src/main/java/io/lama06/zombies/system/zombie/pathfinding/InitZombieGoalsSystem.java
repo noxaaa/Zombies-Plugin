@@ -43,16 +43,16 @@ public final class InitZombieGoalsSystem implements Listener {
         // 0. Float in water (basic behavior)
         nmsMob.goalSelector.addGoal(0, new FloatGoal(nmsMob));
 
-        // 1. Melee attack (highest priority when in range)
-        if (nmsMob instanceof final PathfinderMob pathfinderMob) {
-            nmsMob.goalSelector.addGoal(1, new MeleeAttackGoal(pathfinderMob, 1.0, false));
-        }
-
-        // 2. Window breaking (if zombie is configured with breakWindow)
+        // 1. Window breaking (highest priority - must break window before doing anything else)
         if (data.breakWindow != null) {
-            nmsMob.goalSelector.addGoal(2, new ZombieBreakWindowGoal(
+            nmsMob.goalSelector.addGoal(1, new ZombieBreakWindowGoal(
                 nmsMob, zombie, data.breakWindow.maxDistance() + 10
             ));
+        }
+
+        // 2. Melee attack (only activates after window is passable)
+        if (nmsMob instanceof final PathfinderMob pathfinderMob) {
+            nmsMob.goalSelector.addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.0, false));
         }
 
         // 3. Chase player (uses flow field for complex navigation, unlimited range)

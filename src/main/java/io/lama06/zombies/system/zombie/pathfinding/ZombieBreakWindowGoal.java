@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import com.destroystokyo.paper.entity.Pathfinder;
 import io.lama06.zombies.Window;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.data.Component;
@@ -43,6 +44,11 @@ public final class ZombieBreakWindowGoal extends Goal {
             }
         }
 
+        // If the zombie can already reach the repair area, don't need to break more
+        if (canReachRepairArea()) {
+            return false;
+        }
+
         final Component comp = zombie.getComponent(Zombie.BREAK_WINDOW);
         if (comp != null && comp.get(BreakWindowData.REMAINING_TIME) != null) {
             isBreaking = true;
@@ -51,6 +57,36 @@ public final class ZombieBreakWindowGoal extends Goal {
 
         targetWindow = findNearestBlockInSpawnWindow();
         return targetWindow != null;
+    }
+
+    /**
+     * Check if the zombie can pathfind to the repair area using Paper's Pathfinder API.
+     * If findPath returns a valid result, the window is passable.
+     */
+    private boolean canReachRepairArea() {
+        if (spawnWindow == null || spawnWindow.repairArea == null) {
+            return false;
+        }
+
+        // Use Paper's Bukkit Pathfinder API
+        if (!(zombie.getEntity() instanceof final org.bukkit.entity.Mob bukkitMob)) {
+            return false;
+        }
+
+        final Pathfinder pathfinder = bukkitMob.getPathfinder();
+
+        // Get center of repair area as target
+        final BlockPosition lower = spawnWindow.repairArea.getLowerCorner();
+        final BlockPosition upper = spawnWindow.repairArea.getUpperCorner();
+        final double targetX = (lower.blockX() + upper.blockX()) / 2.0 + 0.5;
+        final double targetY = lower.blockY();
+        final double targetZ = (lower.blockZ() + upper.blockZ()) / 2.0 + 0.5;
+
+        final Location targetLoc = new Location(zombie.getWorld().getBukkit(), targetX, targetY, targetZ);
+
+        // findPath returns null if no path exists
+        final Pathfinder.PathResult path = pathfinder.findPath(targetLoc);
+        return path != null;
     }
 
     /**
@@ -160,6 +196,11 @@ public final class ZombieBreakWindowGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
+        // If the zombie can now reach the repair area, stop breaking
+        if (canReachRepairArea()) {
+            return false;
+        }
+
         if (isBreaking) {
             return true;
         }

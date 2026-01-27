@@ -170,7 +170,16 @@ public final class FlowField {
 
     private boolean isPassable(final Block block) {
         final Material type = block.getType();
-        return !type.isSolid() || isPassableBlock(type);
+        if (!type.isSolid()) {
+            return true;
+        }
+        // Check for non-full blocks that entities can walk through/on
+        final String name = type.name();
+        // Slabs, stairs, and other partial blocks are passable at feet level
+        if (name.endsWith("_SLAB") || name.endsWith("_STAIRS")) {
+            return true;
+        }
+        return isPassableBlock(type);
     }
 
     private boolean isPassableBlock(final Material type) {
