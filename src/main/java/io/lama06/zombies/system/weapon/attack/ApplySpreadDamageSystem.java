@@ -2,7 +2,9 @@ package io.lama06.zombies.system.weapon.attack;
 
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.data.Component;
 import io.lama06.zombies.event.player.PlayerAttackZombieEvent;
+import io.lama06.zombies.perk.GlobalPerk;
 import io.lama06.zombies.weapon.AttackData;
 import io.lama06.zombies.weapon.SpreadDamageData;
 import io.lama06.zombies.weapon.Weapon;
@@ -43,6 +45,11 @@ public final class ApplySpreadDamageSystem implements Listener {
                 .limit(spreadData.maxTargets())
                 .toList();
 
+        // Check if instant kill is active
+        final Component perksComponent = world.getComponent(ZombiesWorld.PERKS_COMPONENT);
+        final boolean instantKill = perksComponent != null
+                && perksComponent.get(GlobalPerk.INSTANT_KILL.getRemainingTimeAttribute()) > 0;
+
         // Apply non-crit damage and gold to nearby zombies
         final double spreadDamage = attackData.damage();  // Always non-crit
         final int spreadGold = attackData.gold();  // Always non-crit gold
@@ -54,8 +61,13 @@ public final class ApplySpreadDamageSystem implements Listener {
                 continue;
             }
 
-            // Deal damage
-            livingEntity.damage(spreadDamage, player.getBukkit());
+            // Deal damage or instant kill
+            if (instantKill) {
+                livingEntity.setKiller(player.getBukkit());
+                livingEntity.setHealth(0);
+            } else {
+                livingEntity.damage(spreadDamage, player.getBukkit());
+            }
 
             // Give gold to player
             final int currentGold = player.get(ZombiesPlayer.GOLD);
