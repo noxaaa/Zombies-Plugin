@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -115,5 +116,13 @@ public final class InputMenu<T> implements Listener {
         }
         cancelCallback.run();
         HandlerList.unregisterAll(this);
+    }
+
+    @EventHandler
+    private void onPlayerSwapHands(final PlayerSwapHandItemsEvent event) {
+        if (!event.getPlayer().equals(player)) {
+            return;
+        }
+        event.setCancelled(true);
     }
 }
