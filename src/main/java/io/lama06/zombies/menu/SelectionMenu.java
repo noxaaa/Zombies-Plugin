@@ -72,6 +72,7 @@ public final class SelectionMenu implements Listener, InventoryHolder {
     private final SelectionEntry[] entries;
     private final Inventory[] pages;
     private int currentPage;
+    private boolean handled = false;
 
     @Override
     public Inventory getInventory() {
@@ -242,13 +243,17 @@ public final class SelectionMenu implements Listener, InventoryHolder {
         } else if (pdc.has(nextPageKey)) {
             switchPage(1);
         } else if (pdc.has(entryIndexKey)) {
+            if (handled) {
+                return;
+            }
+            handled = true;
             final int entryIndex = Objects.requireNonNull(pdc.get(entryIndexKey, PersistentDataType.INTEGER));
             if (entryIndex < 0 || entryIndex >= entries.length) {
                 return;
             }
-            HandlerList.unregisterAll(this);
             Bukkit.getScheduler().runTask(ZombiesPlugin.INSTANCE, () -> {
                 player.closeInventory();
+                HandlerList.unregisterAll(this);
                 if (event.getClick().isLeftClick()) {
                     entries[entryIndex].callback().run();
                 } else if (event.getClick().isRightClick() && entries[entryIndex].secondAction() != null) {
