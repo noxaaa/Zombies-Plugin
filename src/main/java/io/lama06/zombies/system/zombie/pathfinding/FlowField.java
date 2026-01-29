@@ -99,9 +99,19 @@ public final class FlowField {
      * Get distance to target from a location. Returns -1 if not reachable.
      */
     public int getDistance(final Location from) {
-        final long key = packPos(from.getBlockX(), from.getBlockY(), from.getBlockZ());
-        final DirectionEntry entry = field.get(key);
-        return entry != null ? entry.distance : -1;
+        final int x = from.getBlockX();
+        final int y = from.getBlockY();
+        final int z = from.getBlockZ();
+
+        // Check current block and one below (consistent with getDirection)
+        for (int dy = 0; dy >= -1; dy--) {
+            final long key = packPos(x, y + dy, z);
+            final DirectionEntry entry = field.get(key);
+            if (entry != null) {
+                return entry.distance;
+            }
+        }
+        return -1;
     }
 
     public Location getTarget() {

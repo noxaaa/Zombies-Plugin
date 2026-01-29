@@ -22,6 +22,7 @@ public final class WorldConfig implements CheckableConfig {
     public final List<Window> windows = new ArrayList<>();
     public final List<WeaponShop> weaponShops = new ArrayList<>();
     public final List<ArmorShop> armorShops = new ArrayList<>();
+    public final List<AmmoShop> ammoShops = new ArrayList<>();
     public final List<LuckyChest> luckyChests = new ArrayList<>();
     public int luckyChestMoveAfterUses = 0;  // 0 = 不移动
     public final List<LuckyChestItemEntry> luckyChestItems = new ArrayList<>();  // 空 = 使用默认
@@ -43,6 +44,7 @@ public final class WorldConfig implements CheckableConfig {
         InvalidConfigException.checkList(windows, false, "windows");
         InvalidConfigException.checkList(weaponShops, true, "weapon shops");
         InvalidConfigException.checkList(armorShops, true, "armor shops");
+        InvalidConfigException.checkList(ammoShops, true, "ammo shops");
         InvalidConfigException.checkList(luckyChests, true, "lucky chests");
         InvalidConfigException.checkList(perkMachines, true, "perk machines");
         if (powerSwitch != null) {
@@ -139,6 +141,20 @@ public final class WorldConfig implements CheckableConfig {
                                 shop -> Component.text("Armor Shop: ").append(shop.quality.getDisplayName())
                                         .appendSpace().append(shop.part.getDisplayName()),
                                 ArmorShop::new,
+                                shop -> shop.openMenu(player, reopen),
+                                reopen
+                        )
+                ),
+                new SelectionEntry(
+                        Component.text("Ammo Shops"),
+                        Material.GUNPOWDER,
+                        () -> ListConfigMenu.open(
+                                player,
+                                Component.text("Ammo Shops"),
+                                ammoShops,
+                                Material.GUNPOWDER,
+                                shop -> Component.text("Ammo Shop at " + PositionUtil.format(shop.position)),
+                                AmmoShop::new,
                                 shop -> shop.openMenu(player, reopen),
                                 reopen
                         )

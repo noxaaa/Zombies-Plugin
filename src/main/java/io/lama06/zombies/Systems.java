@@ -46,12 +46,14 @@ import org.bukkit.event.Listener;
 
 public final class Systems {
     public static Listener[] SYSTEMS = new Listener[] {
+            new AmmoShopDisplaySystem(),
             new ArmorShopDisplaySystem(),
             new BuyArmorAtShopSystem(),
             new CleanupAfterGameSystem(),
             new EnablePowerSwitchSystem(),
             new EndGameWhenPlayersDeadSystem(),
             new HandleNewPlayersSystem(),
+            new InteractWithAmmoShopSystem(),
             new InteractWithWeaponShopSystem(),
             new WeaponShopDisplaySystem(),
             new OpenDoorSystem(),
