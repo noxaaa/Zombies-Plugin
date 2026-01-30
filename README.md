@@ -7,13 +7,15 @@
 - Collectable perks dropped by zombies (instant kill, full ammo, double gold)
 - Several different weapons (rifle, shotgun, sniper, flamethrower etc.)
 - Animated lucky chests
+- Flow fields pathfinding
 - Highly configurable using inventory UIs: door, windows, shops etc.
 - Support for custom maps
 - Commands to give yourself gold, weapons, summon zombies etc.
 - Armor shops
 - Power switch
 - Team machine
-- No usage of NMS: the plugin probably won't break with new Minecraft versions
+- Ammo shop
+
 - ...
 
 ## Showcase
