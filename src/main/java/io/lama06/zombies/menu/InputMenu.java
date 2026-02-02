@@ -17,6 +17,8 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.function.Consumer;
 
@@ -72,6 +74,8 @@ public final class InputMenu<T> implements Listener {
         final ItemStack firstItem = new ItemStack(Material.PAPER);
         final ItemMeta firstItemMeta = firstItem.getItemMeta();
         firstItemMeta.displayName(Component.text(inputType.formatData(initialData)));
+        final PersistentDataContainer pdc = firstItemMeta.getPersistentDataContainer();
+        pdc.set(new org.bukkit.NamespacedKey(ZombiesPlugin.INSTANCE, "input_menu_paper"), PersistentDataType.BOOLEAN, true);
         firstItem.setItemMeta(firstItemMeta);
         inventory.setFirstItem(firstItem);
         Bukkit.getPluginManager().registerEvents(this, ZombiesPlugin.INSTANCE);
@@ -93,6 +97,7 @@ public final class InputMenu<T> implements Listener {
             player.sendMessage(Component.text(e.getMessage()));
             return;
         }
+        removeInputPaperFromInventory();
         HandlerList.unregisterAll(this);
         Bukkit.getScheduler().runTask(ZombiesPlugin.INSTANCE, () -> {
             player.closeInventory();
@@ -102,9 +107,10 @@ public final class InputMenu<T> implements Listener {
 
     @EventHandler
     private void onInventoryClose(final InventoryCloseEvent event) {
-        if (!event.getPlayer().equals(player)) {
+        if (!event.getPlayer().equals(player) || !event.getInventory().equals(inventory)) {
             return;
         }
+        removeInputPaperFromInventory();
         Bukkit.getScheduler().runTask(ZombiesPlugin.INSTANCE, cancelCallback);
         HandlerList.unregisterAll(this);
     }
@@ -114,6 +120,7 @@ public final class InputMenu<T> implements Listener {
         if (!event.getPlayer().equals(player)) {
             return;
         }
+        removeInputPaperFromInventory();
         cancelCallback.run();
         HandlerList.unregisterAll(this);
     }
@@ -124,5 +131,33 @@ public final class InputMenu<T> implements Listener {
             return;
         }
         event.setCancelled(true);
+    }
+
+    private void removeInputPaperFromInventory() {
+        final var key = new org.bukkit.NamespacedKey(ZombiesPlugin.INSTANCE, "input_menu_paper");
+        final ItemStack[] contents = player.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            final ItemStack item = contents[i];
+            if (item == null || !item.hasItemMeta()) {
+                continue;
+            }
+            final ItemMeta meta = item.getItemMeta();
+            if (meta.getPersistentDataContainer().has(key, PersistentDataType.BOOLEAN)) {
+                player.getInventory().setItem(i, null);
+            }
+        }
+        if (inventory != null) {
+            final ItemStack[] topContents = inventory.getContents();
+            for (int i = 0; i < topContents.length; i++) {
+                final ItemStack item = topContents[i];
+                if (item == null || !item.hasItemMeta()) {
+                    continue;
+                }
+                final ItemMeta meta = item.getItemMeta();
+                if (meta.getPersistentDataContainer().has(key, PersistentDataType.BOOLEAN)) {
+                    inventory.setItem(i, null);
+                }
+            }
+        }
     }
 }

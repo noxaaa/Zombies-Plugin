@@ -277,6 +277,9 @@ public final class SelectionMenu implements Listener, InventoryHolder {
         if (event.getInventory().getHolder() != this) {
             return;
         }
+        if (handled) {
+            return;
+        }
         final PersistentDataContainer pdc = player.getPersistentDataContainer();
         final NamespacedKey switchingPageKey = new NamespacedKey(ZombiesPlugin.INSTANCE, SWITCHING_PAGE_KEY);
         if (pdc.getOrDefault(switchingPageKey, PersistentDataType.BOOLEAN, false)) {
