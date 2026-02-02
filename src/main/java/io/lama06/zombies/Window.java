@@ -16,10 +16,16 @@ public final class Window implements CheckableConfig {
     public BlockArea repairArea;
 
     public void open(final ZombiesWorld world) {
+        if (blocks == null) {
+            return;
+        }
         blocks.fill(world.getBukkit(), Bukkit.createBlockData(Material.AIR));
     }
 
     public void close(final ZombiesWorld world) {
+        if (blocks == null) {
+            return;
+        }
         blocks.fill(world.getBukkit(), Bukkit.createBlockData(Material.OAK_SLAB));
     }
 
