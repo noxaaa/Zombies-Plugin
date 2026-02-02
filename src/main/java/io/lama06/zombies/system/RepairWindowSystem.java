@@ -34,6 +34,9 @@ public final class RepairWindowSystem implements Listener {
             final ZombiesWorld world = player.getWorld();
             final WorldConfig config = world.getConfig();
             for (final Window window : config.windows) {
+                if (window.repairArea == null) {
+                    continue;
+                }
                 if (!window.repairArea.containsBlock(playerLocation.toBlock())) {
                     continue;
                 }

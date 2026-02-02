@@ -27,8 +27,10 @@ public final class Window implements CheckableConfig {
     public void check() throws InvalidConfigException {
         InvalidConfigException.mustBeSet(area, "area");
         InvalidConfigException.mustBeSet(spawnLocation, "spawn location");
-        InvalidConfigException.mustBeSet(blocks, "blocks");
-        InvalidConfigException.mustBeSet(repairArea, "repair area");
+        if (needBreak) {
+            InvalidConfigException.mustBeSet(blocks, "blocks");
+            InvalidConfigException.mustBeSet(repairArea, "repair area");
+        }
     }
 
     public void openMenu(final Player player, final Runnable callback) {
