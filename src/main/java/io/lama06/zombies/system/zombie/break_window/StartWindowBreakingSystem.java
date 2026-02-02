@@ -44,6 +44,9 @@ public final class StartWindowBreakingSystem implements Listener {
         if (spawnWindow == null) {
             return;
         }
+        if (!spawnWindow.needBreak) {
+            return;
+        }
 
         // If the zombie can already reach the repair area, don't need to break more
         if (canReachRepairArea(zombie, spawnWindow)) {

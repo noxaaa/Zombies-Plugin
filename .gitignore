@@ -33,3 +33,7 @@ bin/
 .DS_Store
 
 CLAUDE.md
+.env
+deploy.sh
+.env.example
+scripts/ci_upload_mcsm.sh

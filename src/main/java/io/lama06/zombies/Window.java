@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 public final class Window implements CheckableConfig {
     public String area = "";
     public EntityPosition spawnLocation;
+    public boolean needBreak = true;
     public BlockArea blocks;
     public BlockArea repairArea;
 
@@ -64,6 +65,14 @@ public final class Window implements CheckableConfig {
                                     reopen.run();
                                 }
                         )
+                ),
+                new SelectionEntry(
+                        Component.text("Need Break: " + needBreak),
+                        Material.LEVER,
+                        () -> {
+                            this.needBreak = !this.needBreak;
+                            reopen.run();
+                        }
                 ),
                 new SelectionEntry(
                         Component.text("Blocks: " + blocks),

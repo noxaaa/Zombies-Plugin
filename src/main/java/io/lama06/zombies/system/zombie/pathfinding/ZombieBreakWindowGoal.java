@@ -43,6 +43,9 @@ public final class ZombieBreakWindowGoal extends Goal {
                 return false;
             }
         }
+        if (!spawnWindow.needBreak) {
+            return false;
+        }
 
         // If the zombie can already reach the repair area, don't need to break more
         if (canReachRepairArea()) {
@@ -196,6 +199,9 @@ public final class ZombieBreakWindowGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
+        if (spawnWindow != null && !spawnWindow.needBreak) {
+            return false;
+        }
         // If the zombie can now reach the repair area, stop breaking
         if (canReachRepairArea()) {
             return false;
