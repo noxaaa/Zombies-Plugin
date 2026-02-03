@@ -5,6 +5,7 @@ import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
 import io.lama06.zombies.util.pdc.UuidDataType;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieType;
+import io.lama06.zombies.zombie.ZombieData;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Bee;
@@ -52,6 +53,15 @@ public final class InitCreeperBeeSystem implements Listener {
         final UUID beeId = bee.getUniqueId();
         creeperPdc.set(CreeperBeeKeys.partnerKey(), UuidDataType.INSTANCE, beeId);
         bee.getPersistentDataContainer().set(CreeperBeeKeys.partnerKey(), UuidDataType.INSTANCE, creeperId);
+
+        // Mark the bee as a zombie so it gets cleaned up on game end and can be attacked
+        final Zombie beeZombie = new Zombie(bee);
+        beeZombie.set(Zombie.IS_ZOMBIE, true);
+        beeZombie.set(Zombie.TYPE, ZombieType.SUICIDER);
+        final ZombieData data = ZombieType.SUICIDER.data;
+        if (data.defense != 0) {
+            beeZombie.set(Zombie.DEFENSE, data.defense);
+        }
     }
 
     private void applyAttributes(final org.bukkit.entity.LivingEntity entity) {
