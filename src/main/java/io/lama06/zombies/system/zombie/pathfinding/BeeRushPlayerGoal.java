@@ -1,11 +1,12 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
-import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Comparator;
 import java.util.EnumSet;
 
@@ -26,14 +27,14 @@ public final class BeeRushPlayerGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        return !world.getAlivePlayers().isEmpty();
+        return !getTargets().isEmpty();
     }
 
     @Override
     public void tick() {
-        final ZombiesPlayer target = world.getAlivePlayers().stream()
+        final Player target = getTargets().stream()
                 .min(Comparator.comparingDouble(p ->
-                        p.getBukkit().getLocation().distanceSquared(mob.getBukkitEntity().getLocation())))
+                        p.getLocation().distanceSquared(mob.getBukkitEntity().getLocation())))
                 .orElse(null);
 
         if (target == null) {
@@ -41,14 +42,14 @@ public final class BeeRushPlayerGoal extends Goal {
             return;
         }
 
-        final Location targetLoc = target.getBukkit().getLocation();
+        final Location targetLoc = target.getLocation();
         mob.getLookControl().setLookAt(targetLoc.getX(), targetLoc.getY() + 1, targetLoc.getZ());
         mob.getNavigation().moveTo(targetLoc.getX(), targetLoc.getY(), targetLoc.getZ(), speed);
     }
 
     @Override
     public boolean canContinueToUse() {
-        return !world.getAlivePlayers().isEmpty();
+        return !getTargets().isEmpty();
     }
 
     @Override
@@ -59,5 +60,12 @@ public final class BeeRushPlayerGoal extends Goal {
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
+    }
+
+    private List<Player> getTargets() {
+        return world.getBukkit().getPlayers().stream()
+                .filter(player -> player.getGameMode() != org.bukkit.GameMode.SPECTATOR)
+                .filter(player -> !player.isDead())
+                .toList();
     }
 }

@@ -2,11 +2,9 @@ package io.lama06.zombies.system.zombie.creeper_bee;
 
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
-import io.lama06.zombies.system.zombie.pathfinding.BeeRushPlayerGoal;
 import io.lama06.zombies.util.pdc.UuidDataType;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieType;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Bee;
@@ -14,7 +12,6 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.craftbukkit.entity.CraftMob;
 
 import java.util.UUID;
 
@@ -42,11 +39,12 @@ public final class InitCreeperBeeSystem implements Listener {
 
         creeper.setAI(false);
         creeper.setRemoveWhenFarAway(false);
+        bee.setAI(true);
+        bee.setAI(true);
         bee.setRemoveWhenFarAway(false);
 
         applyAttributes(creeper);
         applyAttributes(bee);
-        setupBeeGoals(bee, world);
 
         bee.addPassenger(creeper);
 
@@ -73,14 +71,6 @@ public final class InitCreeperBeeSystem implements Listener {
                 scale.setBaseValue(SCALE);
             }
         }
-    }
-
-    private void setupBeeGoals(final Bee bee, final ZombiesWorld world) {
-        final var nmsBee = ((CraftMob) bee).getHandle();
-        nmsBee.goalSelector.removeAllGoals(goal -> true);
-        nmsBee.targetSelector.removeAllGoals(goal -> true);
-        nmsBee.goalSelector.addGoal(0, new FloatGoal(nmsBee));
-        nmsBee.goalSelector.addGoal(1, new BeeRushPlayerGoal(nmsBee, world, BEE_SPEED));
     }
 
     private Attribute getScaleAttribute() {

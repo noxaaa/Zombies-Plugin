@@ -32,6 +32,7 @@ import io.lama06.zombies.system.weapon.shoot.RenderShootLoreSystem;
 import io.lama06.zombies.system.weapon.shoot.SpawnParticlesAfterShotSystem;
 import io.lama06.zombies.system.zombie.*;
 import io.lama06.zombies.system.zombie.break_window.*;
+import io.lama06.zombies.system.zombie.creeper_bee.CreeperBeeChaseSystem;
 import io.lama06.zombies.system.zombie.creeper_bee.InitCreeperBeeSystem;
 import io.lama06.zombies.system.zombie.pathfinding.InitZombieGoalsSystem;
 import io.lama06.zombies.system.zombie.pathfinding.UpdateFlowFieldSystem;
@@ -180,6 +181,7 @@ public final class Systems {
             new SpawnZombiesSystem(),
             new PreventMagmaSplitSystem(),
             new InitCreeperBeeSystem(),
+            new CreeperBeeChaseSystem(),
 
             // Break Window
             new CancelMovementDuringWindowBreakingSystem(),
