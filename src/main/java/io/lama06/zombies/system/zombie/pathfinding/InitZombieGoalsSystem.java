@@ -3,6 +3,7 @@ package io.lama06.zombies.system.zombie.pathfinding;
 import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieData;
+import io.lama06.zombies.zombie.ZombieType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -27,6 +28,7 @@ public final class InitZombieGoalsSystem implements Listener {
 
         final var nmsMob = ((CraftMob) bukkitMob).getHandle();
         final ZombieData data = zombie.getData();
+        final ZombieType type = zombie.getType();
 
         // Clear all vanilla goals
         nmsMob.goalSelector.removeAllGoals(goal -> true);
@@ -42,6 +44,10 @@ public final class InitZombieGoalsSystem implements Listener {
 
         // 0. Float in water (basic behavior)
         nmsMob.goalSelector.addGoal(0, new FloatGoal(nmsMob));
+
+        if (type == ZombieType.SUICIDER) {
+            return;
+        }
 
         // 1. Window breaking (highest priority - must break window before doing anything else)
         if (data.breakWindow != null) {

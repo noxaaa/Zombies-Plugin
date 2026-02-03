@@ -143,6 +143,14 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setMeleeDamage(6)
                     .setDefense(5)
     ),
+    SUICIDER(
+            new ZombieData()
+                    .setEntity(EntityType.CREEPER)
+                    .setHealth(20)
+                    .setKnockbackResistance(1.0)
+                    .setDefense(0)
+                    .setExplosionAttack(new ExplosionAttackData(0, false, 4))
+    ),
     BOMBIE(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
@@ -175,6 +183,7 @@ public enum ZombieType implements MenuDisplayableEnum {
             case FIRE_ZOMBIE, INFERNO -> Material.BLAZE_ROD;
             case ZOMBIE_WOLF -> Material.BONE;
             case GUARDIAN_ZOMBIE -> Material.SEA_LANTERN;
+            case SUICIDER -> Material.BEE_SPAWN_EGG;
         };
     }
 
