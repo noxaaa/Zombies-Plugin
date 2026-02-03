@@ -5,16 +5,15 @@ import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.util.pdc.UuidDataType;
-import com.destroystokyo.paper.entity.Pathfinder;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.util.Vector;
+import org.bukkit.craftbukkit.entity.CraftMob;
 
 import java.util.Comparator;
 import java.util.List;
@@ -51,13 +50,20 @@ public final class CreeperBeeChaseSystem implements Listener {
                     continue;
                 }
                 boolean moved = false;
-                if (bee instanceof final Mob mob) {
-                    final Pathfinder pathfinder = mob.getPathfinder();
-                    final Pathfinder.PathResult path = pathfinder.findPath(target.getLocation());
-                    if (path != null) {
-                        pathfinder.moveTo(target.getLocation());
-                        moved = true;
-                    }
+                if (bee instanceof final CraftMob craftMob) {
+                    final var nmsMob = craftMob.getHandle();
+                    nmsMob.getLookControl().setLookAt(
+                            target.getLocation().getX(),
+                            target.getLocation().getY() + 1,
+                            target.getLocation().getZ()
+                    );
+                    nmsMob.getNavigation().moveTo(
+                            target.getLocation().getX(),
+                            target.getLocation().getY(),
+                            target.getLocation().getZ(),
+                            SPEED
+                    );
+                    moved = true;
                 }
                 if (!moved) {
                     final Vector velocity = toTarget.normalize().multiply(SPEED);
