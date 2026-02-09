@@ -22,6 +22,7 @@ public final class WorldConfig implements CheckableConfig {
     public final List<Window> windows = new ArrayList<>();
     public final List<WeaponShop> weaponShops = new ArrayList<>();
     public final List<ArmorShop> armorShops = new ArrayList<>();
+    public final List<UpgradeableArmorShop> upgradeableArmorShops = new ArrayList<>();
     public final List<AmmoShop> ammoShops = new ArrayList<>();
     public final List<LuckyChest> luckyChests = new ArrayList<>();
     public int luckyChestMoveAfterUses = 0;  // 0 = 不移动
@@ -45,6 +46,7 @@ public final class WorldConfig implements CheckableConfig {
         InvalidConfigException.checkList(windows, false, "windows");
         InvalidConfigException.checkList(weaponShops, true, "weapon shops");
         InvalidConfigException.checkList(armorShops, true, "armor shops");
+        InvalidConfigException.checkList(upgradeableArmorShops, true, "upgradeable armor shops");
         InvalidConfigException.checkList(ammoShops, true, "ammo shops");
         InvalidConfigException.checkList(luckyChests, true, "lucky chests");
         InvalidConfigException.checkList(perkMachines, true, "perk machines");
@@ -145,6 +147,20 @@ public final class WorldConfig implements CheckableConfig {
                                 shop -> Component.text("Armor Shop: ").append(shop.quality.getDisplayName())
                                         .appendSpace().append(shop.part.getDisplayName()),
                                 ArmorShop::new,
+                                shop -> shop.openMenu(player, reopen),
+                                reopen
+                        )
+                ),
+                new SelectionEntry(
+                        Component.text("Upgradeable Armor Shops (" + upgradeableArmorShops.size() + ")"),
+                        Material.DIAMOND_CHESTPLATE,
+                        () -> ListConfigMenu.open(
+                                player,
+                                Component.text("Upgradeable Armor Shops"),
+                                upgradeableArmorShops,
+                                Material.DIAMOND_CHESTPLATE,
+                                shop -> Component.text("Upgradeable Armor Shop: " + PositionUtil.format(shop.position)),
+                                UpgradeableArmorShop::new,
                                 shop -> shop.openMenu(player, reopen),
                                 reopen
                         )

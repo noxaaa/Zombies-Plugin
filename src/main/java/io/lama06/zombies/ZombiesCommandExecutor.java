@@ -508,6 +508,20 @@ public final class ZombiesCommandExecutor implements TabExecutor {
                 errors.add(armorShop.position);
             }
         }
+        final UpgradeableArmorShop.Upgrade firstUpgrade = UpgradeableArmorShop.getUpgradeByPurchaseCount(0);
+        for (final UpgradeableArmorShop upgradeableArmorShop : config.upgradeableArmorShops) {
+            if (upgradeableArmorShop.position == null || firstUpgrade == null) {
+                continue;
+            }
+            final boolean ok = placeSign(this::getShopSignPosition, world.getBukkit(), upgradeableArmorShop.position, List.of(
+                    Component.text("Upgradeable").color(NamedTextColor.GREEN),
+                    firstUpgrade.displayName,
+                    Component.text(firstUpgrade.price + " Gold").color(NamedTextColor.GOLD)
+            ));
+            if (!ok) {
+                errors.add(upgradeableArmorShop.position);
+            }
+        }
         for (final WeaponShop weaponShop : config.weaponShops) {
             if (weaponShop.position == null || weaponShop.weaponType == null) {
                 continue;
