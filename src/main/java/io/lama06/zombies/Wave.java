@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public final class Wave {
     public int delayTicks;
@@ -21,23 +22,25 @@ public final class Wave {
     public Map<ZombieType, Double> zombieDefense = new HashMap<>(); // 每种僵尸的防御力覆盖, 0或不存在 = 使用默认防御力
 
     public int getTotalZombies() {
-        return zombies.values().stream().mapToInt(i -> i).sum();
+        return zombies.values().stream()
+                .mapToInt(count -> Objects.requireNonNullElse(count, 0))
+                .sum();
     }
 
     public int getHealthForType(final ZombieType type) {
-        return zombieHealth.getOrDefault(type, 0);
+        return Objects.requireNonNullElse(zombieHealth.get(type), 0);
     }
 
     public double getSpeedForType(final ZombieType type) {
-        return zombieSpeed.getOrDefault(type, 0.0);
+        return Objects.requireNonNullElse(zombieSpeed.get(type), 0.0);
     }
 
     public double getDamageForType(final ZombieType type) {
-        return zombieDamage.getOrDefault(type, 0.0);
+        return Objects.requireNonNullElse(zombieDamage.get(type), 0.0);
     }
 
     public double getDefenseForType(final ZombieType type) {
-        return zombieDefense.getOrDefault(type, 0.0);
+        return Objects.requireNonNullElse(zombieDefense.get(type), 0.0);
     }
 
     public void openMenu(final Player player, final Runnable callback) {
@@ -111,13 +114,14 @@ public final class Wave {
 
         for (final var entry : zombies.entrySet()) {
             final ZombieType type = entry.getKey();
-            final int count = entry.getValue();
+            final int count = Objects.requireNonNullElse(entry.getValue(), 0);
+            final String typeName = getTypeName(type);
             entries.add(new SelectionEntry(
-                    Component.text(type.name() + ": " + count),
-                    type.getDisplayMaterial(),
+                    formatTypeValue(type, count),
+                    getTypeMaterial(type),
                     () -> InputMenu.open(
                             player,
-                            Component.text(type.name() + " Count"),
+                            Component.text(typeName + " Count"),
                             count,
                             new IntegerInputType(),
                             newCount -> {
@@ -169,13 +173,14 @@ public final class Wave {
 
         for (final var entry : zombieHealth.entrySet()) {
             final ZombieType type = entry.getKey();
-            final int health = entry.getValue();
+            final int health = Objects.requireNonNullElse(entry.getValue(), 0);
+            final String typeName = getTypeName(type);
             entries.add(new SelectionEntry(
-                    Component.text(type.name() + ": " + health + " HP"),
-                    Material.RED_DYE,
+                    formatTypeValue(type, health + " HP"),
+                    getTypeMaterial(type),
                     () -> InputMenu.open(
                             player,
-                            Component.text(type.name() + " Health"),
+                            Component.text(typeName + " Health"),
                             health,
                             new IntegerInputType(1, null),
                             newHealth -> {
@@ -223,13 +228,14 @@ public final class Wave {
 
         for (final var entry : zombieSpeed.entrySet()) {
             final ZombieType type = entry.getKey();
-            final double speed = entry.getValue();
+            final double speed = Objects.requireNonNullElse(entry.getValue(), 0.0);
+            final String typeName = getTypeName(type);
             entries.add(new SelectionEntry(
-                    Component.text(type.name() + ": " + speed),
-                    Material.FEATHER,
+                    formatTypeValue(type, speed),
+                    getTypeMaterial(type),
                     () -> InputMenu.open(
                             player,
-                            Component.text(type.name() + " Speed"),
+                            Component.text(typeName + " Speed"),
                             speed,
                             new DoubleInputType(0.0, 10.0),
                             newSpeed -> {
@@ -277,13 +283,14 @@ public final class Wave {
 
         for (final var entry : zombieDamage.entrySet()) {
             final ZombieType type = entry.getKey();
-            final double damage = entry.getValue();
+            final double damage = Objects.requireNonNullElse(entry.getValue(), 0.0);
+            final String typeName = getTypeName(type);
             entries.add(new SelectionEntry(
-                    Component.text(type.name() + ": " + damage + " dmg"),
-                    Material.IRON_SWORD,
+                    formatTypeValue(type, damage + " dmg"),
+                    getTypeMaterial(type),
                     () -> InputMenu.open(
                             player,
-                            Component.text(type.name() + " Damage"),
+                            Component.text(typeName + " Damage"),
                             damage,
                             new DoubleInputType(0.0, 100.0),
                             newDamage -> {
@@ -331,13 +338,14 @@ public final class Wave {
 
         for (final var entry : zombieDefense.entrySet()) {
             final ZombieType type = entry.getKey();
-            final double defense = entry.getValue();
+            final double defense = Objects.requireNonNullElse(entry.getValue(), 0.0);
+            final String typeName = getTypeName(type);
             entries.add(new SelectionEntry(
-                    Component.text(type.name() + ": " + defense + " def"),
-                    Material.SHIELD,
+                    formatTypeValue(type, defense + " def"),
+                    getTypeMaterial(type),
                     () -> InputMenu.open(
                             player,
-                            Component.text(type.name() + " Defense"),
+                            Component.text(typeName + " Defense"),
                             defense,
                             new DoubleInputType(0.0, 20.0),
                             newDefense -> {
@@ -355,5 +363,18 @@ public final class Wave {
         }
 
         SelectionMenu.open(player, Component.text("Defense Overrides"), callback, entries.toArray(SelectionEntry[]::new));
+    }
+
+    private static String getTypeName(final ZombieType type) {
+        return type == null ? "INVALID_ZOMBIE_TYPE" : type.name();
+    }
+
+    private static Material getTypeMaterial(final ZombieType type) {
+        return type == null ? Material.BARRIER : type.getDisplayMaterial();
+    }
+
+    private static Component formatTypeValue(final ZombieType type, final Object value) {
+        final Component text = Component.text(getTypeName(type) + ": " + value);
+        return type == null ? text.color(NamedTextColor.RED) : text;
     }
 }
