@@ -40,6 +40,11 @@ public final class RespawnDeadPlayersAfterRoundSystem implements Listener {
                     bukkit.getInventory().setItem(slot, PlaceholderItem.createWeaponPlaceholder(slot));
                 }
             }
+
+            final ItemStack offhand = bukkit.getInventory().getItemInOffHand();
+            if (offhand == null || offhand.getType() == Material.AIR) {
+                bukkit.getInventory().setItemInOffHand(PlaceholderItem.createOffhandPlaceholder());
+            }
         }
     }
 }

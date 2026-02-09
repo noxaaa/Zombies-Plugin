@@ -39,6 +39,15 @@ public final class PlaceholderItem {
         return item;
     }
 
+    public static ItemStack createOffhandPlaceholder() {
+        final ItemStack item = new ItemStack(Material.GRAY_DYE);
+        final ItemMeta meta = item.getItemMeta();
+        meta.displayName(Component.text("Offhand (Empty)").color(NamedTextColor.GRAY));
+        meta.getPersistentDataContainer().set(IS_PLACEHOLDER_KEY, PersistentDataType.BOOLEAN, true);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public static boolean isPlaceholder(final ItemStack item) {
         if (item == null || item.getType() == Material.AIR) {
             return false;

@@ -1,5 +1,7 @@
 package io.lama06.zombies.system.player.revive;
 
+import io.lama06.zombies.PlaceholderItem;
+import io.lama06.zombies.TotemFragmentItem;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
@@ -8,13 +10,18 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -47,6 +54,27 @@ public final class SpawnPlayerCorpseSystem implements Listener {
         final double healthAfterDamage = bukkit.getHealth() - event.getFinalDamage();
         if (healthAfterDamage > 0) {
             return; // Not fatal, let normal damage happen
+        }
+
+        if (consumeTotemFragment(player)) {
+            event.setCancelled(true);
+            bukkit.setHealth(1);
+            bukkit.setAbsorptionAmount(Math.max(bukkit.getAbsorptionAmount(), 4));
+            bukkit.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 5 * 20, 0));
+            bukkit.playEffect(EntityEffect.TOTEM_RESURRECT);
+            bukkit.playSound(bukkit.getLocation(), Sound.ITEM_TOTEM_USE, 1.0f, 1.0f);
+            bukkit.setInvulnerable(true);
+            Bukkit.getScheduler().runTaskLater(
+                    ZombiesPlugin.INSTANCE,
+                    () -> {
+                        if (bukkit.isOnline()) {
+                            bukkit.setInvulnerable(false);
+                        }
+                    },
+                    30L
+            );
+            player.sendMessage(Component.text("Totem Fragment activated!").color(NamedTextColor.GOLD));
+            return;
         }
 
         // Cancel the fatal damage - player enters "downed" state instead of dying
@@ -106,6 +134,16 @@ public final class SpawnPlayerCorpseSystem implements Listener {
                 triggerGameOver(world);
             }
         });
+    }
+
+    private boolean consumeTotemFragment(final ZombiesPlayer player) {
+        final Player bukkit = player.getBukkit();
+        final ItemStack offhandItem = bukkit.getInventory().getItemInOffHand();
+        if (!TotemFragmentItem.isTotemFragment(offhandItem)) {
+            return false;
+        }
+        bukkit.getInventory().setItemInOffHand(PlaceholderItem.createOffhandPlaceholder());
+        return true;
     }
 
     private void triggerGameOver(final ZombiesWorld world) {

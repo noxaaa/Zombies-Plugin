@@ -1,5 +1,7 @@
 package io.lama06.zombies.system.player;
 
+import io.lama06.zombies.PlaceholderItem;
+import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.weapon.WeaponType;
@@ -32,7 +34,17 @@ public final class HandleNewPlayersSystem implements Listener {
         player.set(ZombiesPlayer.GAME_ID, worldGameId);
         player.set(ZombiesPlayer.GOLD, 0);
         player.set(ZombiesPlayer.KILLS, 0);
+        final WorldConfig config = world.getConfig();
         player.giveWeapon(0, WeaponType.KNIFE);
         player.giveWeapon(1, WeaponType.PISTOL);
+        bukkit.getInventory().setItem(2, PlaceholderItem.createWeaponPlaceholder(2));
+        if (config.defaultWeaponSlots >= 3) {
+            bukkit.getInventory().setItem(3, PlaceholderItem.createWeaponPlaceholder(3));
+        }
+        bukkit.getInventory().setItem(4, PlaceholderItem.createSkillPlaceholder());
+        bukkit.getInventory().setItem(6, PlaceholderItem.createPerkPlaceholder(1));
+        bukkit.getInventory().setItem(7, PlaceholderItem.createPerkPlaceholder(2));
+        bukkit.getInventory().setItem(8, PlaceholderItem.createPerkPlaceholder(3));
+        bukkit.getInventory().setItemInOffHand(PlaceholderItem.createOffhandPlaceholder());
     }
 }

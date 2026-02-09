@@ -91,6 +91,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             bukkit.getInventory().setItem(6, PlaceholderItem.createPerkPlaceholder(1));
             bukkit.getInventory().setItem(7, PlaceholderItem.createPerkPlaceholder(2));
             bukkit.getInventory().setItem(8, PlaceholderItem.createPerkPlaceholder(3));
+            bukkit.getInventory().setItemInOffHand(PlaceholderItem.createOffhandPlaceholder());
         }
 
         // 显示回合1的 Title 和音效
