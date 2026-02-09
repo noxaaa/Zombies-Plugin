@@ -1,6 +1,7 @@
 package io.lama06.zombies.system.player;
 
 import io.lama06.zombies.PlaceholderItem;
+import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.StartRoundEvent;
 import io.lama06.zombies.ZombiesPlayer;
@@ -29,8 +30,11 @@ public final class RespawnDeadPlayersAfterRoundSystem implements Listener {
             bukkit.setHealth(20);
             bukkit.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, PotionEffect.INFINITE_DURATION, 1));
 
-            // Restore empty weapon slot placeholders (slots 1-2, not slot 3 since EXTRA_WEAPON perk is lost)
-            for (int slot = 1; slot <= 2; slot++) {
+            final WorldConfig config = world.getConfig();
+            final int defaultWeaponSlots = config != null ? config.defaultWeaponSlots : 2;
+
+            // Restore empty default weapon slot placeholders.
+            for (int slot = 1; slot <= defaultWeaponSlots; slot++) {
                 final ItemStack item = bukkit.getInventory().getItem(slot);
                 if (item == null || item.getType() == Material.AIR) {
                     bukkit.getInventory().setItem(slot, PlaceholderItem.createWeaponPlaceholder(slot));

@@ -84,6 +84,9 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             player.giveWeapon(0, WeaponType.KNIFE);
             player.giveWeapon(1, WeaponType.PISTOL);
             bukkit.getInventory().setItem(2, PlaceholderItem.createWeaponPlaceholder(2));
+            if (config.defaultWeaponSlots >= 3) {
+                bukkit.getInventory().setItem(3, PlaceholderItem.createWeaponPlaceholder(3));
+            }
             bukkit.getInventory().setItem(4, PlaceholderItem.createSkillPlaceholder());
             bukkit.getInventory().setItem(6, PlaceholderItem.createPerkPlaceholder(1));
             bukkit.getInventory().setItem(7, PlaceholderItem.createPerkPlaceholder(2));

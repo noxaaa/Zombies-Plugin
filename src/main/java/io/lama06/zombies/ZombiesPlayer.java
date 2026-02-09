@@ -74,6 +74,11 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
     }
 
     public int getLastWeaponSlot() {
+        final WorldConfig config = getWorld().getConfig();
+        final int defaultWeaponSlots = config != null ? config.defaultWeaponSlots : 2;
+        if (defaultWeaponSlots >= 3) {
+            return 3;
+        }
         return hasPerk(PlayerPerk.EXTRA_WEAPON) ? 3 : 2;
     }
 

@@ -31,6 +31,7 @@ public final class WorldConfig implements CheckableConfig {
     public BlockPosition teamMachine;
     public BlockPosition ultimateMachine;
     public int ultimateMachinePrice = 5000;
+    public int defaultWeaponSlots = 2;
     public boolean autoStartStop;
     public boolean preventBuilding;
     public double spawnRange = 0; // 0 = unlimited
@@ -47,6 +48,9 @@ public final class WorldConfig implements CheckableConfig {
         InvalidConfigException.checkList(ammoShops, true, "ammo shops");
         InvalidConfigException.checkList(luckyChests, true, "lucky chests");
         InvalidConfigException.checkList(perkMachines, true, "perk machines");
+        if (defaultWeaponSlots < 2 || defaultWeaponSlots > 3) {
+            throw new InvalidConfigException("default weapon slots must be 2 or 3");
+        }
         if (powerSwitch != null) {
             powerSwitch.check();
         }
@@ -263,6 +267,27 @@ public final class WorldConfig implements CheckableConfig {
                                 new IntegerInputType(),
                                 price -> {
                                     this.ultimateMachinePrice = price;
+                                    reopen.run();
+                                },
+                                reopen
+                        )
+                ),
+                new SelectionEntry(
+                        Component.text("Default Weapon Slots: " + defaultWeaponSlots),
+                        Material.IRON_SWORD,
+                        () -> InputMenu.open(
+                                player,
+                                Component.text("Default Weapon Slots (2 or 3)"),
+                                defaultWeaponSlots,
+                                new IntegerInputType(),
+                                slots -> {
+                                    if (slots < 2 || slots > 3) {
+                                        player.sendMessage(Component.text("Default weapon slots must be 2 or 3")
+                                                                   .color(NamedTextColor.RED));
+                                        reopen.run();
+                                        return;
+                                    }
+                                    this.defaultWeaponSlots = slots;
                                     reopen.run();
                                 },
                                 reopen

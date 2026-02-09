@@ -1,6 +1,7 @@
 package io.lama06.zombies.perk;
 
 import io.lama06.zombies.PlaceholderItem;
+import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.data.AttributeId;
 import io.lama06.zombies.menu.MenuDisplayableEnum;
@@ -47,6 +48,9 @@ public enum PlayerPerk implements MenuDisplayableEnum {
     EXTRA_WEAPON(Material.CHEST, Component.text("Extra Weapon").color(NamedTextColor.GREEN)) {
         @Override
         public void enable(final ZombiesPlayer player) {
+            if (hasDefaultThirdWeaponSlot(player)) {
+                return;
+            }
             final ItemStack item = player.getBukkit().getInventory().getItem(3);
             if (item == null || item.getType() == Material.AIR) {
                 player.getBukkit().getInventory().setItem(3, PlaceholderItem.createWeaponPlaceholder(3));
@@ -55,6 +59,9 @@ public enum PlayerPerk implements MenuDisplayableEnum {
 
         @Override
         public void disable(final ZombiesPlayer player) {
+            if (hasDefaultThirdWeaponSlot(player)) {
+                return;
+            }
             final ItemStack item = player.getBukkit().getInventory().getItem(3);
             if (PlaceholderItem.isPlaceholder(item)) {
                 player.getBukkit().getInventory().setItem(3, null);
@@ -77,6 +84,11 @@ public enum PlayerPerk implements MenuDisplayableEnum {
     public void enable(final ZombiesPlayer player) { }
 
     public void disable(final ZombiesPlayer player) { }
+
+    private static boolean hasDefaultThirdWeaponSlot(final ZombiesPlayer player) {
+        final WorldConfig config = player.getWorld().getConfig();
+        return config != null && config.defaultWeaponSlots >= 3;
+    }
 
     @Override
     public Material getDisplayMaterial() {

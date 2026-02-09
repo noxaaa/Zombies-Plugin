@@ -1,6 +1,7 @@
 {
   "startArea": "Alley",
   "spawnRange": 0,
+  "defaultWeaponSlots": 2,
   "doors": [
     {
       "area1": "Alley",
