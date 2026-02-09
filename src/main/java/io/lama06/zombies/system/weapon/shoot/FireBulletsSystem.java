@@ -1,6 +1,7 @@
 package io.lama06.zombies.system.weapon.shoot;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import io.papermc.paper.math.Position;
 import io.lama06.zombies.data.Component;
 import io.lama06.zombies.event.GameEndEvent;
 import io.lama06.zombies.event.player.PlayerAttackZombieEvent;
@@ -14,7 +15,9 @@ import io.lama06.zombies.weapon.ShootData;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.Bukkit;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +34,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.random.RandomGenerator;
 
 public final class FireBulletsSystem implements Listener {
+    private static final double TRACE_EPSILON = 1e-6;
+    private static final double STEP_EPSILON = 1e-4;
     private static final int HOLD_TIMEOUT_TICKS = 4;
 
     private record HoldingState(int weaponSlot, int lastActivityTick) { }
@@ -183,22 +188,46 @@ public final class FireBulletsSystem implements Listener {
         final Set<Entity> hitEntities = new HashSet<>();
         hitEntities.add(player.getBukkit());
 
+        final org.bukkit.World bukkitWorld = player.getWorld().getBukkit();
+        final Vector direction = bullet.direction().clone();
+        if (direction.lengthSquared() <= TRACE_EPSILON) {
+            return;
+        }
+        direction.normalize();
+
         Location rayStart = player.getBukkit().getEyeLocation();
         final double maxDistance = 50;
         double remainingDistance = maxDistance;
 
         for (int i = 0; i < maxTargets && remainingDistance > 0; i++) {
             final double searchDistance = remainingDistance;
-            final RayTraceResult ray = player.getWorld().getBukkit().rayTraceEntities(
+            final RayTraceResult entityRay = bukkitWorld.rayTraceEntities(
                     rayStart,
-                    bullet.direction(),
+                    direction,
                     searchDistance,
                     entity -> !hitEntities.contains(entity) && !(entity instanceof Player)  // Exclude all players
             );
-            if (ray == null) {
+            final RayTraceResult blockRay = bukkitWorld.rayTraceBlocks(
+                    Position.fine(rayStart),
+                    direction,
+                    searchDistance,
+                    FluidCollisionMode.NEVER,
+                    false,
+                    this::isFullBlockCollider
+            );
+
+            final double entityDistance = rayDistance(rayStart, entityRay);
+            final double blockDistance = rayDistance(rayStart, blockRay);
+
+            // Nearest full block blocks the bullet before it can hit an entity.
+            if (blockDistance <= entityDistance + TRACE_EPSILON) {
                 break;
             }
-            final Entity entity = ray.getHitEntity();
+            if (entityRay == null) {
+                break;
+            }
+
+            final Entity entity = entityRay.getHitEntity();
             if (entity == null) {
                 break;
             }
@@ -206,7 +235,7 @@ public final class FireBulletsSystem implements Listener {
             final Zombie zombie = new Zombie(entity);
             if (zombie.isZombie()) {
                 // 判断是否爆头
-                final Vector hitPos = ray.getHitPosition();
+                final Vector hitPos = entityRay.getHitPosition();
                 final BoundingBox box = entity.getBoundingBox();
                 final double headThreshold = box.getMinY() + (box.getHeight() * 0.75);
                 final boolean isHeadshot = hitPos.getY() >= headThreshold;
@@ -215,9 +244,42 @@ public final class FireBulletsSystem implements Listener {
                 event.setHeadshot(isHeadshot);
                 Bukkit.getPluginManager().callEvent(event);
             }
-            final double hitDistance = ray.getHitPosition().distance(rayStart.toVector());
+            final double hitDistance = entityDistance;
             remainingDistance -= hitDistance;
-            rayStart = ray.getHitPosition().toLocation(player.getWorld().getBukkit());
+            if (remainingDistance <= TRACE_EPSILON) {
+                break;
+            }
+            rayStart = entityRay.getHitPosition().toLocation(bukkitWorld)
+                    .add(direction.clone().multiply(STEP_EPSILON));
         }
+    }
+
+    private double rayDistance(final Location start, final RayTraceResult ray) {
+        if (ray == null || ray.getHitPosition() == null) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return ray.getHitPosition().distance(start.toVector());
+    }
+
+    private boolean isFullBlockCollider(final Block block) {
+        final Collection<BoundingBox> boxes = block.getCollisionShape().getBoundingBoxes();
+        if (boxes.size() != 1) {
+            return false;
+        }
+        final BoundingBox box = boxes.iterator().next();
+        return nearlyEquals(box.getWidthX(), 1.0)
+                && nearlyEquals(box.getWidthZ(), 1.0)
+                && nearlyEquals(box.getHeight(), 1.0)
+                && isBlockAligned(box.getMinX())
+                && isBlockAligned(box.getMinY())
+                && isBlockAligned(box.getMinZ());
+    }
+
+    private boolean isBlockAligned(final double value) {
+        return nearlyEquals(value, Math.rint(value));
+    }
+
+    private boolean nearlyEquals(final double a, final double b) {
+        return Math.abs(a - b) <= TRACE_EPSILON;
     }
 }
