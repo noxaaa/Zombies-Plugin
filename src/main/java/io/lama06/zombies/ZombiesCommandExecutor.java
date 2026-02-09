@@ -6,6 +6,7 @@ import io.lama06.zombies.event.player.PlayerCancelCommandEvent;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.perk.GlobalPerk;
 import io.lama06.zombies.perk.PerkMachine;
+import io.lama06.zombies.perk.PerkOffer;
 import io.lama06.zombies.system.perk.global.PerkItem;
 import io.lama06.zombies.util.PositionUtil;
 import io.lama06.zombies.weapon.WeaponType;
@@ -521,13 +522,29 @@ public final class ZombiesCommandExecutor implements TabExecutor {
             }
         }
         for (final PerkMachine perkMachine : config.perkMachines) {
-            if (perkMachine.position == null || perkMachine.perk == null) {
+            if (perkMachine.position == null) {
                 continue;
             }
-            final boolean ok = placeSign(this::getPerkSignPosition, world.getBukkit(), perkMachine.position, List.of(
-                    perkMachine.perk.getDisplayName(),
-                    Component.text(perkMachine.gold + " Gold").color(NamedTextColor.GOLD)
-            ));
+            final List<PerkOffer> offers = perkMachine.getOffers();
+            if (offers.isEmpty()) {
+                continue;
+            }
+            final List<Component> lines;
+            if (offers.size() == 1) {
+                final PerkOffer offer = offers.getFirst();
+                lines = List.of(
+                        offer.perk.getDisplayName(),
+                        Component.text(offer.gold + " Gold").color(NamedTextColor.GOLD)
+                );
+            } else {
+                final int minPrice = offers.stream().mapToInt(offer -> offer.gold).min().orElse(0);
+                lines = List.of(
+                        Component.text("Vending Machine").color(NamedTextColor.AQUA),
+                        Component.text(offers.size() + " Perks").color(NamedTextColor.GRAY),
+                        Component.text("From " + minPrice + " Gold").color(NamedTextColor.GOLD)
+                );
+            }
+            final boolean ok = placeSign(this::getPerkSignPosition, world.getBukkit(), perkMachine.position, lines);
             if (!ok) {
                 errors.add(perkMachine.position);
             }

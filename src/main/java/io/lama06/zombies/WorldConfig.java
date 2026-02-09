@@ -194,14 +194,14 @@ public final class WorldConfig implements CheckableConfig {
                         () -> openLuckyChestItemsMenu(player, reopen)
                 ),
                 new SelectionEntry(
-                        Component.text("Perk Machines"),
+                        Component.text("Vending Machines"),
                         Material.COMMAND_BLOCK,
                         () -> ListConfigMenu.open(
                                 player,
-                                Component.text("Perk Machines"),
+                                Component.text("Vending Machines"),
                                 perkMachines,
                                 Material.COMMAND_BLOCK,
-                                machine -> Component.text("Perk Machine: ").append(machine.perk.getDisplayName()),
+                                PerkMachine::getMenuDisplayName,
                                 PerkMachine::new,
                                 machine -> machine.openMenu(player, reopen),
                                 reopen
