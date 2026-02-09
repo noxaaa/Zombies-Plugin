@@ -28,6 +28,7 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -105,6 +106,15 @@ public final class PreventEventsSystem implements Listener {
     private void onPlayerDropsItem(final PlayerDropItemEvent event) {
         final ZombiesWorld world = new ZombiesWorld(event.getPlayer().getWorld());
         if (!world.isZombiesWorld()) {
+            return;
+        }
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    private void onPlayerSwapHands(final PlayerSwapHandItemsEvent event) {
+        final ZombiesWorld world = new ZombiesWorld(event.getPlayer().getWorld());
+        if (!world.isZombiesWorld() || !world.isGameRunning()) {
             return;
         }
         event.setCancelled(true);
