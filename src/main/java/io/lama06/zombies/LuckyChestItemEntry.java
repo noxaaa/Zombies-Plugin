@@ -1,15 +1,17 @@
 package io.lama06.zombies;
 
 import io.lama06.zombies.menu.MenuDisplayableEnum;
+import io.lama06.zombies.offhand.OffhandItemType;
 import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.weapon.WeaponType;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 
 public final class LuckyChestItemEntry {
-    public String type;  // "WEAPON" or "SKILL"
+    public String type;  // "WEAPON" or "SKILL" or "OFFHAND"
     public WeaponType weapon;
     public SkillType skill;
+    public OffhandItemType offhand;
 
     public LuckyChestItemEntry() {
     }
@@ -24,6 +26,11 @@ public final class LuckyChestItemEntry {
         this.skill = skill;
     }
 
+    public LuckyChestItemEntry(final OffhandItemType offhand) {
+        this.type = "OFFHAND";
+        this.offhand = offhand;
+    }
+
     public boolean isWeapon() {
         return "WEAPON".equals(type);
     }
@@ -32,11 +39,17 @@ public final class LuckyChestItemEntry {
         return "SKILL".equals(type);
     }
 
+    public boolean isOffhand() {
+        return "OFFHAND".equals(type);
+    }
+
     public Component getDisplayName() {
         if (isWeapon() && weapon != null) {
             return weapon.getDisplayName();
         } else if (isSkill() && skill != null) {
             return skill.getDisplayName();
+        } else if (isOffhand() && offhand != null) {
+            return offhand.getDisplayName();
         }
         return Component.text("Unknown");
     }
@@ -46,6 +59,8 @@ public final class LuckyChestItemEntry {
             return weapon.getDisplayMaterial();
         } else if (isSkill() && skill != null) {
             return skill.getDisplayMaterial();
+        } else if (isOffhand() && offhand != null) {
+            return offhand.getDisplayMaterial();
         }
         return Material.BARRIER;
     }
@@ -55,6 +70,8 @@ public final class LuckyChestItemEntry {
             return weapon;
         } else if (isSkill()) {
             return skill;
+        } else if (isOffhand()) {
+            return offhand;
         }
         return null;
     }

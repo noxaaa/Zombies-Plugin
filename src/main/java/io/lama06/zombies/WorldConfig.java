@@ -1,6 +1,7 @@
 package io.lama06.zombies;
 
 import io.lama06.zombies.menu.*;
+import io.lama06.zombies.offhand.OffhandItemType;
 import io.lama06.zombies.perk.PerkMachine;
 import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.PositionUtil;
@@ -372,13 +373,34 @@ public final class WorldConfig implements CheckableConfig {
                 )
         ));
 
+        // 添加副手物品按钮
+        entries.add(new SelectionEntry(
+                Component.text("Add Offhand Item").color(NamedTextColor.LIGHT_PURPLE),
+                Material.TOTEM_OF_UNDYING,
+                () -> EnumSelectionMenu.open(
+                        OffhandItemType.class,
+                        player,
+                        Component.text("Select Offhand Item"),
+                        reopen,
+                        offhandItemType -> {
+                            luckyChestItems.add(new LuckyChestItemEntry(offhandItemType));
+                            reopen.run();
+                        }
+                )
+        ));
+
         // 显示已选物品
         for (int i = 0; i < luckyChestItems.size(); i++) {
             final int index = i;
             final LuckyChestItemEntry item = luckyChestItems.get(i);
-            final Component prefix = item.isWeapon()
-                    ? Component.text("[Weapon] ").color(NamedTextColor.AQUA)
-                    : Component.text("[Skill] ").color(NamedTextColor.GOLD);
+            final Component prefix;
+            if (item.isWeapon()) {
+                prefix = Component.text("[Weapon] ").color(NamedTextColor.AQUA);
+            } else if (item.isSkill()) {
+                prefix = Component.text("[Skill] ").color(NamedTextColor.GOLD);
+            } else {
+                prefix = Component.text("[Offhand] ").color(NamedTextColor.LIGHT_PURPLE);
+            }
             entries.add(new SelectionEntry(
                     prefix.append(item.getDisplayName()),
                     item.getDisplayMaterial(),
@@ -394,7 +416,7 @@ public final class WorldConfig implements CheckableConfig {
         // 提示信息
         if (luckyChestItems.isEmpty()) {
             entries.add(new SelectionEntry(
-                    Component.text("Empty = use default (inLuckyChest)").color(NamedTextColor.GRAY),
+                    Component.text("Empty = use default (weapon/skill/offhand inLuckyChest)").color(NamedTextColor.GRAY),
                     Material.PAPER,
                     () -> {}
             ));

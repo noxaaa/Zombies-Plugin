@@ -5,6 +5,7 @@ import io.lama06.zombies.LuckyChestItemEntry;
 import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.offhand.OffhandItemType;
 import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.WeaponType;
@@ -63,14 +64,14 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 final int newShuffleCount = shuffleCount + 1;
                 pdc.set(LuckyChestItem.getShuffleCountKey(), PersistentDataType.INTEGER, newShuffleCount);
 
-                // 收集所有可用的物品（武器和技能）
+                // 收集所有可用的物品（武器、技能、副手物品）
                 final List<LuckyChestItemEntry> entries = new ArrayList<>();
 
                 if (config != null && !config.luckyChestItems.isEmpty()) {
                     // 使用配置中的物品
                     entries.addAll(config.luckyChestItems);
                 } else {
-                    // 使用默认（所有 inLuckyChest=true 的武器和技能）
+                    // 使用默认（所有 inLuckyChest=true 的武器、技能、副手物品）
                     for (final WeaponType weaponType : WeaponType.values()) {
                         if (weaponType.data.inLuckyChest) {
                             entries.add(new LuckyChestItemEntry(weaponType));
@@ -79,6 +80,11 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                     for (final SkillType skillType : SkillType.values()) {
                         if (skillType.data.inLuckyChest) {
                             entries.add(new LuckyChestItemEntry(skillType));
+                        }
+                    }
+                    for (final OffhandItemType offhandItemType : OffhandItemType.values()) {
+                        if (offhandItemType.isInLuckyChest()) {
+                            entries.add(new LuckyChestItemEntry(offhandItemType));
                         }
                     }
                 }
@@ -92,9 +98,15 @@ public final class ShuffleLuckyChestItemSystem implements Listener {
                 if (entry.isWeapon()) {
                     pdc.set(LuckyChestItem.getWeaponKey(), new EnumPersistentDataType<>(WeaponType.class), entry.weapon);
                     pdc.remove(LuckyChestItem.getSkillKey());
-                } else {
+                    pdc.remove(LuckyChestItem.getOffhandKey());
+                } else if (entry.isSkill()) {
                     pdc.set(LuckyChestItem.getSkillKey(), new EnumPersistentDataType<>(SkillType.class), entry.skill);
                     pdc.remove(LuckyChestItem.getWeaponKey());
+                    pdc.remove(LuckyChestItem.getOffhandKey());
+                } else {
+                    pdc.set(LuckyChestItem.getOffhandKey(), new EnumPersistentDataType<>(OffhandItemType.class), entry.offhand);
+                    pdc.remove(LuckyChestItem.getWeaponKey());
+                    pdc.remove(LuckyChestItem.getSkillKey());
                 }
 
                 // 更新显示（缩小到0.5倍）

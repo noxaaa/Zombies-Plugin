@@ -6,6 +6,7 @@ import io.lama06.zombies.WorldConfig;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.event.player.PlayerGoldChangeEvent;
 import io.lama06.zombies.ZombiesPlayer;
+import io.lama06.zombies.offhand.OffhandItemType;
 import io.lama06.zombies.skill.Skill;
 import io.lama06.zombies.skill.SkillType;
 import io.lama06.zombies.util.pdc.EnumPersistentDataType;
@@ -27,6 +28,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.Material;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -134,11 +136,20 @@ public final class InteractWithLuckyChestSystem implements Listener {
         // 检查物品类型
         final String itemType = pdc.get(LuckyChestItem.getItemTypeKey(), PersistentDataType.STRING);
 
+        if ("WEAPON".equals(itemType)) {
+            claimWeapon(player, world, chest, itemDisplay, pdc, chestIndex);
+            return;
+        }
         if ("SKILL".equals(itemType)) {
             claimSkill(player, world, chest, itemDisplay, pdc, chestIndex);
-        } else {
-            claimWeapon(player, world, chest, itemDisplay, pdc, chestIndex);
+            return;
         }
+        if ("OFFHAND".equals(itemType)) {
+            claimOffhand(player, world, chest, itemDisplay, pdc, chestIndex);
+            return;
+        }
+
+        player.sendMessage(Component.text("Unknown lucky chest item type").color(NamedTextColor.RED));
     }
 
     private void claimWeapon(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest, final ItemDisplay itemDisplay, final PersistentDataContainer pdc, final int chestIndex) {
@@ -218,6 +229,37 @@ public final class InteractWithLuckyChestSystem implements Listener {
         setChestOpen(chest, world.getBukkit(), false);
 
         // 增加使用次数并检查是否需要移动
+        incrementUsesAndMaybeMove(world, chestIndex);
+    }
+
+    private void claimOffhand(final ZombiesPlayer player, final ZombiesWorld world, final LuckyChest chest,
+                              final ItemDisplay itemDisplay, final PersistentDataContainer pdc, final int chestIndex) {
+        final OffhandItemType offhandItemType = pdc.get(LuckyChestItem.getOffhandKey(), new EnumPersistentDataType<>(OffhandItemType.class));
+        if (offhandItemType == null) {
+            return;
+        }
+
+        final ItemStack offhandItem = player.getBukkit().getInventory().getItemInOffHand();
+        if (offhandItemType.matches(offhandItem)) {
+            itemDisplay.remove();
+            player.sendMessage(Component.text("You already have this offhand item").color(NamedTextColor.YELLOW));
+            setChestOpen(chest, world.getBukkit(), false);
+            incrementUsesAndMaybeMove(world, chestIndex);
+            return;
+        }
+
+        final boolean offhandIsEmpty = offhandItem == null
+                || offhandItem.getType() == Material.AIR
+                || PlaceholderItem.isPlaceholder(offhandItem);
+        if (!offhandIsEmpty) {
+            player.sendMessage(Component.text("Offhand slot is occupied").color(NamedTextColor.RED));
+            return;
+        }
+
+        itemDisplay.remove();
+        player.getBukkit().getInventory().setItemInOffHand(offhandItemType.createItem());
+        player.sendMessage(Component.text("You obtained: ").color(NamedTextColor.GREEN).append(offhandItemType.getDisplayName()));
+        setChestOpen(chest, world.getBukkit(), false);
         incrementUsesAndMaybeMove(world, chestIndex);
     }
 

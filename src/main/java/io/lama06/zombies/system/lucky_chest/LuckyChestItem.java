@@ -47,6 +47,10 @@ public final class LuckyChestItem {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_skill");
     }
 
+    public static NamespacedKey getOffhandKey() {
+        return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_offhand");
+    }
+
     public static NamespacedKey getItemTypeKey() {
         return new NamespacedKey(ZombiesPlugin.INSTANCE, "lucky_chest_item_type");
     }
