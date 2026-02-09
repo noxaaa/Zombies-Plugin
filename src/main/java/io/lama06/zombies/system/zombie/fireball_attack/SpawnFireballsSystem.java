@@ -31,6 +31,10 @@ public final class SpawnFireballsSystem implements Listener {
             if (target == null) {
                 continue;
             }
+            if (!mob.hasLineOfSight(target)) {
+                // Keep pressure while blocked; melee/chase goals will path around obstacles.
+                continue;
+            }
             final Vector directionPreNormalization = target.getLocation().clone().subtract(zombie.getEntity().getLocation()).toVector();
             if (directionPreNormalization.isZero()) {
                 // Otherwise, we'd try to normalize the zero vector, which gives (NaN, NaN, NaN)
