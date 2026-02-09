@@ -17,6 +17,8 @@ import java.util.EnumSet;
  */
 public final class ZombieChasePlayerGoal extends Goal {
     private static final double DIRECT_CHASE_DISTANCE_SQ = 25.0; // 5 blocks squared
+    private static final double SLIME_HORIZONTAL_SPEED = 0.22;
+    private static final double SLIME_JUMP_VELOCITY = 0.42;
 
     private final Mob mob;
     private final Zombie zombie;
@@ -59,6 +61,7 @@ public final class ZombieChasePlayerGoal extends Goal {
 
         if (nearestPlayer != null) {
             final Location playerLoc = nearestPlayer.getBukkit().getLocation();
+            Location chaseTarget = playerLoc;
             mob.getLookControl().setLookAt(playerLoc.getX(), playerLoc.getY() + 1, playerLoc.getZ());
 
             final double distanceSq = zombieLoc.distanceSquared(playerLoc);
@@ -68,14 +71,20 @@ public final class ZombieChasePlayerGoal extends Goal {
                 mob.getNavigation().moveTo(playerLoc.getX(), playerLoc.getY(), playerLoc.getZ(), speed);
             } else {
                 // Use flow field for long-distance navigation
-                navigateWithFlowField(zombieLoc, world, playerLoc);
+                chaseTarget = navigateWithFlowField(zombieLoc, world, playerLoc);
+            }
+
+            // Slime/MagmaCube navigation can become idle after replacing vanilla goals.
+            // Apply a directional jump/velocity fallback to guarantee active chasing.
+            if (mob.getBukkitEntity() instanceof org.bukkit.entity.Slime) {
+                moveSlimeTowards(zombieLoc, chaseTarget);
             }
         }
 
         checkStuck();
     }
 
-    private void navigateWithFlowField(final Location zombieLoc, final ZombiesWorld world, final Location playerLoc) {
+    private Location navigateWithFlowField(final Location zombieLoc, final ZombiesWorld world, final Location playerLoc) {
         final Vector direction = FlowFieldManager.INSTANCE.getDirectionToNearestPlayer(zombieLoc, world);
 
         if (direction != null) {
@@ -85,6 +94,7 @@ public final class ZombieChasePlayerGoal extends Goal {
             final double targetZ = mob.getZ() + direction.getZ() * 2;
 
             mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
+            return new Location(world.getBukkit(), targetX, targetY, targetZ);
         } else {
             // Fallback: move towards player direction (won't avoid obstacles, but stuck detection will handle it)
             final Vector toPlayer = playerLoc.toVector().subtract(zombieLoc.toVector()).normalize();
@@ -93,7 +103,20 @@ public final class ZombieChasePlayerGoal extends Goal {
             final double targetZ = mob.getZ() + toPlayer.getZ() * 3;
 
             mob.getNavigation().moveTo(targetX, targetY, targetZ, speed);
+            return new Location(world.getBukkit(), targetX, targetY, targetZ);
         }
+    }
+
+    private void moveSlimeTowards(final Location from, final Location to) {
+        final Vector horizontal = to.toVector().subtract(from.toVector());
+        horizontal.setY(0);
+        if (horizontal.lengthSquared() < 0.0001) {
+            return;
+        }
+
+        horizontal.normalize().multiply(SLIME_HORIZONTAL_SPEED * speed);
+        final double verticalVelocity = mob.onGround() ? SLIME_JUMP_VELOCITY : mob.getDeltaMovement().y;
+        mob.setDeltaMovement(horizontal.getX(), verticalVelocity, horizontal.getZ());
     }
 
     private void checkStuck() {
