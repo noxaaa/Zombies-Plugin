@@ -40,7 +40,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
         world.set(ZombiesWorld.ROUND, 1);
         world.set(ZombiesWorld.OPEN_DOORS, List.of());
         world.set(ZombiesWorld.REACHABLE_AREAS, List.of(config.startArea));
-        world.set(ZombiesWorld.POWER_SWITCH, false);
+        world.set(ZombiesWorld.POWER_SWITCH, config.defaultPowerOn);
         world.set(ZombiesWorld.ROUND_START_TIME, world.getBukkit().getGameTime());
         world.set(ZombiesWorld.TRIGGERED_WAVES, 0);
         world.set(ZombiesWorld.DRAGONS_WRATH_USED, 0);
@@ -65,7 +65,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             door.setOpen(world, false);
         }
         if (config.powerSwitch != null) {
-            config.powerSwitch.setActive(world, false);
+            config.powerSwitch.setActive(world, config.defaultPowerOn);
         }
 
         for (final ZombiesPlayer player : world.getPlayers()) {

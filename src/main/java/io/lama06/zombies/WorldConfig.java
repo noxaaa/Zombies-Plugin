@@ -31,6 +31,7 @@ public final class WorldConfig implements CheckableConfig {
     public BlockPosition teamMachine;
     public BlockPosition ultimateMachine;
     public int ultimateMachinePrice = 5000;
+    public boolean defaultPowerOn;
     public int defaultWeaponSlots = 2;
     public boolean autoStartStop;
     public boolean preventBuilding;
@@ -271,6 +272,14 @@ public final class WorldConfig implements CheckableConfig {
                                 },
                                 reopen
                         )
+                ),
+                new SelectionEntry(
+                        Component.text("Default Power On: " + defaultPowerOn),
+                        Material.REDSTONE_TORCH,
+                        () -> {
+                            defaultPowerOn = !defaultPowerOn;
+                            reopen.run();
+                        }
                 ),
                 new SelectionEntry(
                         Component.text("Default Weapon Slots: " + defaultWeaponSlots),
