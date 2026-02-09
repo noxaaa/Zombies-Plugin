@@ -8,6 +8,7 @@ import io.lama06.zombies.event.weapon.WeaponCreateEvent;
 import io.lama06.zombies.perk.PlayerPerk;
 import io.lama06.zombies.skill.Skill;
 import io.lama06.zombies.skill.SkillType;
+import io.lama06.zombies.util.pdc.EnumPersistentDataType;
 import io.lama06.zombies.weapon.Weapon;
 import io.lama06.zombies.weapon.WeaponType;
 import net.kyori.adventure.audience.Audience;
@@ -33,6 +34,7 @@ import io.papermc.paper.datacomponent.item.blocksattacks.DamageReduction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +44,8 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
     public static final AttributeId<Integer> GAME_ID = new AttributeId<>("game_id", PersistentDataType.INTEGER);
     public static final AttributeId<Integer> GOLD = new AttributeId<>("gold", PersistentDataType.INTEGER);
     public static final AttributeId<Integer> KILLS = new AttributeId<>("kills", PersistentDataType.INTEGER);
+    private static final String REMEMBERED_WEAPON_UPGRADE_PREFIX = "remembered_weapon_upgrade_";
+    private static final EnumPersistentDataType<WeaponType> WEAPON_TYPE_DATA_TYPE = new EnumPersistentDataType<>(WeaponType.class);
 
     private final Player player;
 
@@ -105,16 +109,76 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         return null;
     }
 
+    private static AttributeId<WeaponType> getRememberedWeaponUpgradeAttribute(final WeaponType baseType) {
+        return new AttributeId<>(
+                REMEMBERED_WEAPON_UPGRADE_PREFIX + baseType.name().toLowerCase(Locale.ROOT),
+                WEAPON_TYPE_DATA_TYPE
+        );
+    }
+
+    private static WeaponType getMoreAdvancedWeaponType(final WeaponType first, final WeaponType second) {
+        if (first == null) {
+            return second;
+        }
+        if (second == null) {
+            return first;
+        }
+        if (!first.isSameFamily(second)) {
+            throw new IllegalArgumentException("Weapon types must be from the same family");
+        }
+        WeaponType current = first;
+        while (current != null) {
+            if (current == second) {
+                return second;
+            }
+            current = current.data.upgradesTo;
+        }
+        return first;
+    }
+
+    public WeaponType resolveRememberedWeaponType(final WeaponType requestedType) {
+        final WeaponType baseType = requestedType.getBaseType();
+        final WeaponType rememberedType = get(getRememberedWeaponUpgradeAttribute(baseType));
+        if (rememberedType == null || !rememberedType.isSameFamily(requestedType)) {
+            return requestedType;
+        }
+        return getMoreAdvancedWeaponType(rememberedType, requestedType);
+    }
+
+    public void rememberWeaponUpgrade(final WeaponType type) {
+        final WeaponType baseType = type.getBaseType();
+        if (type == baseType) {
+            return;
+        }
+        final AttributeId<WeaponType> attribute = getRememberedWeaponUpgradeAttribute(baseType);
+        final WeaponType rememberedType = get(attribute);
+        if (rememberedType == null || !rememberedType.isSameFamily(type)) {
+            set(attribute, type);
+            return;
+        }
+        set(attribute, getMoreAdvancedWeaponType(rememberedType, type));
+    }
+
+    public void clearRememberedWeaponUpgrades() {
+        for (final WeaponType type : WeaponType.values()) {
+            if (type.getBaseType() != type) {
+                continue;
+            }
+            remove(getRememberedWeaponUpgradeAttribute(type));
+        }
+    }
+
     public Weapon giveWeapon(final int slot, final WeaponType type) {
-        final ItemStack item = new ItemStack(type.data.material);
+        final WeaponType resolvedType = resolveRememberedWeaponType(type);
+        final ItemStack item = new ItemStack(resolvedType.data.material);
         final ItemMeta meta = item.getItemMeta();
-        meta.displayName(type.data.displayName);
-        if (type.data.glowing) {
+        meta.displayName(resolvedType.data.displayName);
+        if (resolvedType.data.glowing) {
             meta.addEnchant(Enchantment.UNBREAKING, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
         // 近战武器设置超高攻击速度（移除原版攻击冷却）并设为不可损坏
-        if (type.data.melee != null) {
+        if (resolvedType.data.melee != null) {
             meta.addAttributeModifier(
                     Attribute.ATTACK_SPEED,
                     new AttributeModifier(
@@ -130,7 +194,7 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         }
         item.setItemMeta(meta);
         // 近战武器添加格挡功能（减少50%伤害）
-        if (type.data.melee != null) {
+        if (resolvedType.data.melee != null) {
             item.setData(DataComponentTypes.BLOCKS_ATTACKS, BlocksAttacks.blocksAttacks()
                     .blockDelaySeconds(0)
                     .addDamageReduction(DamageReduction.damageReduction()
@@ -142,8 +206,9 @@ public final class ZombiesPlayer extends Storage implements ForwardingAudience {
         inventory.setItem(slot, item);
         final Weapon weapon = new Weapon(this, slot);
         weapon.set(Weapon.IS_WEAPON, true);
-        weapon.set(Weapon.TYPE, type);
-        Bukkit.getPluginManager().callEvent(new WeaponCreateEvent(weapon, type.data));
+        weapon.set(Weapon.TYPE, resolvedType);
+        Bukkit.getPluginManager().callEvent(new WeaponCreateEvent(weapon, resolvedType.data));
+        rememberWeaponUpgrade(resolvedType);
         return weapon;
     }
 

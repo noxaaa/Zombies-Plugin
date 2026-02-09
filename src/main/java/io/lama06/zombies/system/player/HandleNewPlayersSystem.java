@@ -19,6 +19,7 @@ public final class HandleNewPlayersSystem implements Listener {
         final Integer playerGameId = player.get(ZombiesPlayer.GAME_ID);
         final ZombiesWorld world = player.getWorld();
         if (!world.isGameRunning()) {
+            player.clearRememberedWeaponUpgrades();
             bukkit.setGameMode(GameMode.ADVENTURE);
             bukkit.teleport(world.getBukkit().getSpawnLocation());
             bukkit.getInventory().clear();
@@ -34,6 +35,7 @@ public final class HandleNewPlayersSystem implements Listener {
         player.set(ZombiesPlayer.GAME_ID, worldGameId);
         player.set(ZombiesPlayer.GOLD, 0);
         player.set(ZombiesPlayer.KILLS, 0);
+        player.clearRememberedWeaponUpgrades();
         final WorldConfig config = world.getConfig();
         player.giveWeapon(0, WeaponType.KNIFE);
         player.giveWeapon(1, WeaponType.PISTOL);

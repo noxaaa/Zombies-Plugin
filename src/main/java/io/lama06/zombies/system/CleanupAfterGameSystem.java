@@ -93,6 +93,7 @@ public final class CleanupAfterGameSystem implements Listener {
             player.remove(ZombiesPlayer.GAME_ID);
             player.remove(ZombiesPlayer.GOLD);
             player.remove(ZombiesPlayer.KILLS);
+            player.clearRememberedWeaponUpgrades();
             player.clearPerks();
             final Player playerBukkit = player.getBukkit();
             playerBukkit.setGameMode(GameMode.ADVENTURE);

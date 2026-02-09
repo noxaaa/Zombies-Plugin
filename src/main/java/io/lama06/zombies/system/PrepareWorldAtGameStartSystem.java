@@ -72,6 +72,7 @@ public final class PrepareWorldAtGameStartSystem implements Listener {
             player.set(ZombiesPlayer.GAME_ID, gameId);
             player.set(ZombiesPlayer.KILLS, 0);
             player.set(ZombiesPlayer.GOLD, 0);
+            player.clearRememberedWeaponUpgrades();
             final Player bukkit = player.getBukkit();
             bukkit.getInventory().clear();
             bukkit.teleport(world.getBukkit().getSpawnLocation());
