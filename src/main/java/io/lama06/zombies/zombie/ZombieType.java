@@ -92,6 +92,14 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setMeleeDamage(2)
                     .setDefense(0)
     ),
+    SLIME_BLOB(
+            new ZombieData()
+                    .setEntity(EntityType.SLIME)
+                    .setHealth(25)
+                    .setInitializer(entity -> ((Slime) entity).setSize(1))
+                    .setMeleeDamage(3)
+                    .setDefense(0)
+    ),
     MAGMA_ZOMBIE(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
@@ -204,6 +212,7 @@ public enum ZombieType implements MenuDisplayableEnum {
             case NORMAL_EASY, NORMAL_MEDIUM, NORMAL_HARD -> Material.ZOMBIE_HEAD;
             case PIG_ZOMBIE -> Material.PIGLIN_HEAD;
             case MAGMA_CUBE, MAGMA_ZOMBIE -> Material.MAGMA_CREAM;
+            case SLIME_BLOB -> Material.SLIME_BALL;
             case LITTLE_BOMBIE, BOMBIE -> Material.TNT;
             case FIRE_ZOMBIE, INFERNO -> Material.BLAZE_ROD;
             case ZOMBIE_WOLF -> Material.BONE;

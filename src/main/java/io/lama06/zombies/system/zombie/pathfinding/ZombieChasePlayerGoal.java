@@ -19,12 +19,14 @@ public final class ZombieChasePlayerGoal extends Goal {
     private static final double DIRECT_CHASE_DISTANCE_SQ = 25.0; // 5 blocks squared
     private static final double SLIME_HORIZONTAL_SPEED = 0.22;
     private static final double SLIME_JUMP_VELOCITY = 0.42;
+    private static final int SLIME_JUMP_COOLDOWN_TICKS = 5 * 20;
 
     private final Mob mob;
     private final Zombie zombie;
     private final double speed;
     private int stuckTicks;
     private double lastX, lastY, lastZ;
+    private int nextSlimeJumpTick;
 
     public ZombieChasePlayerGoal(final Mob mob, final Zombie zombie, final double speed) {
         this.mob = mob;
@@ -42,6 +44,7 @@ public final class ZombieChasePlayerGoal extends Goal {
     @Override
     public void start() {
         stuckTicks = 0;
+        nextSlimeJumpTick = 0;
         recordPosition();
     }
 
@@ -115,8 +118,16 @@ public final class ZombieChasePlayerGoal extends Goal {
         }
 
         horizontal.normalize().multiply(SLIME_HORIZONTAL_SPEED * speed);
-        final double verticalVelocity = mob.onGround() ? SLIME_JUMP_VELOCITY : mob.getDeltaMovement().y;
-        mob.setDeltaMovement(horizontal.getX(), verticalVelocity, horizontal.getZ());
+        if (mob.onGround()) {
+            if (mob.tickCount < nextSlimeJumpTick) {
+                return;
+            }
+            nextSlimeJumpTick = mob.tickCount + SLIME_JUMP_COOLDOWN_TICKS;
+            mob.setDeltaMovement(horizontal.getX(), SLIME_JUMP_VELOCITY, horizontal.getZ());
+            return;
+        }
+
+        mob.setDeltaMovement(horizontal.getX(), mob.getDeltaMovement().y, horizontal.getZ());
     }
 
     private void checkStuck() {
@@ -127,7 +138,10 @@ public final class ZombieChasePlayerGoal extends Goal {
 
         if (moved < 0.01) {
             stuckTicks++;
-            if (stuckTicks > 60) { // 3 seconds stuck
+            final int stuckThreshold = mob.getBukkitEntity() instanceof org.bukkit.entity.Slime
+                    ? SLIME_JUMP_COOLDOWN_TICKS + 20
+                    : 60;
+            if (stuckTicks > stuckThreshold) { // 3s for normal mobs, longer for slime-like jump cooldown
                 unstuck();
                 stuckTicks = 0;
             }
