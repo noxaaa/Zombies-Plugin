@@ -53,6 +53,8 @@ public final class Systems {
             new AmmoShopDisplaySystem(),
             new ArmorShopDisplaySystem(),
             new BuyArmorAtShopSystem(),
+            new UpgradeableArmorShopDisplaySystem(),
+            new BuyUpgradeableArmorAtShopSystem(),
             new CleanupAfterGameSystem(),
             new EnablePowerSwitchSystem(),
             new EndGameWhenPlayersDeadSystem(),
