@@ -174,6 +174,7 @@ public final class Systems {
             new InitZombieEquipmentSystem(),
             new InitZombieHealthSystem(),
             new MakeZombiesGlowSystem(),
+            new HalveSkeletonRangedDamageSystem(),
             new OverrideMeleeDamageSystem(),
             new PerformFireAttackSystem(),
             new PreventFireWhenImmuneSystem(),

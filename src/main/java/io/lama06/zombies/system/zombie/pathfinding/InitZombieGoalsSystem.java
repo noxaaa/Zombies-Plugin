@@ -63,7 +63,7 @@ public final class InitZombieGoalsSystem implements Listener {
                     nmsMob,
                     16.0,
                     5.0,
-                    25,
+                    50,
                     (mob, target) -> skeleton.performRangedAttack(target, 1.0F)
             ));
         } else if (nmsMob instanceof final PathfinderMob pathfinderMob) {
