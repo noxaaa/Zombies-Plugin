@@ -8,6 +8,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.player.Player;
 import org.bukkit.DyeColor;
 import org.bukkit.craftbukkit.entity.CraftMob;
@@ -56,8 +57,16 @@ public final class InitZombieGoalsSystem implements Listener {
             ));
         }
 
-        // 2. Melee attack (only activates after window is passable)
-        if (nmsMob instanceof final PathfinderMob pathfinderMob) {
+        // 2. Combat goal (ranged for skeleton type, melee for others)
+        if (type == ZombieType.SKELETON && nmsMob instanceof final AbstractSkeleton skeleton) {
+            nmsMob.goalSelector.addGoal(2, new ZombieRangedAttackGoal(
+                    nmsMob,
+                    16.0,
+                    5.0,
+                    25,
+                    (mob, target) -> skeleton.performRangedAttack(target, 1.0F)
+            ));
+        } else if (nmsMob instanceof final PathfinderMob pathfinderMob) {
             nmsMob.goalSelector.addGoal(2, new MeleeAttackGoal(pathfinderMob, 1.0, false));
         }
 

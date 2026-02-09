@@ -3,6 +3,7 @@ package io.lama06.zombies.zombie;
 import io.lama06.zombies.menu.MenuDisplayableEnum;
 import io.lama06.zombies.util.PlayerHeads;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -10,8 +11,31 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 public enum ZombieType implements MenuDisplayableEnum {
+    SKELETON(
+            new ZombieData()
+                    .setEntity(EntityType.SKELETON)
+                    .addEquipment(EquipmentSlot.HEAD, createCustomPlayerHead(
+                            createUuidFromIntArray(1781922283, -1565044638, -1359055109, -183965397),
+                            "https://textures.minecraft.net/texture/e4af7437af155c37527f349935c4f616237b3f1e69312543c6f310a0047d9210",
+                            "https://namemc.com/skin/1cb2369efd1a2412"
+                    ))
+                    .addEquipment(EquipmentSlot.CHEST, createColoredLeatherArmor(Material.LEATHER_CHESTPLATE, Color.BLACK))
+                    .addEquipment(EquipmentSlot.LEGS, createColoredLeatherArmor(Material.LEATHER_LEGGINGS, Color.BLACK))
+                    .addEquipment(EquipmentSlot.FEET, createColoredLeatherArmor(Material.LEATHER_BOOTS, Color.BLACK))
+                    .addEquipment(EquipmentSlot.HAND, new ItemStack(Material.BOW))
+                    .setBreakWindow(new BreakWindowData(20))
+                    .setHealth(20)
+                    .setDefense(6)
+    ),
     NORMAL_EASY(
             new ZombieData()
                     .setEntity(EntityType.ZOMBIE)
@@ -176,6 +200,7 @@ public enum ZombieType implements MenuDisplayableEnum {
     @Override
     public Material getDisplayMaterial() {
         return switch (this) {
+            case SKELETON -> Material.SKELETON_SKULL;
             case NORMAL_EASY, NORMAL_MEDIUM, NORMAL_HARD -> Material.ZOMBIE_HEAD;
             case PIG_ZOMBIE -> Material.PIGLIN_HEAD;
             case MAGMA_CUBE, MAGMA_ZOMBIE -> Material.MAGMA_CREAM;
@@ -193,5 +218,30 @@ public enum ZombieType implements MenuDisplayableEnum {
         meta.setColor(color);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private static ItemStack createCustomPlayerHead(final UUID profileId, final String textureUrl, final String loreText) {
+        final ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        if (!(item.getItemMeta() instanceof final SkullMeta skullMeta)) {
+            return item;
+        }
+
+        final PlayerProfile profile = Bukkit.createPlayerProfile(profileId, "skeleton_zombie");
+        try {
+            profile.getTextures().setSkin(URI.create(textureUrl).toURL());
+        } catch (final IllegalArgumentException | MalformedURLException ignored) {
+            // Keep default texture if URL is invalid.
+        }
+
+        skullMeta.setOwnerProfile(profile);
+        skullMeta.setLore(List.of(loreText));
+        item.setItemMeta(skullMeta);
+        return item;
+    }
+
+    private static UUID createUuidFromIntArray(final int part0, final int part1, final int part2, final int part3) {
+        final long mostSignificantBits = ((long) part0 << 32) | (part1 & 0xFFFFFFFFL);
+        final long leastSignificantBits = ((long) part2 << 32) | (part3 & 0xFFFFFFFFL);
+        return new UUID(mostSignificantBits, leastSignificantBits);
     }
 }

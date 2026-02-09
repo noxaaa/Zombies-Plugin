@@ -4,6 +4,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -43,11 +44,10 @@ public final class ZombieRangedAttackGoal extends Goal {
             mob.getBoundingBox().inflate(attackRange),
             p -> !p.isSpectator() && p.isAlive()
         );
-        if (!players.isEmpty()) {
-            target = players.get(0);
-            return true;
-        }
-        return false;
+        target = players.stream()
+            .min(Comparator.comparingDouble(mob::distanceToSqr))
+            .orElse(null);
+        return target != null;
     }
 
     @Override
@@ -99,5 +99,10 @@ public final class ZombieRangedAttackGoal extends Goal {
     @Override
     public void stop() {
         target = null;
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 }
