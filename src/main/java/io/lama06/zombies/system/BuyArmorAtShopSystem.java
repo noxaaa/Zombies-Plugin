@@ -82,6 +82,9 @@ public final class BuyArmorAtShopSystem implements Listener {
 
         for (final EquipmentSlot slot : slotsToUpgrade) {
             final ItemStack item = new ItemStack(armorShop.quality.materials.get(slot));
+            final var meta = item.getItemMeta();
+            meta.setUnbreakable(true);
+            item.setItemMeta(meta);
             inventory.setItem(slot, item);
         }
 

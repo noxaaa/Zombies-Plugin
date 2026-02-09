@@ -82,7 +82,11 @@ public final class BuyUpgradeableArmorAtShopSystem implements Listener {
     private void equipArmor(final ZombiesPlayer player, final Map<EquipmentSlot, org.bukkit.Material> armor) {
         final var inventory = player.getBukkit().getInventory();
         for (final Map.Entry<EquipmentSlot, org.bukkit.Material> entry : armor.entrySet()) {
-            inventory.setItem(entry.getKey(), new ItemStack(entry.getValue()));
+            final ItemStack item = new ItemStack(entry.getValue());
+            final var meta = item.getItemMeta();
+            meta.setUnbreakable(true);
+            item.setItemMeta(meta);
+            inventory.setItem(entry.getKey(), item);
         }
     }
 }
