@@ -68,9 +68,7 @@ public final class ZombieRangedAttackGoal extends Goal {
 
         if (!hasLineOfSight) {
             moveToVisiblePosition();
-        } else if (distance < preferredRange * 0.8) {
-            retreatFromTarget();
-        } else if (distance > preferredRange * 1.2) {
+        } else if (distance > attackRange) {
             mob.getNavigation().moveTo(target, 1.0);
         } else {
             mob.getNavigation().stop();
@@ -132,22 +130,6 @@ public final class ZombieRangedAttackGoal extends Goal {
                 mob
         ));
         return hitResult.getType() == HitResult.Type.MISS;
-    }
-
-    private void retreatFromTarget() {
-        final double dx = mob.getX() - target.getX();
-        final double dz = mob.getZ() - target.getZ();
-        final double length = Math.sqrt(dx * dx + dz * dz);
-        if (length > 0) {
-            final double normX = dx / length;
-            final double normZ = dz / length;
-            mob.getNavigation().moveTo(
-                mob.getX() + normX * 3,
-                mob.getY(),
-                mob.getZ() + normZ * 3,
-                1.0
-            );
-        }
     }
 
     @Override
