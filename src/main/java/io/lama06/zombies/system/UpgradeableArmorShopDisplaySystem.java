@@ -324,7 +324,11 @@ public final class UpgradeableArmorShopDisplaySystem implements Listener {
         if (ownerUuid == null) {
             return null;
         }
-        return world.getPlayer(ownerUuid);
+        final Player player = Bukkit.getPlayer(ownerUuid);
+        if (player == null || !player.getWorld().equals(world)) {
+            return null;
+        }
+        return player;
     }
 
     private UUID getOwnerUuid(final PersistentDataContainer pdc) {
