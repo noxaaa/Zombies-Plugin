@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
@@ -29,6 +30,11 @@ public final class SpawnFireballsSystem implements Listener {
             }
             final LivingEntity target = mob.getTarget();
             if (target == null) {
+                continue;
+            }
+            if (target instanceof final Player player &&
+                    ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
+                mob.setTarget(null);
                 continue;
             }
             if (!mob.hasLineOfSight(target)) {

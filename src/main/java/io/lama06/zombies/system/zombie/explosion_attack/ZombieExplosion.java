@@ -1,6 +1,7 @@
 package io.lama06.zombies.system.zombie.explosion_attack;
 
 import io.lama06.zombies.ZombiesWorld;
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.zombie.ExplosionAttackData;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.Particle;
@@ -30,6 +31,9 @@ final class ZombieExplosion {
         final List<Entity> nearbyEntities = zombie.getEntity().getNearbyEntities(DAMAGE_REACH, DAMAGE_REACH, DAMAGE_REACH);
         for (final Entity nearbyEntity : nearbyEntities) {
             if (!(nearbyEntity instanceof final Player player)) {
+                continue;
+            }
+            if (ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
                 continue;
             }
             player.setNoDamageTicks(0);

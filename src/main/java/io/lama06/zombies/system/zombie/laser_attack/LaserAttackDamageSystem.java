@@ -7,6 +7,7 @@ import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Guardian;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -19,6 +20,11 @@ public final class LaserAttackDamageSystem implements Listener {
     private void onEntityDamage(final EntityDamageByEntityEvent event) {
         final Entity damager = event.getDamager();
         if (!(damager instanceof final Guardian guardian)) {
+            return;
+        }
+        if (event.getEntity() instanceof final Player player &&
+                ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
+            event.setCancelled(true);
             return;
         }
         final PersistentDataContainer pdc = guardian.getPersistentDataContainer();

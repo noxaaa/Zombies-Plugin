@@ -1,8 +1,10 @@
 package io.lama06.zombies.system.zombie;
 
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.zombie.FireAttackData;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -19,6 +21,10 @@ public final class PerformFireAttackSystem implements Listener {
             return;
         }
         final Entity entity = event.getEntity();
+        if (entity instanceof final Player player &&
+                ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
+            return;
+        }
         entity.setFireTicks(fireAttackData.ticks());
     }
 }

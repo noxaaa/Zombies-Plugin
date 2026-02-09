@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.event.zombie.ZombieSpawnEvent;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieData;
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.player.Player;
 import org.bukkit.DyeColor;
@@ -73,7 +75,17 @@ public final class InitZombieGoalsSystem implements Listener {
         // 3. Chase player (uses flow field for complex navigation, unlimited range)
         nmsMob.goalSelector.addGoal(3, new ZombieChasePlayerGoal(nmsMob, zombie, 1.0));
 
-        // Target selector: target nearest player
-        nmsMob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(nmsMob, Player.class, true));
+        // Target selector: target nearest non-downed player
+        final TargetingConditions.Selector alivePlayerSelector = (target, level) ->
+                target instanceof Player player && ZombiesPlugin.INSTANCE.getCorpse(player.getUUID()) == null;
+
+        nmsMob.targetSelector.addGoal(1, new NearestAttackableTargetGoal<Player>(
+                nmsMob,
+                Player.class,
+                10,
+                true,
+                false,
+                alivePlayerSelector
+        ));
     }
 }

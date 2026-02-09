@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie;
 
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieData;
@@ -11,7 +12,11 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public final class OverrideMeleeDamageSystem implements Listener {
     @EventHandler
     private void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
+        if (!(event.getEntity() instanceof final Player player)) {
+            return;
+        }
+        if (ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
+            event.setCancelled(true);
             return;
         }
         final ZombiesWorld world = new ZombiesWorld(event.getEntity().getWorld());

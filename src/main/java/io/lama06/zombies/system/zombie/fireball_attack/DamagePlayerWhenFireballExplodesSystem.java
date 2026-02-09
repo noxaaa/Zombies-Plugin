@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie.fireball_attack;
 
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.zombie.FireBallAttackData;
 import io.lama06.zombies.zombie.Zombie;
 import org.bukkit.entity.Entity;
@@ -19,7 +20,11 @@ public final class DamagePlayerWhenFireballExplodesSystem implements Listener {
             return;
         }
         final Entity entity = event.getEntity();
-        if (!(entity instanceof Player)) {
+        if (!(entity instanceof final Player player)) {
+            event.setCancelled(true);
+            return;
+        }
+        if (ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
             event.setCancelled(true);
             return;
         }

@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import io.lama06.zombies.ZombiesPlugin;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +48,7 @@ public final class ZombieRangedAttackGoal extends Goal {
         final List<Player> players = mob.level().getEntitiesOfClass(
             Player.class,
             mob.getBoundingBox().inflate(attackRange),
-            p -> !p.isSpectator() && p.isAlive()
+            this::isAttackableTarget
         );
         target = players.stream()
             .min(Comparator.comparingDouble(mob::distanceToSqr))
@@ -57,7 +58,9 @@ public final class ZombieRangedAttackGoal extends Goal {
 
     @Override
     public void tick() {
-        if (target == null || !target.isAlive()) {
+        if (!isAttackableTarget(target)) {
+            mob.getNavigation().stop();
+            target = null;
             return;
         }
 
@@ -134,7 +137,7 @@ public final class ZombieRangedAttackGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return target != null && target.isAlive() && !target.isSpectator()
+        return isAttackableTarget(target)
             && mob.distanceToSqr(target) < attackRange * attackRange;
     }
 
@@ -146,5 +149,12 @@ public final class ZombieRangedAttackGoal extends Goal {
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
+    }
+
+    private boolean isAttackableTarget(final Player player) {
+        return player != null
+                && player.isAlive()
+                && !player.isSpectator()
+                && ZombiesPlugin.INSTANCE.getCorpse(player.getUUID()) == null;
     }
 }

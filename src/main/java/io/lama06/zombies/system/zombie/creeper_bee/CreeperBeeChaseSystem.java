@@ -5,7 +5,6 @@ import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.util.pdc.UuidDataType;
-import org.bukkit.GameMode;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -76,13 +75,8 @@ public final class CreeperBeeChaseSystem implements Listener {
     }
 
     private List<Player> getTargets(final ZombiesWorld world) {
-        final List<ZombiesPlayer> alive = world.getAlivePlayers();
-        if (!alive.isEmpty()) {
-            return alive.stream().map(ZombiesPlayer::getBukkit).toList();
-        }
-        return world.getBukkit().getPlayers().stream()
-                .filter(player -> player.getGameMode() != GameMode.SPECTATOR)
-                .filter(player -> !player.isDead())
+        return world.getAlivePlayers().stream()
+                .map(ZombiesPlayer::getBukkit)
                 .toList();
     }
 

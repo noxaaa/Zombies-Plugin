@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie;
 
+import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.zombie.Zombie;
 import io.lama06.zombies.zombie.ZombieType;
@@ -14,7 +15,11 @@ import org.bukkit.projectiles.ProjectileSource;
 public final class HalveSkeletonRangedDamageSystem implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player)) {
+        if (!(event.getEntity() instanceof final Player player)) {
+            return;
+        }
+        if (ZombiesPlugin.INSTANCE.getCorpse(player.getUniqueId()) != null) {
+            event.setCancelled(true);
             return;
         }
 

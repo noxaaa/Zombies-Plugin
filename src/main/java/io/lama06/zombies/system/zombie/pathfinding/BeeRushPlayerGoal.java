@@ -1,5 +1,6 @@
 package io.lama06.zombies.system.zombie.pathfinding;
 
+import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesWorld;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -63,9 +64,8 @@ public final class BeeRushPlayerGoal extends Goal {
     }
 
     private List<Player> getTargets() {
-        return world.getBukkit().getPlayers().stream()
-                .filter(player -> player.getGameMode() != org.bukkit.GameMode.SPECTATOR)
-                .filter(player -> !player.isDead())
+        return world.getAlivePlayers().stream()
+                .map(ZombiesPlayer::getBukkit)
                 .toList();
     }
 }

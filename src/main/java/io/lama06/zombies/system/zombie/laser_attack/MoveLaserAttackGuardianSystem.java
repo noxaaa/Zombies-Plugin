@@ -1,6 +1,7 @@
 package io.lama06.zombies.system.zombie.laser_attack;
 
 import com.destroystokyo.paper.event.server.ServerTickEndEvent;
+import io.lama06.zombies.ZombiesPlayer;
 import io.lama06.zombies.ZombiesPlugin;
 import io.lama06.zombies.ZombiesWorld;
 import io.lama06.zombies.data.Component;
@@ -10,9 +11,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Guardian;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 public final class MoveLaserAttackGuardianSystem implements Listener {
@@ -33,6 +36,13 @@ public final class MoveLaserAttackGuardianSystem implements Listener {
                     ? living.getEyeLocation()
                     : zombie.getEntity().getLocation();
             guardian.teleport(zombieHead);
+
+            final Player target = world.getAlivePlayers().stream()
+                    .map(ZombiesPlayer::getBukkit)
+                    .min(Comparator.comparingDouble(player ->
+                            player.getLocation().distanceSquared(zombie.getEntity().getLocation())))
+                    .orElse(null);
+            guardian.setTarget(target);
         }
     }
 }
