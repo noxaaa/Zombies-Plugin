@@ -6,6 +6,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
@@ -99,6 +101,21 @@ public enum ZombieType implements MenuDisplayableEnum {
                     .setInitializer(entity -> ((Slime) entity).setSize(1))
                     .setMeleeDamage(3)
                     .setDefense(0)
+    ),
+    WARDEN(
+            new ZombieData()
+                    .setEntity(EntityType.WARDEN)
+                    .setHealth(200)
+                    .setInitializer(entity -> {
+                        final Warden warden = (Warden) entity;
+                        final AttributeInstance movementSpeed = warden.getAttribute(Attribute.MOVEMENT_SPEED);
+                        if (movementSpeed != null) {
+                            movementSpeed.setBaseValue(1.0);
+                        }
+                    })
+                    .setKnockbackResistance(1.0)
+                    .setMeleeDamage(10)
+                    .setDefense(15)
     ),
     MAGMA_ZOMBIE(
             new ZombieData()
@@ -213,6 +230,7 @@ public enum ZombieType implements MenuDisplayableEnum {
             case PIG_ZOMBIE -> Material.PIGLIN_HEAD;
             case MAGMA_CUBE, MAGMA_ZOMBIE -> Material.MAGMA_CREAM;
             case SLIME_BLOB -> Material.SLIME_BALL;
+            case WARDEN -> Material.SCULK_SHRIEKER;
             case LITTLE_BOMBIE, BOMBIE -> Material.TNT;
             case FIRE_ZOMBIE, INFERNO -> Material.BLAZE_ROD;
             case ZOMBIE_WOLF -> Material.BONE;
