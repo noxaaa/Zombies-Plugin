@@ -110,7 +110,7 @@ public enum ZombieType implements MenuDisplayableEnum {
                         final Warden warden = (Warden) entity;
                         final AttributeInstance movementSpeed = warden.getAttribute(Attribute.MOVEMENT_SPEED);
                         if (movementSpeed != null) {
-                            movementSpeed.setBaseValue(1.0);
+                            movementSpeed.setBaseValue(0.5);
                         }
                     })
                     .setKnockbackResistance(1.0)

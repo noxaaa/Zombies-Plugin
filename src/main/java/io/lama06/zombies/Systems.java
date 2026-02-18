@@ -179,6 +179,7 @@ public final class Systems {
             new MakeZombiesGlowSystem(),
             new HalveSkeletonRangedDamageSystem(),
             new OverrideMeleeDamageSystem(),
+            new KeepWardenAggroSystem(),
             new PreventTargetingDownedPlayersSystem(),
             new PerformFireAttackSystem(),
             new PreventFireWhenImmuneSystem(),
